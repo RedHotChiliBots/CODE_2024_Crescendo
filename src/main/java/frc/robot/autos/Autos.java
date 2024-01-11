@@ -3,8 +3,8 @@ package frc.robot.autos;
 import java.util.List;
 
 import frc.robot.Constants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.ChassisConstants;
+import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.subsystems.Chassis;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -46,7 +46,7 @@ public class Autos {
 	private TrajectoryConfig config = new TrajectoryConfig(
 			Constants.AutoConstants.kMaxSpeedMetersPerSecond,
 			Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-			.setKinematics(Constants.DriveConstants.kDriveKinematics);
+			.setKinematics(Constants.ChassisConstants.kDriveKinematics);
 
 	private ProfiledPIDController thetaController = new ProfiledPIDController(
 			Constants.AutoConstants.kPThetaController, 0, 0,
@@ -75,7 +75,7 @@ public class Autos {
 		swerveControllerCommand = new SwerveControllerCommand(
 				zigzag3Trajectory,
 				chassis::getPose,
-				Constants.DriveConstants.kDriveKinematics,
+				Constants.ChassisConstants.kDriveKinematics,
 				holonomicController,
 				chassis::setModuleStates,
 				chassis);
@@ -90,12 +90,12 @@ public class Autos {
 				// ChassisSpeeds
 				new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live
 						// in your Constants class
-						new PIDConstants(ModuleConstants.kDrivingP,
+						new PIDConstants(SwerveModuleConstants.kDrivingP,
 								0.0, 0.0), // Translation PID constants
-						new PIDConstants(ModuleConstants.kDrivingP,
+						new PIDConstants(SwerveModuleConstants.kDrivingP,
 								0.0, 0.0), // Rotation PID constants
-						DriveConstants.kMaxSpeedMetersPerSecond, // Max module speed, in m/s
-						DriveConstants.kWheelRadius, // Drive base radius in meters. Distance
+						ChassisConstants.kMaxSpeedMetersPerSecond, // Max module speed, in m/s
+						ChassisConstants.kWheelRadius, // Drive base radius in meters. Distance
 						// from robot center to
 						// furthest module.
 						new ReplanningConfig() // Default path replanning config. See the API
@@ -105,7 +105,7 @@ public class Autos {
 				chassis // Reference to this subsystem to set requirements
 		);
 
-		//********************************************
+		// ********************************************
 		// Register Named Commands
 		// Note: Must be done before defining Auto commands
 		// NamedCommands.registerCommand("ZigZag3m", cmdZigZag3m);
@@ -115,18 +115,18 @@ public class Autos {
 		temp = AutoBuilder.isPathfindingConfigured() ? "IS" : "IS NOT";
 		System.out.println("AutoBuilder Pathfinding " + temp + " configured");
 
-		//********************************************
+		// ********************************************
 		// Generate Paths and Path commands
 		pathZigZag3m = PathPlannerPath.fromPathFile("ZigZag3m");
 		cmdZigZag3m = AutoBuilder.followPathWithEvents(pathZigZag3m);
 
-		//********************************************
+		// ********************************************
 		// Generate Auto commands
-		// Note: Named commands used in Auto command must be defined 
-		//		before defining the Auto command
+		// Note: Named commands used in Auto command must be defined
+		// before defining the Auto command
 		cmdAutoZigZag3m = new PathPlannerAuto("ZigZag3m");
 
-		//********************************************
+		// ********************************************
 		// Initialize auto command chooser with auton commands
 		chooser = AutoBuilder.buildAutoChooser();
 
@@ -134,7 +134,7 @@ public class Autos {
 		chooser.addOption("Path ZigZag3Cmd", cmdZigZag3m);
 		chooser.addOption("Auto ZigZag3Cmd", cmdAutoZigZag3m);
 
-		//********************************************
+		// ********************************************
 		// Add Auton Command chooser to Shuffleboard
 		compTab.add("Auton Command", chooser)
 				.withWidget("ComboBox Chooser")
