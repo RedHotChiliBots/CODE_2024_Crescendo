@@ -24,7 +24,55 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final class DriveConstants {
+
+  public static final class OIConstants {
+    public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
+    public static final double kDriveDeadband = 0.05;
+  }
+
+  public static final class CANIdConstants {
+    // Drive/Turn CAN IDs
+    public static final int kRearRightDrivingCanId = 10;
+    public static final int kRearLeftDrivingCanId = 20;
+    public static final int kFrontLeftDrivingCanId = 30;
+    public static final int kFrontRightDrivingCanId = 40;
+
+    public static final int kRearRightTurningCanId = 11;
+    public static final int kRearLeftTurningCanId = 21;
+    public static final int kFrontLeftTurningCanId = 31;
+    public static final int kFrontRightTurningCanId = 41;
+  }
+
+  public static final class DigitalIOConstants {
+
+  }
+
+  public static final class AnalogConstants {
+
+  }
+
+  public static final class MotorConstants {
+    public static final double kVortexFreeSpeedRpm = 6784;
+    public static final double kNeoFreeSpeedRpm = 5676;
+  }
+
+  public static final class IntakeConstants {
+  }
+
+  public static final class HopperConstants {
+  }
+
+  public static final class ShooterConstants {
+  }
+
+  public static final class ClimberConstants {
+  }
+
+  public static final class TrapperConstants {
+  }
+
+  public static final class ChassisConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
     public static final double kMaxSpeedMetersPerSecond = 4.8;
@@ -40,7 +88,7 @@ public final class Constants {
     public static final double kWheelBase = Units.inchesToMeters(24.75);
     // Distance between front and back wheels on robot
     public static final double kWheelRadius = Math.sqrt(2.0 * Math.pow(kWheelBase, 2)) / 2.0;
-    
+
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
         new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
@@ -53,38 +101,31 @@ public final class Constants {
     public static final double kBackLeftChassisAngularOffset = Math.PI;
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
-    // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 30;
-    public static final int kRearLeftDrivingCanId = 20;
-    public static final int kFrontRightDrivingCanId = 40;
-    public static final int kRearRightDrivingCanId = 10;
-
-    public static final int kFrontLeftTurningCanId = 31;
-    public static final int kRearLeftTurningCanId = 21;
-    public static final int kFrontRightTurningCanId = 41;
-    public static final int kRearRightTurningCanId = 11;
-
     public static final boolean kGyroReversed = false;
   }
 
-  public static final class ModuleConstants {
-    // The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
-    // This changes the drive speed of the module (a pinion gear with more teeth will result in a
+  public static final class SwerveModuleConstants {
+    // The MAXSwerve module can be configured with one of three pinion gears: 12T,
+    // 13T, or 14T.
+    // This changes the drive speed of the module (a pinion gear with more teeth
+    // will result in a
     // robot that drives faster).
     public static final int kDrivingMotorPinionTeeth = 14;
 
-    // Invert the turning encoder, since the output shaft rotates in the opposite direction of
+    // Invert the turning encoder, since the output shaft rotates in the opposite
+    // direction of
     // the steering motor in the MAXSwerve Module.
     public static final boolean kTurningEncoderInverted = false;
-    
+
     public static final boolean kTurningMotorInverted = true;
     public static final boolean kDrivingMotorInverted = true;
 
     // Calculations required for driving motor conversion factors and feed forward
-    public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kWheelDiameterMeters = Units.feetToMeters(0.33333);//0.0762;
+    public static final double kDrivingMotorFreeSpeedRps = MotorConstants.kNeoFreeSpeedRpm / 60;
+    public static final double kWheelDiameterMeters = Units.feetToMeters(0.33333);// 0.0762;
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
-    // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
+    // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
+    // teeth on the bevel pinion
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
     public static final double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
         / kDrivingMotorReduction;
@@ -121,11 +162,6 @@ public final class Constants {
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 
-  public static final class OIConstants {
-    public static final int kDriverControllerPort = 0;
-    public static final double kDriveDeadband = 0.05;
-  }
-
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 3;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
@@ -139,9 +175,5 @@ public final class Constants {
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-  }
-
-  public static final class NeoMotorConstants {
-    public static final double kFreeSpeedRpm = 5676;
   }
 }
