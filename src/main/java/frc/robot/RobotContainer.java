@@ -15,6 +15,7 @@ import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Trapper;
+import frc.robot.subsystems.Vision;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -34,11 +35,12 @@ public class RobotContainer {
 	private final Intake intake = new Intake();
 	private final Shooter shooter = new Shooter();
 	private final Trapper trapper = new Trapper();
+	private final Vision vision = new Vision();
 
 	// The driver's controller
 	XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 	XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
-	
+
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
