@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import java.util.List;
+import java.util.Map;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
@@ -58,15 +59,15 @@ public class Vision extends SubsystemBase {
       .withWidget("Text View").withPosition(0, 4).withSize(2, 1).getEntry();
 
   private final GenericEntry sbTargetID = visionTab.addPersistent("Target ID", 0.0)
-      .withWidget("Text View").withPosition(3, 0).withSize(2, 1).getEntry();
+      .withWidget("Text View").withPosition(3, 0).withSize(1, 1).getEntry();
   private final GenericEntry sbHasTargets = visionTab.addPersistent("Has Targets", false)
-      .withWidget("Boolean Box").withPosition(3, 1).withSize(2, 1).getEntry();
+      .withWidget("Boolean Box").withPosition(3, 1).withSize(1, 1).getEntry();
   private final GenericEntry sbHasTarget = visionTab.addPersistent("Has Target", false)
-      .withWidget("Boolean Box").withPosition(3, 2).withSize(2, 1).getEntry();
+      .withWidget("Boolean Box").withPosition(3, 2).withSize(1, 1).getEntry();
   private final GenericEntry sbDistAtTarget = visionTab.addPersistent("Dist At Target", false)
-      .withWidget("Boolean Box").withPosition(3, 3).withSize(2, 1).getEntry();
+      .withWidget("Boolean Box").withPosition(3, 3).withSize(1, 1).getEntry();
   private final GenericEntry sbTurnAtTarget = visionTab.addPersistent("Turn At Target", false)
-      .withWidget("Boolean Box").withPosition(3, 4).withSize(2, 1).getEntry();
+      .withWidget("Boolean Box").withPosition(3, 4).withSize(1, 1).getEntry();
 
   // // Query the latest result from PhotonVision
   // PhotonPipelineResult result = null;
@@ -108,14 +109,17 @@ public class Vision extends SubsystemBase {
     // sbCamera.add
     compTab.addCamera("Camera", VisionConstants.kCameraName,
         "http://photonvision.local:1182/stream.mjpg")
-        .withWidget("Camera Stream").withPosition(7, 3).withSize(6, 6);
-    // .withProperties(Map.of("crosshaircolor", #7cfc00, "showcontrols", false));
+        .withWidget("Camera Stream")
+        .withPosition(7, 2).withSize(4, 4)
+        .withProperties(Map.of("crosshaircolor", "Red", "showcontrols", false));
 
     // // Set driver mode to on.
     // camera.setDriverMode(true);
 
     // // Change pipeline to 2
     // camera.setPipelineIndex(2);
+
+    setTargetId(16);
 
     System.out.println("+++++ Vision Constructor finished +++++");
   }
