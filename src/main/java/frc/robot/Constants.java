@@ -176,4 +176,29 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
+
+  public static final class VisionConstants {
+    public static final String kCameraName = "LimeLight";
+
+    // Constants such as camera and target height stored. Change per robot and goal!
+    public static final double kCameraHeight = Units.inchesToMeters(19.0);
+    public static final double kTargetHeight = Units.inchesToMeters(18.75);
+
+    // Angle between horizontal and the camera.
+    public static final double kCameraPitch = Units.degreesToRadians(0);
+
+    // How far from the target we want to be
+    public static final double kTargetDist = Units.feetToMeters(2);
+
+    public static final double kRange2Rumble = Units.feetToMeters(20.0);
+
+    // PID constants should be tuned per robot
+    public static final double kDistP = 0.6;
+    public static final double kDistI = 0.0;
+    public static final double kDistD = 0.0;
+
+    public static final double kTurnP = 0.03;
+    public static final double kTurnI = 0.0;
+    public static final double kTurnD = 0.0;
+  }
 }
