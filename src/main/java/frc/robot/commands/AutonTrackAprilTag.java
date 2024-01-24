@@ -4,11 +4,11 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Vision;
 
-public class AutonTrackAprilTag extends CommandBase {
+public class AutonTrackAprilTag extends Command {
   Chassis chassis;
   Vision vision;
   int targetId;
