@@ -6,12 +6,6 @@
     "data": {
       "commands": [
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "ZigZag3m"
@@ -20,5 +14,6 @@
       ]
     }
   },
-  "folder": null
+  "folder": null,
+  "choreoAuto": false
 }
