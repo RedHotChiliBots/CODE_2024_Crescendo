@@ -55,7 +55,6 @@ public final class Constants {
   public static final class MotorConstants {
     public static final double kVortexFreeSpeedRpm = 6784;
     public static final double kNeoFreeSpeedRpm = 5676;
-    public static final double k550FreeSpeedRpm = 11000;
   }
 
   public static final class IntakeConstants {
