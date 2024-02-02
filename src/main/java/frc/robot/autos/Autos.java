@@ -117,22 +117,22 @@ public class Autos {
 
 		// ********************************************
 		// Generate Paths and Path commands
-		pathZigZag3m = PathPlannerPath.fromPathFile("ZigZag3m");
-		cmdZigZag3m = AutoBuilder.followPathWithEvents(pathZigZag3m);
+		// pathZigZag3m = PathPlannerPath.fromPathFile("ZigZag3m");
+		// cmdZigZag3m = AutoBuilder.followPathWithEvents(pathZigZag3m);
 
 		// ********************************************
 		// Generate Auto commands
 		// Note: Named commands used in Auto command must be defined
 		// before defining the Auto command
-		cmdAutoZigZag3m = new PathPlannerAuto("ZigZag3m");
+		// cmdAutoZigZag3m = new PathPlannerAuto("ZigZag3m");
 
 		// ********************************************
 		// Initialize auto command chooser with auton commands
 		chooser = AutoBuilder.buildAutoChooser();
 
-		chooser.addOption("Traj ZigZag3Cmd", swerveControllerCommand);
-		chooser.addOption("Path ZigZag3Cmd", cmdZigZag3m);
-		chooser.addOption("Auto ZigZag3Cmd", cmdAutoZigZag3m);
+		// chooser.addOption("Traj ZigZag3Cmd", swerveControllerCommand);
+		// chooser.addOption("Path ZigZag3Cmd", cmdZigZag3m);
+		// chooser.addOption("Auto ZigZag3Cmd", cmdAutoZigZag3m);
 
 		// ********************************************
 		// Add Auton Command chooser to Shuffleboard
