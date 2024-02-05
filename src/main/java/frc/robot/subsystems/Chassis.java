@@ -59,7 +59,7 @@ public class Chassis extends SubsystemBase {
   // ==============================================================
   // Initialize NavX AHRS board
   // Alternatively: I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB
-  private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
+  private final AHRS ahrs = new AHRS(SPI.Port.kMXP);
 
   // The gyro sensor
   // private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
@@ -80,7 +80,7 @@ public class Chassis extends SubsystemBase {
   // Odometry class for tracking robot pose
   // SwerveDriveOdometry m_odometry = new SwerveDriveOdometry( //TODO Remove Odometry
   // ChassisConstants.kDriveKinematics,
-  // Rotation2d.fromDegrees(-m_gyro.getAngle()),
+  // Rotation2d.fromDegrees(-ahrs.getAngle()),
   // new SwerveModulePosition[] {
   // m_frontLeft.getPosition(),
   // m_frontRight.getPosition(),
@@ -140,7 +140,7 @@ public class Chassis extends SubsystemBase {
 
     // Update the odometry in the periodic block
     // m_odometry.update( //TODO Remove Odometry
-    // Rotation2d.fromDegrees(-m_gyro.getAngle()),
+    // Rotation2d.fromDegrees(-ahrs.getAngle()),
     // new SwerveModulePosition[] {
     // m_frontLeft.getPosition(),
     // m_frontRight.getPosition(),
@@ -233,12 +233,12 @@ public class Chassis extends SubsystemBase {
 
   /** Raw gyro yaw (this may not match the field heading!). */
   public Rotation2d getGyroYaw() {
-    return m_gyro.getRotation2d();
+    return ahrs.getRotation2d();
   }
 
   public Rotation2d getAngle() {
     // Negating the angle because WPILib gyros are CW positive.
-    return m_gyro.getRotation2d();
+    return ahrs.getRotation2d();
   }
 
   /**
@@ -257,7 +257,7 @@ public class Chassis extends SubsystemBase {
    */
   // public void resetPose(Pose2d pose) { //TODO Remove Odometry
   // m_odometry.resetPosition(
-  // Rotation2d.fromDegrees(-m_gyro.getAngle()),
+  // Rotation2d.fromDegrees(-ahrs.getAngle()),
   // new SwerveModulePosition[] {
   // m_frontLeft.getPosition(),
   // m_frontRight.getPosition(),
@@ -380,7 +380,7 @@ public class Chassis extends SubsystemBase {
     var swerveModuleStates = ChassisConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
-                Rotation2d.fromDegrees(-m_gyro.getAngle()))
+                Rotation2d.fromDegrees(-ahrs.getAngle()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, ChassisConstants.kMaxSpeedMetersPerSecond);
@@ -434,7 +434,7 @@ public class Chassis extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.reset();
+    ahrs.reset();
   }
 
   /**
@@ -443,7 +443,7 @@ public class Chassis extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Rotation2d.fromDegrees(-m_gyro.getAngle()).getDegrees();
+    return Rotation2d.fromDegrees(-ahrs.getAngle()).getDegrees();
   }
 
   /**
@@ -452,6 +452,6 @@ public class Chassis extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return -m_gyro.getRate() * (ChassisConstants.kGyroReversed ? -1.0 : 1.0);
+    return -ahrs.getRate() * (ChassisConstants.kGyroReversed ? -1.0 : 1.0);
   }
 }
