@@ -31,7 +31,6 @@ public class RobotContainer {
 	private final Chassis chassis = new Chassis();
 	private final Autos auton = new Autos(chassis);
 	// private final Climber climber = new Climber();
-	// private final Feeder hopper = new Feeder();
 	// private final Intake intake = new Intake();
 	// private final Shooter shooter = new Shooter();
 	// private final Trapper trapper = new Trapper();
