@@ -69,12 +69,10 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
   // ==============================================================
   // Initialize NavX AHRS board
   // Alternatively: I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB
-  private final AHRS ahrs = new AHRS(SPI.Port.kMXP);
-
-  private Pose2d robotPose = null;
+  private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
 
   // The gyro sensor
-  // private final ADIS16470_IMU ahrs = new ADIS16470_IMU();
+  // private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
 
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
@@ -105,18 +103,6 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
   private final ShuffleboardTab chassisTab = Shuffleboard.getTab("Chassis");
   private final GenericEntry sbAngle = chassisTab.addPersistent("Angle", 0)
       .withWidget("Text View").withPosition(5, 0).withSize(2, 1).getEntry();
-  private final GenericEntry sbHeading = chassisTab.addPersistent("Heading", 0)
-      .withWidget("Text View").withPosition(5, 1).withSize(2, 1).getEntry();
-  private final GenericEntry sbFusedHeading = chassisTab.addPersistent("FusedHeading", 0)
-      .withWidget("Text View").withPosition(5, 2).withSize(2, 1).getEntry();
-  private final GenericEntry sbPitch = chassisTab.addPersistent("Pitch", 0)
-      .withWidget("Text View").withPosition(4, 0).withSize(1, 1).getEntry();
-  private final GenericEntry sbRoll = chassisTab.addPersistent("Roll", 0)
-      .withWidget("Text View").withPosition(4, 1).withSize(1, 1).getEntry();
-  private final GenericEntry sbYaw = chassisTab.addPersistent("Yaw", 0)
-      .withWidget("Text View").withPosition(4, 2).withSize(1, 1).getEntry();
-  private final GenericEntry sbRotation2d = chassisTab.addPersistent("Rotation2D Angle", 0)
-      .withWidget("Text View").withPosition(4, 3).withSize(2, 1).getEntry();
 
   /** Creates a new DriveSubsystem. */
   public Chassis() {
@@ -157,19 +143,7 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
 
   @Override
   public void periodic() {
-    sbAngle.setDouble(getAngle());
-    sbHeading.setDouble(getHeading());
-    sbYaw.setDouble(getYaw());
-    sbFusedHeading.setDouble(getFusedHeading());
-    sbPitch.setDouble(getPitch());
-    sbRoll.setDouble(getRoll());
-    sbRotation2d.setDouble(getRotation2d().getDegrees());
-
-    // Update the odometry of the swerve drive using the wheel encoders and gyro.
-    poseEstimator.update(getGyroYaw(), getModulePositions());
-
-    // Update the odometry of the swerve drive using the wheel encoders and gyro.
-    poseEstimator.update(getGyroYaw(), getModulePositions());
+    sbAngle.setDouble(getAngle().getDegrees());
 
     // Update the odometry of the swerve drive using the wheel encoders and gyro.
     poseEstimator.update(getGyroYaw(), getModulePositions());
@@ -248,7 +222,7 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
     resetPose(pose, false);
   }
 
-  public void resetPose(Pose2d pose, boolean resetSimPose) { // TODO Add Simulation
+  public void resetPose(Pose2d pose, boolean resetSimPose) { // TODO Add Sim
     // if (resetSimPose) {
     // swerveDriveSim.reset(pose, false);
     // // we shouldnt realistically be resetting pose after startup, but we will
@@ -277,32 +251,7 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
 
   public Rotation2d getRotation2d() {
     // Negating the angle because WPILib gyros are CW positive.
-    return ahrs.getRotation2d();
-  }
-
-  public double getAngle() {
-    // Negating the angle because WPILib gyros are CW positive.
-    return -ahrs.getAngle();
-  }
-
-  public double getYaw() {
-    // Negating the angle because WPILib gyros are CW positive.
-    return -ahrs.getYaw();
-  }
-
-  public double getPitch() {
-    // Negating the angle because WPILib gyros are CW positive.
-    return -ahrs.getPitch();
-  }
-
-  public double getRoll() {
-    // Negating the angle because WPILib gyros are CW positive.
-    return -ahrs.getRoll();
-  }
-
-  public double getFusedHeading() {
-    // Negating the angle because WPILib gyros are CW positive.
-    return -ahrs.getFusedHeading();
+    return m_gyro.getRotation2d();
   }
 
   /**
@@ -444,7 +393,7 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
     var swerveModuleStates = ChassisConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
-                Rotation2d.fromDegrees(getAngle()))
+                Rotation2d.fromDegrees(-m_gyro.getAngle()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, ChassisConstants.kMaxSpeedMetersPerSecond);
@@ -465,7 +414,7 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
   }
 
   /**
-   * Sets the wheels into an X formation to prevent movement.
+   * Stops wheels.
    */
   public void stopChassis() {
     m_frontLeft.setDesiredState(new SwerveModuleState(0, m_frontLeft.getState().angle));
@@ -498,8 +447,7 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    ahrs.reset();
-    ahrs.zeroYaw();
+    m_gyro.reset();
   }
 
   /**
@@ -508,7 +456,7 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Rotation2d.fromDegrees(getAngle()).getDegrees();
+    return Rotation2d.fromDegrees(-m_gyro.getAngle()).getDegrees();
   }
 
   /**
@@ -517,6 +465,6 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return -ahrs.getRate() * (ChassisConstants.kGyroReversed ? -1.0 : 1.0);
+    return -m_gyro.getRate() * (ChassisConstants.kGyroReversed ? -1.0 : 1.0);
   }
 }
