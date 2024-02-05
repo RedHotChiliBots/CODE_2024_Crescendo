@@ -7,20 +7,27 @@ package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+// import edu.wpi.first.math.kinematics.SwerveDriveOdometry;  //TODO Remove Odometry
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+// import edu.wpi.first.math.system.plant.DCMotor;  //TODO Add Simulation
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.WPIUtilJNI;
 //import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+// import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;  //TODO Add Simulation
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.CANIdConstants;
 import frc.robot.Constants.ChassisConstants;
@@ -68,18 +75,20 @@ public class Chassis extends SubsystemBase {
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(ChassisConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
+  // The robot pose estimator for tracking swerve odometry and applying vision
+  // corrections.
+  private final SwerveDrivePoseEstimator poseEstimator;
+
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-      ChassisConstants.kDriveKinematics,
-      // Rotation2d.fromDegrees(getAngle()),
-      getRotation2d(),
-      new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-      },
-      new Pose2d(0.0, 0.0, new Rotation2d(Math.PI/2.0))); //TODO verify starting position
+  // SwerveDriveOdometry m_odometry = new SwerveDriveOdometry( //TODO Remove Odometry
+  // ChassisConstants.kDriveKinematics,
+  // Rotation2d.fromDegrees(-m_gyro.getAngle()),
+  // new SwerveModulePosition[] {
+  // m_frontLeft.getPosition(),
+  // m_frontRight.getPosition(),
+  // m_rearLeft.getPosition(),
+  // m_rearRight.getPosition()
+  // });
 
   // ==============================================================
   // Define Shuffleboard data - Chassis Tab
@@ -102,7 +111,37 @@ public class Chassis extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
   public Chassis() {
     System.out.println("+++++ Starting Chassis Constructor +++++");
-    zeroHeading();
+
+    // Define the standard deviations for the pose estimator, which determine how
+    // fast the pose
+    // estimate converges to the vision measurement. This should depend on the
+    // vision measurement
+    // noise
+    // and how many or how frequently vision measurements are applied to the pose
+    // estimator.
+    var stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
+    var visionStdDevs = VecBuilder.fill(1, 1, 1);
+    poseEstimator = new SwerveDrivePoseEstimator(
+        ChassisConstants.kDriveKinematics,
+        getGyroYaw(),
+        getModulePositions(),
+        new Pose2d(),
+        stateStdDevs,
+        visionStdDevs);
+
+    // ----- Simulation
+    // gyroSim = new ADXRS450_GyroSim(gyro);
+    // swerveDriveSim =
+    // new SwerveDriveSim(
+    // kDriveFF,
+    // DCMotor.getFalcon500(1),
+    // kDriveGearRatio,
+    // kWheelDiameter / 2.0,
+    // kSteerFF,
+    // DCMotor.getFalcon500(1),
+    // kSteerGearRatio,
+    // kinematics);
+
     System.out.println("----- Ending Chassis Constructor -----");
   }
 
@@ -116,16 +155,18 @@ public class Chassis extends SubsystemBase {
     sbRoll.setDouble(getRoll());
     sbRotation2d.setDouble(getRotation2d().getDegrees());
 
+    // Update the odometry of the swerve drive using the wheel encoders and gyro.
+    poseEstimator.update(getGyroYaw(), getModulePositions());
+
     // Update the odometry in the periodic block
-    robotPose = m_odometry.update(
-//        Rotation2d.fromDegrees(getAngle()),
-        getRotation2d(),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        });
+    // m_odometry.update( //TODO Remove Odometry
+    // Rotation2d.fromDegrees(-m_gyro.getAngle()),
+    // new SwerveModulePosition[] {
+    // m_frontLeft.getPosition(),
+    // m_frontRight.getPosition(),
+    // m_rearLeft.getPosition(),
+    // m_rearRight.getPosition()
+    // });
 
     // Add Swerve Drive to SmartDashboard
     SwerveModuleState[] currentStates = new SwerveModuleState[4];
@@ -145,7 +186,77 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putNumberArray("swerve/status", stateAdv);
   }
 
-  public Rotation2d getRotation2d() {
+  /**
+   * Get the SwerveModulePosition of each swerve module (position, angle). The
+   * returned array order
+   * matches the kinematics module order.
+   */
+  public SwerveModulePosition[] getModulePositions() {
+    return new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+    };
+  }
+
+  /**
+   * See {@link SwerveDrivePoseEstimator#addVisionMeasurement(Pose2d, double)}.
+   */
+  public void addVisionMeasurement(Pose2d visionMeasurement, double timestampSeconds) {
+    poseEstimator.addVisionMeasurement(visionMeasurement, timestampSeconds);
+  }
+
+  /**
+   * See
+   * {@link SwerveDrivePoseEstimator#addVisionMeasurement(Pose2d, double, Matrix)}.
+   */
+  public void addVisionMeasurement(
+      Pose2d visionMeasurement, double timestampSeconds, Matrix<N3, N1> stdDevs) {
+    poseEstimator.addVisionMeasurement(visionMeasurement, timestampSeconds, stdDevs);
+  }
+
+  /**
+   * Reset the estimated pose of the swerve drive on the field.
+   *
+   * @param pose         New robot pose.
+   * @param resetSimPose If the simulated robot pose should also be reset. This
+   *                     effectively
+   *                     teleports the robot and should only be used during the
+   *                     setup of the simulation world.
+   */
+  public void resetPose(Pose2d pose) {
+    resetPose(pose, false);
+  }
+
+  public void resetPose(Pose2d pose, boolean resetSimPose) { // TODO Add Simulation
+    // if (resetSimPose) {
+    // swerveDriveSim.reset(pose, false);
+    // // we shouldnt realistically be resetting pose after startup, but we will
+    // handle
+    // // it anyway for
+    // // testing
+    // for (int i = 0; i < swerveMods.length; i++) {
+    // swerveMods[i].simulationUpdate(0, 0, 0, 0, 0, 0);
+    // }
+    // gyroSim.setAngle(-pose.getRotation().getDegrees());
+    // gyroSim.setRate(0);
+    // }
+
+    poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose);
+  }
+
+  /** Get the estimated pose of the swerve drive on the field. */
+  public Pose2d getPose() {
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  /** Raw gyro yaw (this may not match the field heading!). */
+  public Rotation2d getGyroYaw() {
+    return m_gyro.getRotation2d();
+  }
+
+  public Rotation2d getAngle() {
     // Negating the angle because WPILib gyros are CW positive.
     return ahrs.getRotation2d();
   }
@@ -180,27 +291,26 @@ public class Chassis extends SubsystemBase {
    *
    * @return The pose.
    */
-  public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
-  }
+  // public Pose2d getPose() { //TODO Remove Odometry
+  // return m_odometry.getPoseMeters();
+  // }
 
   /**
    * Resets the odometry to the specified pose.
    *
    * @param pose The pose to which to set the odometry.
    */
-  public void resetPose(Pose2d pose) {
-    m_odometry.resetPosition(
-        getRotation2d(),
-//        Rotation2d.fromDegrees(getAngle()),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        },
-        pose);
-  }
+  // public void resetPose(Pose2d pose) { //TODO Remove Odometry
+  // m_odometry.resetPosition(
+  // Rotation2d.fromDegrees(-m_gyro.getAngle()),
+  // new SwerveModulePosition[] {
+  // m_frontLeft.getPosition(),
+  // m_frontRight.getPosition(),
+  // m_rearLeft.getPosition(),
+  // m_rearRight.getPosition()
+  // },
+  // pose);
+  // }
 
   /**
    * 

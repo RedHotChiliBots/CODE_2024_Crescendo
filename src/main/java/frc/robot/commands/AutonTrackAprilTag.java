@@ -12,12 +12,11 @@ public class AutonTrackAprilTag extends Command {
   Chassis chassis;
   Vision vision;
   int targetId;
-  
+
   /** Creates a new AutonTrackAprilTag. */
-  public AutonTrackAprilTag(Chassis chassis, Vision vision, int targetId) {
+  public AutonTrackAprilTag(Chassis chassis, Vision vision) {
     this.chassis = chassis;
     this.vision = vision;
-    this.targetId = targetId;
 
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -25,13 +24,12 @@ public class AutonTrackAprilTag extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    vision.setTargetId(targetId);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (vision.hasTargets()) {
+    if (vision.getHasTargets()) {
 
       double[] spd = vision.trackAprilTag();
 
@@ -39,7 +37,8 @@ public class AutonTrackAprilTag extends Command {
       chassis.drive(spd[0], spd[1], 0.0, true, false);
     }
   }
-    // Called once the command ends or is interrupted.
+
+  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
   }
