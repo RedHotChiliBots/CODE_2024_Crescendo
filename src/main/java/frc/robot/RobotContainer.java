@@ -35,7 +35,7 @@ public class RobotContainer {
 	private final Intake intake = new Intake();
 	private final Shooter shooter = new Shooter();
 	private final Trapper trapper = new Trapper();
-	private final Vision vision = new Vision();
+	private final Vision vision = new Vision(chassis);
 
 	// The driver's controller
 	XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -75,6 +75,16 @@ public class RobotContainer {
 				.whileTrue(new RunCommand(
 						() -> chassis.setX(),
 						chassis));
+
+		new JoystickButton(m_driverController, Button.kB.value).debounce(1)
+				.onTrue(new RunCommand(
+						() -> vision.setInsertOffset(true),
+						vision));
+
+		new JoystickButton(m_driverController, Button.kA.value)
+				.whileTrue(new RunCommand(
+						() -> vision.trackAprilTag(),
+						vision));
 	}
 
 	/**
