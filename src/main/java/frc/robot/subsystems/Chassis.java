@@ -158,6 +158,9 @@ public class Chassis extends SubsystemBase {
     // Update the odometry of the swerve drive using the wheel encoders and gyro.
     poseEstimator.update(getGyroYaw(), getModulePositions());
 
+    // Update the odometry of the swerve drive using the wheel encoders and gyro.
+    poseEstimator.update(getGyroYaw(), getModulePositions());
+
     // Update the odometry in the periodic block
     // m_odometry.update( //TODO Remove Odometry
     // Rotation2d.fromDegrees(-m_gyro.getAngle()),
