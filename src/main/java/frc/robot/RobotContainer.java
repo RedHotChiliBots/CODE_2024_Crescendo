@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.Constants.OIConstants;
 import frc.robot.autos.Autos;
 import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.Vision;
 // import frc.robot.subsystems.Climber;
 // import frc.robot.subsystems.Feeder;
 // import frc.robot.subsystems.Intake;
@@ -34,6 +35,7 @@ public class RobotContainer {
 	// private final Intake intake = new Intake();
 	// private final Shooter shooter = new Shooter();
 	// private final Trapper trapper = new Trapper();
+	private final Vision vision = new Vision(chassis);
 
 	// The driver's controller
 	XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -73,6 +75,16 @@ public class RobotContainer {
 				.whileTrue(new RunCommand(
 						() -> chassis.setX(),
 						chassis));
+
+		new JoystickButton(m_driverController, Button.kB.value).debounce(1)
+				.onTrue(new RunCommand(
+						() -> vision.setInsertOffset(true),
+						vision));
+
+		new JoystickButton(m_driverController, Button.kA.value)
+				.whileTrue(new RunCommand(
+						() -> vision.trackAprilTag(),
+						vision));
 	}
 
 	/**

@@ -6,8 +6,17 @@ package frc.robot;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
@@ -402,9 +411,26 @@ public final class Constants {
   public static final class VisionConstants {
     public static final String kCameraName = "LimeLight";
 
+    // Camera mounted facing forward on front perimeter and six inches off floor
+    // (Note: this is the prototype robot, needs to be modified for competition
+    // robot)
+    public static final Transform3d kRobotToCam = new Transform3d(
+        new Translation3d(Units.inchesToMeters(30.0 / 2.0), 0.0, Units.inchesToMeters(6.0)),
+        new Rotation3d(0.0, 0.0, 0.0));
+
+    // Layout of AprilTags on the 2024 field
+    public static final AprilTagFieldLayout kTagLayout = AprilTagFields.kDefaultField.loadAprilTagLayoutField();
+
+    // Standard deviations of vision estimated poses, which affect the correction
+    // rate
+    // (Fake values. Experiment and determine estimation noise on actual robot)
+    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+
     // Constants such as camera and target height stored. Change per robot and goal!
-    public static final double kCameraHeight = Units.inchesToMeters(19.0);
-    public static final double kTargetHeight = Units.inchesToMeters(18.75);
+    public static final double kCameraHeight = Units.inchesToMeters(6.0);
+    public static final double kTargetHeight = 1.32; // Tag height off floor in meters
+    // Units.inchesToMeters(18.75);
 
     // Angle between horizontal and the camera.
     public static final double kCameraPitch = Units.degreesToRadians(0);
