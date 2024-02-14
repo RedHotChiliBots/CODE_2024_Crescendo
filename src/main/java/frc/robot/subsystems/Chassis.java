@@ -6,6 +6,10 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,10 +28,16 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.CANIdConstants;
 import frc.robot.Constants.ChassisConstants;
+import frc.robot.Constants.ChassisConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Chassis extends SubsystemBase {
+
+private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId, MotorType.kBrushless);
+  private final RelativeEncoder frontLeftEncoder = frontLeft.getEncoder();
+  private final SparkPIDController frontLeftPIDController = frontLeft.getPIDController();
+
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       CANIdConstants.kFrontLeftDrivingCanId,
@@ -102,7 +112,23 @@ public class Chassis extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
   public Chassis() {
     System.out.println("+++++ Starting Chassis Constructor +++++");
-    zeroHeading();
+
+    frontLeftEncoder.setPositionConversionFactor(ChassisConstants.kFrontLeftEncoderPositionFactor);
+    frontLeftEncoder.setVelocityConversionFactor(ChassisConstants.kFrontLeftEncoderVelocityFactor);
+
+    frontLeft.setInverted(ChassisConstants.kFrontLeftMotorInverted);
+
+    frontLeftPIDController.setP(ChassisConstants.kFrontLeftP);
+    frontLeftPIDController.setI(ChassisConstants.kFrontLeftI);
+    frontLeftPIDController.setD(ChassisConstants.kFrontLeftD);
+    frontLeftPIDController.setFF(ChassisConstants.kFrontLeftFF);
+    frontLeftPIDController.setOutputRange(ChassisConstants.kFrontLeftMinOutput, ChassisConstants.kFrontLeftMaxOutput);
+
+    frontLeft.setIdleMode(ChassisConstants.kFrontLeftMotorIdleMode);
+    frontLeft.setSmartCurrentLimit(ChassisConstants.kFrontLeftMotorCurrentLimit);
+
+    frontLeft.burnFlash();
+
     System.out.println("----- Ending Chassis Constructor -----");
   }
 

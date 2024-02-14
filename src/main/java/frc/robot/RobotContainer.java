@@ -10,12 +10,11 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.Constants.OIConstants;
 import frc.robot.autos.Autos;
 import frc.robot.subsystems.Chassis;
-import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Trapper;
-import frc.robot.subsystems.Vision;
+// import frc.robot.subsystems.Climber;
+// import frc.robot.subsystems.Feeder;
+// import frc.robot.subsystems.Intake;
+// import frc.robot.subsystems.Shooter;
+// import frc.robot.subsystems.Trapper;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -30,12 +29,11 @@ public class RobotContainer {
 	// The robot's subsystems
 	private final Chassis chassis = new Chassis();
 	private final Autos auton = new Autos(chassis);
-	private final Climber climber = new Climber();
-	private final Hopper hopper = new Hopper();
-	private final Intake intake = new Intake();
-	private final Shooter shooter = new Shooter();
-	private final Trapper trapper = new Trapper();
-	private final Vision vision = new Vision();
+	// private final Climber climber = new Climber();
+	// private final Feeder hopper = new Feeder();
+	// private final Intake intake = new Intake();
+	// private final Shooter shooter = new Shooter();
+	// private final Trapper trapper = new Trapper();
 
 	// The driver's controller
 	XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
