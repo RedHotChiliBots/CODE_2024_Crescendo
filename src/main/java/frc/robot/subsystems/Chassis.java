@@ -1,4 +1,3 @@
-
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -38,11 +37,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.CANIdConstants;
 import frc.robot.Constants.ChassisConstants;
-<<<<<<< HEAD
-import frc.robot.Constants.ChassisConstants;
-=======
 import frc.robot.Constants.SwerveModuleConstants;
->>>>>>> 99106d6 (Chassis track April Tag)
+import frc.robot.Constants.SwerveModuleConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -157,9 +153,6 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
   @Override
   public void periodic() {
     sbAngle.setDouble(getAngle().getDegrees());
-
-    // Update the odometry of the swerve drive using the wheel encoders and gyro.
-    poseEstimator.update(getGyroYaw(), getModulePositions());
 
     // Update the odometry of the swerve drive using the wheel encoders and gyro.
     poseEstimator.update(getGyroYaw(), getModulePositions());
