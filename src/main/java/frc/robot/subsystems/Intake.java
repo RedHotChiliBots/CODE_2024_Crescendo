@@ -16,7 +16,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 
 public class Intake extends SubsystemBase {
-  /** Creates a newIntake. */
+  /** Creates a new Intake. */
   private final ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
 
   private final CANSparkMax intake = new CANSparkMax(CANIdConstants.kIntakeCANId, MotorType.kBrushless);
@@ -27,7 +27,7 @@ public class Intake extends SubsystemBase {
   private double setPoint = 0.0;
 
   public Intake() {
-    System.out.println("+++++ StartingIntake Constructor +++++");
+    System.out.println("+++++ Starting Intake Constructor +++++");
 
     intakeEncoder.setPositionConversionFactor(IntakeConstants.kIntakeEncoderPositionFactor);
     intakeEncoder.setVelocityConversionFactor(IntakeConstants.kIntakeEncoderVelocityFactor);
@@ -46,7 +46,7 @@ public class Intake extends SubsystemBase {
 
     intake.burnFlash();
 
-    System.out.println("----- EndingIntake Constructor -----");
+    System.out.println("----- Ending Intake Constructor -----");
   }
 
   @Override

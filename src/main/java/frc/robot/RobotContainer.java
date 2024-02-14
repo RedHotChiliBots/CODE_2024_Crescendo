@@ -60,8 +60,7 @@ public class RobotContainer {
 	}
 
 	/**
-	 * Use this method
-	 *  to define your button->command mappings. Buttons can be
+	 * Use this method to define your button->command mappings. Buttons can be
 	 * created by
 	 * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its
 	 * subclasses ({@link
