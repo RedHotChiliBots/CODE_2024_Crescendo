@@ -1,6 +1,8 @@
 package frc.robot.autos;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 import frc.robot.Constants;
 import frc.robot.Constants.ChassisConstants;
@@ -24,7 +26,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -68,10 +71,21 @@ public class Autos {
 			new Pose2d(3, 0, new Rotation2d(0)),
 			config);
 
+	String dsEventName = DriverStation.getEventName();
+	OptionalInt dsLocation = DriverStation.getLocation();
+	Optional<DriverStation.Alliance> dsAlliance = DriverStation.getAlliance();
+	int dsMatchNumber = DriverStation.getMatchNumber();
+	double dsMatchTime = DriverStation.getMatchTime();
+
 	public Autos(Chassis chassis) {
 		System.out.println("+++++ Starting Autos Constructor +++++");
 
-		thetaController.enableContinuousInput(-Math.PI, Math.PI);
+		String match = dsAlliance + " " + dsLocation + " / " + dsEventName + " " + dsMatchNumber;
+
+		final GenericEntry sbMatch = compTab.addPersistent("Match Info", "")
+				.withWidget("Text View").withPosition(0, 1).withSize(2, 1).getEntry();
+		sbMatch.getString(match);
+																																															thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
 		swerveControllerCommand = new SwerveControllerCommand(
 				zigzag3Trajectory,
@@ -139,7 +153,7 @@ public class Autos {
 		// Add Auton Command chooser to Shuffleboard
 		compTab.add("Auton Command", chooser)
 				.withWidget("ComboBox Chooser")
-				.withPosition(0, 0)
+				.withPosition(0, 1)
 				.withSize(4, 1);
 
 		System.out.println("----- Ending Autos Constructor -----");

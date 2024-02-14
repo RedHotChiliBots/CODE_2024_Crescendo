@@ -31,6 +31,13 @@ public class MAXSwerveModule {
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
+      // --- simulation    //TODO Add simulation
+    // private final EncoderSim driveEncoderSim;
+    // private double driveCurrentSim = 0;
+    // private final EncoderSim steerEncoderSim;
+    // private double steerCurrentSim = 0;
+
+
   /**
    * Constructs a MAXSwerveModule and configures the driving and turning motor,
    * encoder, and PID controller. This configuration is specific to the REV
@@ -88,7 +95,7 @@ public class MAXSwerveModule {
     m_drivingPIDController.setP(SwerveModuleConstants.kDrivingP);
     m_drivingPIDController.setI(SwerveModuleConstants.kDrivingI);
     m_drivingPIDController.setD(SwerveModuleConstants.kDrivingD);
-    m_drivingPIDController.setFF(SwerveModuleConstants.kDrivingFF);
+    m_drivingPIDController.setFF(SwerveModuleConstants.kDrivingFF.ks);
     m_drivingPIDController.setOutputRange(SwerveModuleConstants.kDrivingMinOutput,
         SwerveModuleConstants.kDrivingMaxOutput);
 
@@ -98,7 +105,7 @@ public class MAXSwerveModule {
     m_turningPIDController.setP(SwerveModuleConstants.kTurningP);
     m_turningPIDController.setI(SwerveModuleConstants.kTurningI);
     m_turningPIDController.setD(SwerveModuleConstants.kTurningD);
-    m_turningPIDController.setFF(SwerveModuleConstants.kTurningFF);
+    m_turningPIDController.setFF(SwerveModuleConstants.kTurningFF.ks);
     m_turningPIDController.setOutputRange(SwerveModuleConstants.kTurningMinOutput,
         SwerveModuleConstants.kTurningMaxOutput);
 
@@ -115,6 +122,10 @@ public class MAXSwerveModule {
     m_chassisAngularOffset = chassisAngularOffset;
     m_desiredState.angle = new Rotation2d(m_turningEncoder.getPosition());
     m_drivingEncoder.setPosition(0);
+    
+    // --- Simulation   //TODO Add Simulation
+    // driveEncoderSim = new EncoderSim(driveEncoder);
+    // steerEncoderSim = new EncoderSim(steerEncoder);
   }
 
   /**
@@ -168,4 +179,29 @@ public class MAXSwerveModule {
   public void resetEncoders() {
     m_drivingEncoder.setPosition(0);
   }
+
+  // ----- Simulation   //TODO Add Simulation
+
+  // public void simulationUpdate(
+  //     double driveEncoderDist,
+  //     double driveEncoderRate,
+  //     double driveCurrent,
+  //     double steerEncoderDist,
+  //     double steerEncoderRate,
+  //     double steerCurrent) {
+  //   driveEncoderSim.setDistance(driveEncoderDist);
+  //   driveEncoderSim.setRate(driveEncoderRate);
+  //   this.driveCurrentSim = driveCurrent;
+  //   steerEncoderSim.setDistance(steerEncoderDist);
+  //   steerEncoderSim.setRate(steerEncoderRate);
+  //   this.steerCurrentSim = steerCurrent;
+  // }
+
+  // public double getDriveCurrentSim() {
+  //   return driveCurrentSim;
+  // }
+
+  // public double getSteerCurrentSim() {
+  //   return steerCurrentSim;
+  // }
 }

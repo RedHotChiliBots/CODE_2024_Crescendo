@@ -1,0 +1,34 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Competition/Auton Command": "String Chooser"
+    }
+  },
+  "NetworkTables": {
+    "persistent": {
+      "Shuffleboard": {
+        "open": true
+      }
+    },
+    "transitory": {
+      "Shuffleboard": {
+        "Chassis": {
+          "open": true
+        },
+        "Vision": {
+          "open": true
+        }
+      },
+      "SmartDashboard": {
+        "open": true
+      },
+      "photonvision": {
+        "open": true
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  }
+}

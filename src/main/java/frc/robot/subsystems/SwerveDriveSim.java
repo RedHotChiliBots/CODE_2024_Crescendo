@@ -46,15 +46,23 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * This class attempts to simulate the dynamics of a swerve drive. In simulationPeriodic, users
- * should first set inputs from motors with {@link #setDriveInputs(double...)} and {@link
- * #setSteerInputs(double...)}, call {@link #update(double)} to update the simulation, and then set
- * swerve module's encoder values and the drivetrain's gyro values with the results from this class.
+ * This class attempts to simulate the dynamics of a swerve drive. In
+ * simulationPeriodic, users
+ * should first set inputs from motors with {@link #setDriveInputs(double...)}
+ * and {@link
+ * #setSteerInputs(double...)}, call {@link #update(double)} to update the
+ * simulation, and then set
+ * swerve module's encoder values and the drivetrain's gyro values with the
+ * results from this class.
  *
- * <p>In this class, distances are expressed with meters, angles with radians, and inputs with
+ * <p>
+ * In this class, distances are expressed with meters, angles with radians, and
+ * inputs with
  * voltages.
  *
- * <p>Teams can use {@link edu.wpi.first.wpilibj.smartdashboard.Field2d} to visualize their robot on
+ * <p>
+ * Teams can use {@link edu.wpi.first.wpilibj.smartdashboard.Field2d} to
+ * visualize their robot on
  * the Sim GUI's field.
  */
 public class SwerveDriveSim {
@@ -85,49 +93,59 @@ public class SwerveDriveSim {
     /**
      * Creates a swerve drive simulation.
      *
-     * @param driveFF The feedforward for the drive motors of this swerve drive. This should be in
-     *     units of meters.
-     * @param driveMotor The DCMotor model for the drive motor(s) of this swerve drive's modules. This
-     *     should not have any gearing applied.
-     * @param driveGearing The gear ratio of the drive system. Positive values indicate a reduction
-     *     where one rotation of the drive wheel equals driveGearing rotations of the drive motor.
+     * @param kdrivingff       The feedforward for the drive motors of this swerve
+     *                         drive. This should be in
+     *                         units of meters.
+     * @param driveMotor       The DCMotor model for the drive motor(s) of this
+     *                         swerve drive's modules. This
+     *                         should not have any gearing applied.
+     * @param driveGearing     The gear ratio of the drive system. Positive values
+     *                         indicate a reduction
+     *                         where one rotation of the drive wheel equals
+     *                         driveGearing rotations of the drive motor.
      * @param driveWheelRadius The radius of the module's driving wheel.
-     * @param steerFF The feedforward for the steer motors of this swerve drive. This should be in
-     *     units of radians.
-     * @param steerMotor The DCMotor model for the steer motor(s) of this swerve drive's modules. This
-     *     should not have any gearing applied.
-     * @param steerGearing The gear ratio of the steer system. Positive values indicate a reduction
-     *     where one rotation of the module heading/azimuth equals steerGearing rotations of the steer
-     *     motor.
-     * @param kinematics The kinematics for this swerve drive. All swerve module information used in
-     *     this class should match the order of the modules this kinematics object was constructed
-     *     with.
+     * @param kturningff       The feedforward for the steer motors of this swerve
+     *                         drive. This should be in
+     *                         units of radians.
+     * @param steerMotor       The DCMotor model for the steer motor(s) of this
+     *                         swerve drive's modules. This
+     *                         should not have any gearing applied.
+     * @param steerGearing     The gear ratio of the steer system. Positive values
+     *                         indicate a reduction
+     *                         where one rotation of the module heading/azimuth
+     *                         equals steerGearing rotations of the steer
+     *                         motor.
+     * @param kinematics       The kinematics for this swerve drive. All swerve
+     *                         module information used in
+     *                         this class should match the order of the modules this
+     *                         kinematics object was constructed
+     *                         with.
      */
     public SwerveDriveSim(
-            SimpleMotorFeedforward driveFF,
+            SimpleMotorFeedforward kdrivingff,
             DCMotor driveMotor,
             double driveGearing,
             double driveWheelRadius,
-            SimpleMotorFeedforward steerFF,
+            SimpleMotorFeedforward kturningff,
             DCMotor steerMotor,
             double steerGearing,
             SwerveDriveKinematics kinematics) {
         this(
                 new LinearSystem<N2, N1, N2>(
-                        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -driveFF.kv / driveFF.ka),
-                        VecBuilder.fill(0.0, 1.0 / driveFF.ka),
+                        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kdrivingff.kv / kdrivingff.ka),
+                        VecBuilder.fill(0.0, 1.0 / kdrivingff.ka),
                         Matrix.mat(Nat.N2(), Nat.N2()).fill(1.0, 0.0, 0.0, 1.0),
                         VecBuilder.fill(0.0, 0.0)),
-                driveFF.ks,
+                kdrivingff.ks,
                 driveMotor,
                 driveGearing,
                 driveWheelRadius,
                 new LinearSystem<N2, N1, N2>(
-                        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -steerFF.kv / steerFF.ka),
-                        VecBuilder.fill(0.0, 1.0 / steerFF.ka),
+                        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kturningff.kv / kturningff.ka),
+                        VecBuilder.fill(0.0, 1.0 / kturningff.ka),
                         Matrix.mat(Nat.N2(), Nat.N2()).fill(1.0, 0.0, 0.0, 1.0),
                         VecBuilder.fill(0.0, 0.0)),
-                steerFF.ks,
+                kturningff.ks,
                 steerMotor,
                 steerGearing,
                 kinematics);
@@ -136,27 +154,43 @@ public class SwerveDriveSim {
     /**
      * Creates a swerve drive simulation.
      *
-     * @param drivePlant The {@link LinearSystem} representing a swerve module's drive system. The
-     *     state should be in units of meters and input in volts.
-     * @param driveKs The static gain in volts of the drive system's feedforward, or the minimum
-     *     voltage to cause motion. Set this to 0 to ignore static friction.
-     * @param driveMotor The DCMotor model for the drive motor(s) of this swerve drive's modules. This
-     *     should not have any gearing applied.
-     * @param driveGearing The gear ratio of the drive system. Positive values indicate a reduction
-     *     where one rotation of the drive wheel equals driveGearing rotations of the drive motor.
+     * @param drivePlant       The {@link LinearSystem} representing a swerve
+     *                         module's drive system. The
+     *                         state should be in units of meters and input in
+     *                         volts.
+     * @param driveKs          The static gain in volts of the drive system's
+     *                         feedforward, or the minimum
+     *                         voltage to cause motion. Set this to 0 to ignore
+     *                         static friction.
+     * @param driveMotor       The DCMotor model for the drive motor(s) of this
+     *                         swerve drive's modules. This
+     *                         should not have any gearing applied.
+     * @param driveGearing     The gear ratio of the drive system. Positive values
+     *                         indicate a reduction
+     *                         where one rotation of the drive wheel equals
+     *                         driveGearing rotations of the drive motor.
      * @param driveWheelRadius The radius of the module's driving wheel.
-     * @param steerPlant The {@link LinearSystem} representing a swerve module's steer system. The
-     *     state should be in units of radians and input in volts.
-     * @param steerKs The static gain in volts of the steer system's feedforward, or the minimum
-     *     voltage to cause motion. Set this to 0 to ignore static friction.
-     * @param steerMotor The DCMotor model for the steer motor(s) of this swerve drive's modules. This
-     *     should not have any gearing applied.
-     * @param steerGearing The gear ratio of the steer system. Positive values indicate a reduction
-     *     where one rotation of the module heading/azimuth equals steerGearing rotations of the steer
-     *     motor.
-     * @param kinematics The kinematics for this swerve drive. All swerve module information used in
-     *     this class should match the order of the modules this kinematics object was constructed
-     *     with.
+     * @param steerPlant       The {@link LinearSystem} representing a swerve
+     *                         module's steer system. The
+     *                         state should be in units of radians and input in
+     *                         volts.
+     * @param steerKs          The static gain in volts of the steer system's
+     *                         feedforward, or the minimum
+     *                         voltage to cause motion. Set this to 0 to ignore
+     *                         static friction.
+     * @param steerMotor       The DCMotor model for the steer motor(s) of this
+     *                         swerve drive's modules. This
+     *                         should not have any gearing applied.
+     * @param steerGearing     The gear ratio of the steer system. Positive values
+     *                         indicate a reduction
+     *                         where one rotation of the module heading/azimuth
+     *                         equals steerGearing rotations of the steer
+     *                         motor.
+     * @param kinematics       The kinematics for this swerve drive. All swerve
+     *                         module information used in
+     *                         this class should match the order of the modules this
+     *                         kinematics object was constructed
+     *                         with.
      */
     public SwerveDriveSim(
             LinearSystem<N2, N1, N2> drivePlant,
@@ -191,10 +225,17 @@ public class SwerveDriveSim {
         }
     }
 
+    // public SwerveDriveSim(double kdrivingff, DCMotor falcon500, double kdrivegearratio, double driveWheelRadius2,
+    //         DoubleFunction kturningff, DCMotor falcon5002, double ksteergearratio,
+    //         SwerveDriveKinematics kdrivekinematics) {
+    //     // TODO Auto-generated constructor stub
+    // }
+
     /**
      * Sets the input voltages of the drive motors.
      *
-     * @param inputs Input voltages. These should match the module order used in the kinematics.
+     * @param inputs Input voltages. These should match the module order used in the
+     *               kinematics.
      */
     public void setDriveInputs(double... inputs) {
         final double battVoltage = RobotController.getBatteryVoltage();
@@ -207,7 +248,8 @@ public class SwerveDriveSim {
     /**
      * Sets the input voltages of the steer motors.
      *
-     * @param inputs Input voltages. These should match the module order used in the kinematics.
+     * @param inputs Input voltages. These should match the module order used in the
+     *               kinematics.
      */
     public void setSteerInputs(double... inputs) {
         final double battVoltage = RobotController.getBatteryVoltage();
@@ -218,14 +260,15 @@ public class SwerveDriveSim {
     }
 
     /**
-     * Computes the new x given the old x and the control input. Includes the effect of static
+     * Computes the new x given the old x and the control input. Includes the effect
+     * of static
      * friction.
      *
      * @param discA The discretized system matrix.
      * @param discB The discretized input matrix.
-     * @param x The position/velocity state of the drive/steer system.
+     * @param x     The position/velocity state of the drive/steer system.
      * @param input The input voltage.
-     * @param ks The kS value of the feedforward model.
+     * @param ks    The kS value of the feedforward model.
      * @return The updated x, including the effect of static friction.
      */
     protected static Matrix<N2, N1> calculateX(
@@ -249,7 +292,8 @@ public class SwerveDriveSim {
             double absInput = Math.abs(input);
             ksInputEffect = -MathUtil.clamp(ks * inputSign, -absInput, absInput);
         }
-        // non-zero system velocity, but input causes velocity sign change. Resist input after sign
+        // non-zero system velocity, but input causes velocity sign change. Resist input
+        // after sign
         // change
         else if ((input * signToStop) > (inputToStop * signToStop)) {
             double absInput = Math.abs(input - inputToStop);
@@ -264,7 +308,8 @@ public class SwerveDriveSim {
     /**
      * Update the drivetrain states with the given timestep.
      *
-     * @param dtSeconds The timestep in seconds. This should be the robot loop period.
+     * @param dtSeconds The timestep in seconds. This should be the robot loop
+     *                  period.
      */
     public void update(double dtSeconds) {
         var driveDiscAB = Discretization.discretizeAB(drivePlant.getA(), drivePlant.getB(), dtSeconds);
@@ -291,9 +336,8 @@ public class SwerveDriveSim {
                             steerInputs[i],
                             steerKs));
             double currSteerStatePos = steerStates.get(i).get(0, 0);
-            moduleDeltas[i] =
-                    new SwerveModulePosition(
-                            currDriveStatePos - prevDriveStatePos, new Rotation2d(currSteerStatePos));
+            moduleDeltas[i] = new SwerveModulePosition(
+                    currDriveStatePos - prevDriveStatePos, new Rotation2d(currSteerStatePos));
         }
 
         var twist = kinematics.toTwist2d(moduleDeltas);
@@ -302,12 +346,14 @@ public class SwerveDriveSim {
     }
 
     /**
-     * Reset the simulated swerve drive state. This effectively teleports the robot and should only be
+     * Reset the simulated swerve drive state. This effectively teleports the robot
+     * and should only be
      * used during the setup of the simulation world.
      *
-     * @param pose The new pose of the simulated swerve drive.
-     * @param preserveMotion If true, the current module states will be preserved. Otherwise, they
-     *     will be reset to zeros.
+     * @param pose           The new pose of the simulated swerve drive.
+     * @param preserveMotion If true, the current module states will be preserved.
+     *                       Otherwise, they
+     *                       will be reset to zeros.
      */
     public void reset(Pose2d pose, boolean preserveMotion) {
         this.pose = pose;
@@ -321,14 +367,19 @@ public class SwerveDriveSim {
     }
 
     /**
-     * Reset the simulated swerve drive state. This effectively teleports the robot and should only be
+     * Reset the simulated swerve drive state. This effectively teleports the robot
+     * and should only be
      * used during the setup of the simulation world.
      *
-     * @param pose The new pose of the simulated swerve drive.
-     * @param moduleDriveStates The new states of the modules' drive systems in [meters, meters/sec].
-     *     These should match the module order used in the kinematics.
-     * @param moduleSteerStates The new states of the modules' steer systems in [radians,
-     *     radians/sec]. These should match the module order used in the kinematics.
+     * @param pose              The new pose of the simulated swerve drive.
+     * @param moduleDriveStates The new states of the modules' drive systems in
+     *                          [meters, meters/sec].
+     *                          These should match the module order used in the
+     *                          kinematics.
+     * @param moduleSteerStates The new states of the modules' steer systems in
+     *                          [radians,
+     *                          radians/sec]. These should match the module order
+     *                          used in the kinematics.
      */
     public void reset(
             Pose2d pose, List<Matrix<N2, N1>> moduleDriveStates, List<Matrix<N2, N1>> moduleSteerStates) {
@@ -344,9 +395,12 @@ public class SwerveDriveSim {
     }
 
     /**
-     * Get the pose of the simulated swerve drive. Note that this is the "actual" pose of the robot in
-     * the simulation world, without any noise. If you are simulating a pose estimator, this pose
-     * should only be used for visualization or camera simulation. This should be called after {@link
+     * Get the pose of the simulated swerve drive. Note that this is the "actual"
+     * pose of the robot in
+     * the simulation world, without any noise. If you are simulating a pose
+     * estimator, this pose
+     * should only be used for visualization or camera simulation. This should be
+     * called after {@link
      * #update(double)}.
      */
     public Pose2d getPose() {
@@ -354,55 +408,59 @@ public class SwerveDriveSim {
     }
 
     /**
-     * Get the {@link SwerveModulePosition} of each module. The returned array order matches the
+     * Get the {@link SwerveModulePosition} of each module. The returned array order
+     * matches the
      * kinematics module order. This should be called after {@link #update(double)}.
      */
     public SwerveModulePosition[] getModulePositions() {
         var positions = new SwerveModulePosition[numModules];
         for (int i = 0; i < numModules; i++) {
-            positions[i] =
-                    new SwerveModulePosition(
-                            driveStates.get(i).get(0, 0), new Rotation2d(steerStates.get(i).get(0, 0)));
+            positions[i] = new SwerveModulePosition(
+                    driveStates.get(i).get(0, 0), new Rotation2d(steerStates.get(i).get(0, 0)));
         }
         return positions;
     }
 
     /**
-     * Get the {@link SwerveModulePosition} of each module with rudimentary noise simulation. The
-     * returned array order matches the kinematics module order. This should be called after {@link
+     * Get the {@link SwerveModulePosition} of each module with rudimentary noise
+     * simulation. The
+     * returned array order matches the kinematics module order. This should be
+     * called after {@link
      * #update(double)}.
      *
-     * @param driveStdDev The standard deviation in meters of the drive wheel position.
+     * @param driveStdDev The standard deviation in meters of the drive wheel
+     *                    position.
      * @param steerStdDev The standard deviation in radians of the steer angle.
      */
     public SwerveModulePosition[] getNoisyModulePositions(double driveStdDev, double steerStdDev) {
         var positions = new SwerveModulePosition[numModules];
         for (int i = 0; i < numModules; i++) {
-            positions[i] =
-                    new SwerveModulePosition(
-                            driveStates.get(i).get(0, 0) + rand.nextGaussian() * driveStdDev,
-                            new Rotation2d(steerStates.get(i).get(0, 0) + rand.nextGaussian() * steerStdDev));
+            positions[i] = new SwerveModulePosition(
+                    driveStates.get(i).get(0, 0) + rand.nextGaussian() * driveStdDev,
+                    new Rotation2d(steerStates.get(i).get(0, 0) + rand.nextGaussian() * steerStdDev));
         }
         return positions;
     }
 
     /**
-     * Get the {@link SwerveModuleState} of each module. The returned array order matches the
+     * Get the {@link SwerveModuleState} of each module. The returned array order
+     * matches the
      * kinematics module order. This should be called after {@link #update(double)}.
      */
     public SwerveModuleState[] getModuleStates() {
         var positions = new SwerveModuleState[numModules];
         for (int i = 0; i < numModules; i++) {
-            positions[i] =
-                    new SwerveModuleState(
-                            driveStates.get(i).get(1, 0), new Rotation2d(steerStates.get(i).get(0, 0)));
+            positions[i] = new SwerveModuleState(
+                    driveStates.get(i).get(1, 0), new Rotation2d(steerStates.get(i).get(0, 0)));
         }
         return positions;
     }
 
     /**
-     * Get the state of each module's drive system in [meters, meters/sec]. The returned list order
-     * matches the kinematics module order. This should be called after {@link #update(double)}.
+     * Get the state of each module's drive system in [meters, meters/sec]. The
+     * returned list order
+     * matches the kinematics module order. This should be called after
+     * {@link #update(double)}.
      */
     public List<Matrix<N2, N1>> getDriveStates() {
         List<Matrix<N2, N1>> states = new ArrayList<>();
@@ -413,8 +471,10 @@ public class SwerveDriveSim {
     }
 
     /**
-     * Get the state of each module's steer system in [radians, radians/sec]. The returned list order
-     * matches the kinematics module order. This should be called after {@link #update(double)}.
+     * Get the state of each module's steer system in [radians, radians/sec]. The
+     * returned list order
+     * matches the kinematics module order. This should be called after
+     * {@link #update(double)}.
      */
     public List<Matrix<N2, N1>> getSteerStates() {
         List<Matrix<N2, N1>> states = new ArrayList<>();
@@ -425,7 +485,8 @@ public class SwerveDriveSim {
     }
 
     /**
-     * Get the angular velocity of the robot, which can be useful for gyro simulation. CCW positive.
+     * Get the angular velocity of the robot, which can be useful for gyro
+     * simulation. CCW positive.
      * This should be called after {@link #update(double)}.
      */
     public double getOmegaRadsPerSec() {
@@ -433,62 +494,71 @@ public class SwerveDriveSim {
     }
 
     /**
-     * Calculates the current drawn from the battery by the motor(s). Ignores regenerative current
+     * Calculates the current drawn from the battery by the motor(s). Ignores
+     * regenerative current
      * from back-emf.
      *
-     * @param motor The motor(s) used.
+     * @param motor         The motor(s) used.
      * @param radiansPerSec The velocity of the motor in radians per second.
-     * @param inputVolts The voltage commanded by the motor controller (battery voltage * duty cycle).
-     * @param battVolts The voltage of the battery.
+     * @param inputVolts    The voltage commanded by the motor controller (battery
+     *                      voltage * duty cycle).
+     * @param battVolts     The voltage of the battery.
      */
     protected static double getCurrentDraw(
             DCMotor motor, double radiansPerSec, double inputVolts, double battVolts) {
         double effVolts = inputVolts - radiansPerSec / motor.KvRadPerSecPerVolt;
         // ignore regeneration
-        if (inputVolts >= 0) effVolts = MathUtil.clamp(effVolts, 0, inputVolts);
-        else effVolts = MathUtil.clamp(effVolts, inputVolts, 0);
+        if (inputVolts >= 0)
+            effVolts = MathUtil.clamp(effVolts, 0, inputVolts);
+        else
+            effVolts = MathUtil.clamp(effVolts, inputVolts, 0);
         // calculate battery current
         return (inputVolts / battVolts) * (effVolts / motor.rOhms);
     }
 
     /**
-     * Get the current draw in amps for each module's drive motor(s). This should be called after
-     * {@link #update(double)}. The returned array order matches the kinematics module order.
+     * Get the current draw in amps for each module's drive motor(s). This should be
+     * called after
+     * {@link #update(double)}. The returned array order matches the kinematics
+     * module order.
      */
     public double[] getDriveCurrentDraw() {
         double[] currents = new double[numModules];
         for (int i = 0; i < numModules; i++) {
             double radiansPerSec = driveStates.get(i).get(1, 0) * driveGearing / driveWheelRadius;
-            currents[i] =
-                    getCurrentDraw(
-                            driveMotor, radiansPerSec, driveInputs[i], RobotController.getBatteryVoltage());
+            currents[i] = getCurrentDraw(
+                    driveMotor, radiansPerSec, driveInputs[i], RobotController.getBatteryVoltage());
         }
         return currents;
     }
 
     /**
-     * Get the current draw in amps for each module's steer motor(s). This should be called after
-     * {@link #update(double)}. The returned array order matches the kinematics module order.
+     * Get the current draw in amps for each module's steer motor(s). This should be
+     * called after
+     * {@link #update(double)}. The returned array order matches the kinematics
+     * module order.
      */
     public double[] getSteerCurrentDraw() {
         double[] currents = new double[numModules];
         for (int i = 0; i < numModules; i++) {
             double radiansPerSec = steerStates.get(i).get(1, 0) * steerGearing;
-            currents[i] =
-                    getCurrentDraw(
-                            steerMotor, radiansPerSec, steerInputs[i], RobotController.getBatteryVoltage());
+            currents[i] = getCurrentDraw(
+                    steerMotor, radiansPerSec, steerInputs[i], RobotController.getBatteryVoltage());
         }
         return currents;
     }
 
     /**
-     * Get the total current draw in amps of all swerve motors. This should be called after {@link
+     * Get the total current draw in amps of all swerve motors. This should be
+     * called after {@link
      * #update(double)}.
      */
     public double getTotalCurrentDraw() {
         double sum = 0;
-        for (double val : getDriveCurrentDraw()) sum += val;
-        for (double val : getSteerCurrentDraw()) sum += val;
+        for (double val : getDriveCurrentDraw())
+            sum += val;
+        for (double val : getSteerCurrentDraw())
+            sum += val;
         return sum;
     }
 }

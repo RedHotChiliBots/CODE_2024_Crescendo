@@ -14,9 +14,10 @@ public class SwerveUtilsTest {
         
     @Test
 	public void testStepTowards() {
-		assertEquals(5.0, SwerveUtils.StepTowards(5.0, 5.0, 1.0));
-		assertEquals(4.0, SwerveUtils.StepTowards(5.0, 4.0, 1.0));
-		assertEquals(5.0, SwerveUtils.StepTowards(4.0, 5.0, 1.0));
+		assertEquals(5.5, SwerveUtils.StepTowards(5.0, 5.5, 1.0));
+		assertEquals(4.5, SwerveUtils.StepTowards(5.0, 4.5, 1.0));
+		assertEquals(5.0, SwerveUtils.StepTowards(6.0, 4.0, 1.0));
+		assertEquals(5.0, SwerveUtils.StepTowards(4.0, 6.0, 1.0));
 	}
 }
     
