@@ -7,15 +7,13 @@ package frc.robot.subsystems;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonUtils;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-// import org.photonvision.simulation.PhotonCameraSim;  //TODO Add Simulation
+// import org.photonvision.simulation.PhotonCameraSim; //TODO Add Simulation
 // import org.photonvision.simulation.SimCameraProperties;
 // import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -26,17 +24,17 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.Constants.ANSIConstants;
+import frc.utils.VisionUtils;
 
 public class Vision extends SubsystemBase {
   /** Creates a new Vision. */
@@ -44,8 +42,7 @@ public class Vision extends SubsystemBase {
   // Change this to match the name of your camera
   private final PhotonCamera camera = new PhotonCamera(VisionConstants.kCameraName);
 
-  private final PhotonPoseEstimator photonEstimator = new PhotonPoseEstimator(VisionConstants.kTagLayout,
-      PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, VisionConstants.kRobotToCam);
+  private PhotonPoseEstimator photonEstimator = null;
 
   private double lastEstTimestamp = 0.0;
 
@@ -109,16 +106,23 @@ public class Vision extends SubsystemBase {
   private final GenericEntry sbTgtRot = visionTab.addPersistent("tgtRot", 0)
       .withWidget("Text View").withPosition(3, 3).withSize(1, 1).getEntry();
 
+  private final GenericEntry sbEstX = visionTab.addPersistent("estX", 0)
+      .withWidget("Text View").withPosition(4, 0).withSize(1, 1).getEntry();
+  private final GenericEntry sbEstY = visionTab.addPersistent("estY", 0)
+      .withWidget("Text View").withPosition(4, 1).withSize(1, 1).getEntry();
+  private final GenericEntry sbEstRot = visionTab.addPersistent("estRot", 0)
+      .withWidget("Text View").withPosition(4, 3).withSize(1, 1).getEntry();
+
   private final GenericEntry sbERange = visionTab.addPersistent("estRange", 0)
-      .withWidget("Text View").withPosition(3, 0).withSize(1, 1).getEntry();
+      .withWidget("Text View").withPosition(5, 0).withSize(1, 1).getEntry();
   private final GenericEntry sbEAngle = visionTab.addPersistent("estAngle", 0)
-      .withWidget("Text View").withPosition(3, 1).withSize(1, 1).getEntry();
+      .withWidget("Text View").withPosition(5, 1).withSize(1, 1).getEntry();
   private final GenericEntry sbDeltaX = visionTab.addPersistent("estDeltaX", 0)
-      .withWidget("Text View").withPosition(3, 2).withSize(1, 1).getEntry();
+      .withWidget("Text View").withPosition(5, 2).withSize(1, 1).getEntry();
   private final GenericEntry sbDeltaY = visionTab.addPersistent("estDeltaY", 0)
-      .withWidget("Text View").withPosition(3, 3).withSize(1, 1).getEntry();
+      .withWidget("Text View").withPosition(5, 3).withSize(1, 1).getEntry();
   private final GenericEntry sbShootAngle = visionTab.addPersistent("Shoot Angle", 0)
-      .withWidget("Text View").withPosition(3, 4).withSize(1, 1).getEntry();
+      .withWidget("Text View").withPosition(5, 4).withSize(1, 1).getEntry();
 
   // Get information from target.
   double yaw = 0.0;
@@ -138,24 +142,38 @@ public class Vision extends SubsystemBase {
 
   private Chassis chassis = null;
 
-  private Random rand = new Random(4512);
-
   public Vision(Chassis chassis) {
     System.out.println("+++++ Vision Constructor starting +++++");
 
     this.chassis = chassis;
 
+    if (camera.getName() == VisionConstants.kCameraName) {
+      System.out.println(ANSIConstants.ANSI_GREEN + "Camera is configured." + ANSIConstants.ANSI_RESET);
+    } else {
+      System.out.println(ANSIConstants.ANSI_RED + "Camera was not configured properly." + ANSIConstants.ANSI_RESET);
+    }
+
+    photonEstimator = new PhotonPoseEstimator(VisionConstants.kTagLayout,
+        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, VisionConstants.kRobotToCam);
+
     photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
+    if (photonEstimator.getRobotToCameraTransform().equals(VisionConstants.kRobotToCam)) {
+      System.out.println(ANSIConstants.ANSI_GREEN + "PhotonPoseEstimator is configured." + ANSIConstants.ANSI_RESET);
+    } else {
+      System.out.println(
+          ANSIConstants.ANSI_RED + "PhotonPoseEstimator was not configured properly." + ANSIConstants.ANSI_RESET);
+    }
+
     // ----- Simulation
-    // if (Robot.isSimulation()) { //TODO Add Simulation
+    // if (Robot.isSimulation()) { // TODO Add Simulation
     // // Create the vision system simulation which handles cameras and targets on
     // the
     // // field.
     // visionSim = new VisionSystemSim("main");
     // // Add all the AprilTags inside the tag layout as visible targets to this
     // // simulated field.
-    // visionSim.addAprilTags(kTagLayout);
+    // visionSim.addAprilTags(VisionConstants.kTagLayout);
     // // Create simulated camera properties. These can be set to mimic your actual
     // // camera.
     // var cameraProp = new SimCameraProperties();
@@ -170,7 +188,7 @@ public class Vision extends SubsystemBase {
     // // targets.
     // cameraSim = new PhotonCameraSim(camera, cameraProp);
     // // Add the simulated camera to view the targets on this simulated field.
-    // visionSim.addCamera(cameraSim, kRobotToCam);
+    // visionSim.addCamera(cameraSim, VisionConstants.kRobotToCam);
 
     // cameraSim.enableDrawWireframe(true);
     // }
@@ -190,6 +208,19 @@ public class Vision extends SubsystemBase {
     // // Change pipeline to 2
     // camera.setPipelineIndex(2);
 
+    Optional<EstimatedRobotPose> visionEst = getEstimatedGlobalPose();
+    if (visionEst.isPresent()) {
+      Pose2d estPose = visionEst.get().estimatedPose.toPose2d();
+      chassis.resetPose(estPose);
+
+      if (estPose.equals(chassis.getPose())) {
+        System.out.println(ANSIConstants.ANSI_GREEN + "Robot pose initialized." + ANSIConstants.ANSI_RESET);
+      } else {
+        System.out.println(ANSIConstants.ANSI_RED + "Robot pose was not initialized." + ANSIConstants.ANSI_RESET);
+      }
+      System.out.println(ANSIConstants.ANSI_RED + "Robot pose could not be determined." + ANSIConstants.ANSI_RESET);
+    }
+
     setTargetId(15);
 
     System.out.println("----- Vision Constructor finished -----");
@@ -200,12 +231,22 @@ public class Vision extends SubsystemBase {
     // This method will be called once per scheduler run
 
     // Correct pose estimate with vision measurements
-    var visionEst = getEstimatedGlobalPose();
+    Optional<EstimatedRobotPose> visionEst = getEstimatedGlobalPose();
+
+    // double[] visionPose = new double[] { visionEst.get().estimatedPose.getX(),
+    // visionEst.get().estimatedPose.getY(),
+    // Math.toDegrees(visionEst.get().estimatedPose.getRotation().getAngle()) };
+    // SmartDashboard.putNumberArray("field/vision2", visionPose);
+
     visionEst.ifPresent(
         est -> {
-          var estPose = est.estimatedPose.toPose2d();
+          Pose2d estPose = est.estimatedPose.toPose2d();
+
+          double[] visPose = new double[] { estPose.getX(), estPose.getY(), estPose.getRotation().getDegrees() };
+          SmartDashboard.putNumberArray("field/vision", visPose);
+
           // Change our trust in the measurement based on the tags we can see
-          var estStdDevs = getEstimationStdDevs(estPose);
+          Matrix<N3, N1> estStdDevs = getEstimationStdDevs(estPose);
 
           chassis.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
@@ -215,17 +256,13 @@ public class Vision extends SubsystemBase {
     if (getInsertOffset()) {
       setInsertOffset(false);
 
-      var trf = new Transform2d(
-          new Translation2d(rand.nextDouble() * 4 - 2, rand.nextDouble() * 4 - 2),
-          new Rotation2d(rand.nextDouble() * 2 * Math.PI));
-      chassis.resetPose(chassis.getPose().plus(trf), false);
+      chassis.resetPose(VisionUtils.BumpPose(chassis.getPose()), false);
     }
 
     // Get information from target.
     result = getLatestResult();
 
     target = null;
-    setHasTarget(false);
 
     if (result.hasTargets()) {
       sbHasTargets.setBoolean(true);
@@ -236,6 +273,8 @@ public class Vision extends SubsystemBase {
         if (t.getFiducialId() == targetId) {
           target = t;
           setHasTarget(true);
+        } else {
+          setHasTarget(false);
         }
       }
 
@@ -267,7 +306,10 @@ public class Vision extends SubsystemBase {
     } else {
       // If we have no targets, stay still.
       sbHasTargets.setBoolean(false);
+      setHasTarget(false);
     }
+
+    sbHasTarget.setBoolean(getHasTarget());
   }
 
   public double[] trackAprilTag() {
@@ -278,7 +320,7 @@ public class Vision extends SubsystemBase {
       double tgtX = tagPose.get().getTranslation().getX();
       double tgtY = tagPose.get().getTranslation().getY();
       double tgtZ = tagPose.get().getTranslation().getZ();
-      double tgtRot = tagPose.get().getRotation().getAngle();
+      double tgtRot = Math.toDegrees(tagPose.get().getRotation().getAngle());
 
       sbTgtX.setDouble(tgtX);
       sbTgtY.setDouble(tgtY);
@@ -286,6 +328,14 @@ public class Vision extends SubsystemBase {
       sbTgtRot.setDouble(tgtRot);
 
       Pose2d estPose = chassis.getPose();
+      double estX = estPose.getTranslation().getX();
+      double estY = estPose.getTranslation().getY();
+      double estRot = estPose.getRotation().getDegrees();
+
+      sbEstX.setDouble(estX);
+      sbEstY.setDouble(estY);
+      sbEstRot.setDouble(estRot);
+
       double range = tagPose.get().toPose2d().getTranslation().getDistance(estPose.getTranslation());
       double angle = tagPose.get().toPose2d().getRotation().minus(estPose.getRotation()).getDegrees();
       double deltaX = tagPose.get().toPose2d().getTranslation().minus(estPose.getTranslation()).getX();
@@ -300,8 +350,12 @@ public class Vision extends SubsystemBase {
 
       sbShootAngle.setDouble(shootAngle);
 
-      Logger.recordOutput("Robot", estPose);
-      Logger.recordOutput("Target", tagPose.get().toPose2d());
+      double[] robotPose = new double[] { estPose.getX(), estPose.getY(), estPose.getRotation().getDegrees() };
+      SmartDashboard.putNumberArray("field/robot", robotPose);
+
+      double[] targetPose = new double[] { tagPose.get().getX(), tagPose.get().getY(), tagPose.get().getZ(),
+          Math.toDegrees(tagPose.get().getRotation().getAngle()) };
+      SmartDashboard.putNumberArray("field/target", targetPose);
 
       // Use this range as the measurement we give to the PID controller.
       // -1.0 required to ensure positive PID controller effort _increases_ range
@@ -333,10 +387,10 @@ public class Vision extends SubsystemBase {
    *         used for estimation.
    */
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-    var visionEst = photonEstimator.update();
+    Optional<EstimatedRobotPose> visionEst = photonEstimator.update();
     double latestTimestamp = camera.getLatestResult().getTimestampSeconds();
     boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
-    // if (Robot.isSimulation()) { //TODO Add Simulation
+    // if (Robot.isSimulation()) { // TODO Add Simulation
     // visionEst.ifPresentOrElse(
     // est -> getSimDebugField()
     // .getObject("VisionEstimation")

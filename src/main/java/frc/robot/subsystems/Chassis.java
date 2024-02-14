@@ -7,8 +7,10 @@ package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 
+// import edu.wpi.first.hal.SimDevice;  //TODO Add Simulation
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,17 +22,19 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-// import edu.wpi.first.math.system.plant.DCMotor;  //TODO Add Simulation
+// import edu.wpi.first.math.system.plant.DCMotor; //TODO Add Simulation
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.WPIUtilJNI;
+// import edu.wpi.first.wpilibj.ADXRS450_Gyro; //TODO Add Simulation
 //import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-// import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;  //TODO Add Simulation
+// import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim; //TODO Add Simulation
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.CANIdConstants;
 import frc.robot.Constants.ChassisConstants;
+import frc.robot.Constants.SwerveModuleConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -77,8 +81,14 @@ public class Chassis extends SubsystemBase {
   // corrections.
   private final SwerveDrivePoseEstimator poseEstimator;
 
+  // private final SwerveDriveSim swerveDriveSim; //TODO Add Simulation
+
+  // private final ADXRS450_GyroSim gyroSim;
+  // private final SimDevice gyroSim;
+
   // Odometry class for tracking robot pose
-  // SwerveDriveOdometry m_odometry = new SwerveDriveOdometry( //TODO Remove Odometry
+  // SwerveDriveOdometry m_odometry = new SwerveDriveOdometry( //TODO Remove
+  // Odometry
   // ChassisConstants.kDriveKinematics,
   // Rotation2d.fromDegrees(-ahrs.getAngle()),
   // new SwerveModulePosition[] {
@@ -91,6 +101,7 @@ public class Chassis extends SubsystemBase {
   // ==============================================================
   // Define Shuffleboard data - Chassis Tab
   private final ShuffleboardTab chassisTab = Shuffleboard.getTab("Chassis");
+
   private final GenericEntry sbAngle = chassisTab.addPersistent("Angle", 0)
       .withWidget("Text View").withPosition(5, 0).withSize(2, 1).getEntry();
 
@@ -99,14 +110,12 @@ public class Chassis extends SubsystemBase {
     System.out.println("+++++ Starting Chassis Constructor +++++");
 
     // Define the standard deviations for the pose estimator, which determine how
-    // fast the pose
-    // estimate converges to the vision measurement. This should depend on the
-    // vision measurement
-    // noise
-    // and how many or how frequently vision measurements are applied to the pose
-    // estimator.
-    var stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
-    var visionStdDevs = VecBuilder.fill(1, 1, 1);
+    // fast the pose estimate converges to the vision measurement. This should
+    // depend on the vision measurement noise and how many or how frequently
+    // vision measurements are applied to the pose estimator.
+    Vector<N3> stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
+    Vector<N3> visionStdDevs = VecBuilder.fill(1, 1, 1);
+
     poseEstimator = new SwerveDrivePoseEstimator(
         ChassisConstants.kDriveKinematics,
         getGyroYaw(),
@@ -116,17 +125,18 @@ public class Chassis extends SubsystemBase {
         visionStdDevs);
 
     // ----- Simulation
+    // ADXRS450_Gyro gyro = new ADXRS450_Gyro();
     // gyroSim = new ADXRS450_GyroSim(gyro);
-    // swerveDriveSim =
-    // new SwerveDriveSim(
-    // kDriveFF,
+    // // gyroSim = new SimDevice();
+    // swerveDriveSim = new SwerveDriveSim(
+    // SwerveModuleConstants.kDrivingFF,
     // DCMotor.getFalcon500(1),
-    // kDriveGearRatio,
-    // kWheelDiameter / 2.0,
-    // kSteerFF,
+    // ChassisConstants.kDriveGearRatio,
+    // SwerveModuleConstants.kWheelDiameterMeters / 2.0,
+    // SwerveModuleConstants.kTurningFF,
     // DCMotor.getFalcon500(1),
-    // kSteerGearRatio,
-    // kinematics);
+    // ChassisConstants.kSteerGearRatio,
+    // ChassisConstants.kDriveKinematics);
 
     System.out.println("----- Ending Chassis Constructor -----");
   }
@@ -209,16 +219,20 @@ public class Chassis extends SubsystemBase {
     resetPose(pose, false);
   }
 
-  public void resetPose(Pose2d pose, boolean resetSimPose) { // TODO Add Sim
+  public void resetPose(Pose2d pose, boolean resetSimPose) { // TODO Add Simulation
     // if (resetSimPose) {
     // swerveDriveSim.reset(pose, false);
     // // we shouldnt realistically be resetting pose after startup, but we will
     // handle
-    // // it anyway for
-    // // testing
-    // for (int i = 0; i < swerveMods.length; i++) {
-    // swerveMods[i].simulationUpdate(0, 0, 0, 0, 0, 0);
-    // }
+    // // it anyway for testing
+    // // for (int i = 0; i < swerveMods.length; i++) {
+    // // swerveMods[i].simulationUpdate(0, 0, 0, 0, 0, 0);
+    // // }
+    // m_frontLeft.simulationUpdate(0, 0, 0, 0, 0, 0);
+    // m_frontRight.simulationUpdate(0, 0, 0, 0, 0, 0);
+    // m_rearLeft.simulationUpdate(0, 0, 0, 0, 0, 0);
+    // m_rearRight.simulationUpdate(0, 0, 0, 0, 0, 0);
+
     // gyroSim.setAngle(-pose.getRotation().getDegrees());
     // gyroSim.setRate(0);
     // }
