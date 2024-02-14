@@ -4,6 +4,7 @@ import java.util.List;
 
 import frc.robot.Constants;
 import frc.robot.Constants.ChassisConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.subsystems.Chassis;
 
@@ -75,7 +76,7 @@ public class Autos {
 		swerveControllerCommand = new SwerveControllerCommand(
 				zigzag3Trajectory,
 				chassis::getPose,
-				Constants.ChassisConstants.kDriveKinematics,
+				ChassisConstants.kDriveKinematics,
 				holonomicController,
 				chassis::setModuleStates,
 				chassis);

@@ -33,43 +33,232 @@ public final class Constants {
 
   public static final class CANIdConstants {
     // Drive/Turn CAN IDs
-    public static final int kRearRightDrivingCanId = 10;
-    public static final int kRearLeftDrivingCanId = 20;
-    public static final int kFrontLeftDrivingCanId = 30;
-    public static final int kFrontRightDrivingCanId = 40;
+    public static final int kRearRightDrivingCanId = 5;
+    public static final int kRearLeftDrivingCanId = 10;
+    public static final int kFrontLeftDrivingCanId = 15;
+    public static final int kFrontRightDrivingCanId = 20;
 
-    public static final int kRearRightTurningCanId = 11;
-    public static final int kRearLeftTurningCanId = 21;
-    public static final int kFrontLeftTurningCanId = 31;
-    public static final int kFrontRightTurningCanId = 41;
+    public static final int kRearRightTurningCanId = 6;
+    public static final int kRearLeftTurningCanId = 11;
+    public static final int kFrontLeftTurningCanId = 16;
+    public static final int kFrontRightTurningCanId = 21;
+
+    // Climber
+    public static final int kLeft1CANId = 30;
+    public static final int kLeft2CANId = 31;
+    public static final int kRight1CANId = 32;
+    public static final int kRight2CANId = 33;
+
+    // Feeder
+    public static final int kFeederCANId = 40;
+
+    // Intake
+    public static final int kIntakeCANId = 41;
+
+    // Shooter
+    public static final int kTiltShooterCANID = 50;
+    public static final int kLeftShooterCANID = 51;
+    public static final int kRightShooterCANID = 52;
+
+    // Trapper
+    public static final int kLiftTrapCANId = 55;
+    public static final int kTiltTrapCANId = 56;
+
+    // CANCoders
+    public static final int kTrapCANCoderID = 60;
   }
 
   public static final class DigitalIOConstants {
-
+    public static final int kShooterNoteDetect = 0;
   }
 
   public static final class AnalogConstants {
+    public static final int kShooterTiltPot = 0;
+    public static final int kClimberLeftPot = 1;
+    public static final int kClimberRightPot = 2;
+  }
 
+  public static final class PWMConstants {
+    public static final int kLeftServoID = 0;
+    public static final int kRightServoID = 1;
   }
 
   public static final class MotorConstants {
     public static final double kVortexFreeSpeedRpm = 6784;
     public static final double kNeoFreeSpeedRpm = 5676;
-  }
-
-  public static final class IntakeConstants {
-  }
-
-  public static final class HopperConstants {
-  }
-
-  public static final class ShooterConstants {
+    public static final double k550FreeSpeedRpm = 11000;
   }
 
   public static final class ClimberConstants {
+    public static final double kClimberGearRatio = 6.0;
+    // public static final double kClimberRotationsPerDegree = kClimberGearRatio /
+    // 360.0;
+    // public static final double kClimberDegreesPerRotation = 360.0 /
+    // kClimberGearRatio;
+
+    public static final double kClimberEncoderPositionFactor = 1.0 / kClimberGearRatio;
+    public static final double kClimberEncoderVelocityFactor = kClimberEncoderPositionFactor / 60.0;
+
+    public static final boolean kLeft1Inverted = false;
+
+    public static final double kP = 0.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    public static final double kFF = 0.0;
+    public static final double kMinOutput = 0.0;
+    public static final double kMaxOutput = 0.0;
+
+    public static final IdleMode kLeft1IdleMode = IdleMode.kBrake;
+    public static final int kLeftCurrentLimit = 0;
+
+    public static final boolean kLeft2Inverted = false;
+    public static final IdleMode kLeft2IdleMode = IdleMode.kBrake;
+
+    public static final boolean kRight1Inverted = false;
+    public static final IdleMode kRight1IdleMode = IdleMode.kBrake;
+
+    public static final boolean kRight2Inverted = false;
+    public static final IdleMode kRight2IdleMode = IdleMode.kBrake;
+  }
+
+  public static final class FeederConstants {
+    public static final double kFeederGearRatio = 1.0;
+    // public static final double kFeederRotationsPerDegree = kFeederGearRatio /
+    // 360.0;
+    // public static final double kFeederDegreesPerRotation = 360.0 /
+    // kFeederGearRatio;
+
+    public static final double kFeederEncoderPositionFactor = kFeederGearRatio;
+    public static final double kFeederEncoderVelocityFactor = kFeederEncoderPositionFactor / 60.0;
+
+    public static final boolean kFeederMotorInverted = false;
+
+    public static final double kFeederP = 0.0;
+    public static final double kFeederI = 0.0;
+    public static final double kFeederD = 0.0;
+    public static final double kFeederFF = 0.0;
+    public static final double kFeederMinOutput = 0.0;
+    public static final double kFeederMaxOutput = 0.0;
+
+    public static final IdleMode kFeederMotorIdleMode = IdleMode.kBrake;
+    public static final int kFeederMotorCurrentLimit = 0;
+  }
+
+  public static final class IntakeConstants {
+    public static final double kIntakeGearRatio = 1.0;
+    // public static final double kIntakeRotationsPerDegree = kIntakeGearRatio /
+    // 360.0;
+    // public static final double kIntakeDegreesPerRotation = 360.0 /
+    // kIntakeGearRatio;
+
+    public static final double kIntakeEncoderPositionFactor = 1.0;
+    public static final double kIntakeEncoderVelocityFactor = kIntakeEncoderPositionFactor / 60.0;
+
+    public static final boolean kIntakeMotorInverted = false;
+
+    public static final double kIntakeP = 0.0;
+    public static final double kIntakeI = 0.0;
+    public static final double kIntakeD = 0.0;
+    public static final double kIntakeFF = 0.0;
+    public static final double kIntakeMinOutput = 0.0;
+    public static final double kIntakeMaxOutput = 0.0;
+
+    public static final IdleMode kIntakeMotorIdleMode = IdleMode.kBrake;
+    public static final int kIntakeMotorCurrentLimit = 0;
+  }
+
+  public static final class ShooterConstants {
+    public static final double kTiltGearRatio = 25.0;
+    public static final double kTiltRotationsPerDegree = kTiltGearRatio / 360.0;
+    public static final double kTiltDegreesPerRotation = 360.0 / kTiltGearRatio;
+
+    public static final double kTiltEncoderPositionFactor = 1.0 / kTiltGearRatio;
+    public static final double kTiltEncoderVelocityFactor = kTiltEncoderPositionFactor / 60.0;
+
+    public static final boolean kTiltMotorInverted = false;
+
+    public static final double kTiltP = 0.0;
+    public static final double kTiltI = 0.0;
+    public static final double kTiltD = 0.0;
+    public static final double kTiltFF = 0.0;
+    public static final double kTiltMinOutput = 0.0;
+    public static final double kTiltMaxOutput = 0.0;
+
+    public static final IdleMode kTiltMotorIdleMode = IdleMode.kBrake;
+    public static final int kTiltMotorCurrentLimit = 0;
+
+    public static final double kLeftEncoderPositionFactor = 1.0;
+    public static final double kLeftEncoderVelocityFactor = kLeftEncoderPositionFactor / 60.0;
+
+    public static final boolean kLeftMotorInverted = false;
+
+    public static final double kLeftP = 0.0;
+    public static final double kLeftI = 0.0;
+    public static final double kLeftD = 0.0;
+    public static final double kLeftFF = 0.0;
+    public static final double kLeftMinOutput = 0.0;
+    public static final double kLeftMaxOutput = 0.0;
+
+    public static final IdleMode kLeftMotorIdleMode = IdleMode.kBrake;
+    public static final int kLeftMotorCurrentLimit = 0;
+
+    public static final double kRightEncoderPositionFactor = 1.0;
+    public static final double kRightEncoderVelocityFactor = kRightEncoderPositionFactor / 60.0;
+
+    public static final boolean kRightMotorInverted = false;
+
+    public static final double kRightP = 0.0;
+    public static final double kRightI = 0.0;
+    public static final double kRightD = 0.0;
+    public static final double kRightFF = 0.0;
+    public static final double kRightMinOutput = 0.0;
+    public static final double kRightMaxOutput = 0.0;
+
+    public static final IdleMode kRightMotorIdleMode = IdleMode.kBrake;
+    public static final int kRightMotorCurrentLimit = 0;
   }
 
   public static final class TrapperConstants {
+    public static final double kGripOpen = 0.0;
+    public static final double kGripClose = 0.0;
+
+    public static final double kLiftGearRatio = 5.0;
+    public static final double kLiftRotationsPerDegree = kLiftGearRatio / 360.0;
+    public static final double kLiftDegreesPerRotation = 360.0 / kLiftGearRatio;
+
+    public static final double kLiftEncoderPositionFactor = 1.0 / kLiftGearRatio;
+    public static final double kLiftEncoderVelocityFactor = kLiftEncoderPositionFactor / 60.0;
+
+    public static final boolean kLiftMotorInverted = false;
+
+    public static final double kLiftP = 0;
+    public static final double kLiftI = 0;
+    public static final double kLiftD = 0;
+    public static final double kLiftFF = 0;
+    public static final double kLiftMinOutput = 0;
+    public static final double kLiftMaxOutput = 0;
+
+    public static final IdleMode kLiftMotorIdleMode = IdleMode.kBrake;
+    public static final int kLiftMotorCurrentLimit = 0;
+
+    public static final double kTiltGearRatio = 25.0;
+    public static final double kTiltRotationsPerDegree = kTiltGearRatio / 360.0;
+    public static final double kTiltDegreesPerRotation = 360.0 / kTiltGearRatio;
+
+    public static final double kTiltEncoderPositionFactor = 1.0 / kTiltGearRatio;
+    public static final double kTiltEncoderVelocityFactor = kTiltEncoderPositionFactor / 60.0;
+
+    public static final boolean kTiltMotorInverted = false;
+
+    public static final double kTiltP = 0;
+    public static final double kTiltI = 0;
+    public static final double kTiltD = 0;
+    public static final double kTiltFF = 0;
+    public static final double kTiltMinOutput = 0;
+    public static final double kTiltMaxOutput = 0;
+
+    public static final IdleMode kTiltMotorIdleMode = IdleMode.kBrake;
+    public static final int kTiltMotorCurrentLimit = 0;
   }
 
   public static final class ChassisConstants {
@@ -102,6 +291,39 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
     public static final boolean kGyroReversed = false;
+
+    // Front Left
+    public static final double kFrontLeftEncoderPositionFactor = 1.0;
+    public static final double kFrontLeftEncoderVelocityFactor = kFrontLeftEncoderPositionFactor / 60.0;
+
+    public static final boolean kFrontLeftMotorInverted = false;
+
+    public static final double kFrontLeftP = 0.0;
+    public static final double kFrontLeftI = 0.0;
+    public static final double kFrontLeftD = 0.0;
+    public static final double kFrontLeftFF = 0.0;
+    public static final double kFrontLeftMinOutput = 0.0;
+    public static final double kFrontLeftMaxOutput = 0.0;
+
+    public static final IdleMode kFrontLeftMotorIdleMode = IdleMode.kBrake;
+    public static final int kFrontLeftMotorCurrentLimit = 0;
+
+    //Front Right 
+    public static final double kFrontRightEncoderPositionFactor = 1.0;
+    public static final double kFrontRightEncoderVelocityFactor = kFrontLeftEncoderPositionFactor / 60.0;
+
+    public static final boolean kFrontrightMotorInverted = false;
+
+    public static final double kFrontRightP = 0.0;
+    public static final double kFrontRightI = 0.0;
+    public static final double kFrontRightD = 0.0;
+    public static final double kFrontRightFF = 0.0;
+    public static final double kFrontRightMinOutput = 0.0;
+    public static final double kFrontRightMaxOutput = 0.0;
+
+    public static final IdleMode kFrontRightMotorIdleMode = IdleMode.kBrake;
+    public static final int kFrontRightMotorCurrentLimit = 0;
+
   }
 
   public static final class SwerveModuleConstants {
