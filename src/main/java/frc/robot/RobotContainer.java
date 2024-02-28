@@ -5,20 +5,27 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
-import frc.robot.Constants.OIConstants;
-import frc.robot.autos.Autos;
-import frc.robot.subsystems.Chassis;
-import frc.robot.subsystems.Vision;
-// import frc.robot.subsystems.Climber;
-// import frc.robot.subsystems.Feeder;
-// import frc.robot.subsystems.Intake;
-// import frc.robot.subsystems.Shooter;
-// import frc.robot.subsystems.Trapper;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import frc.robot.Constants.OIConstants;
+import frc.robot.autos.Autos;
+import frc.robot.commands.IntakeNote;
+import frc.robot.commands.ShootNote;
+import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Trapper;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -30,20 +37,42 @@ public class RobotContainer {
 	// The robot's subsystems
 	private final Chassis chassis = new Chassis();
 	private final Autos auton = new Autos(chassis);
-	// private final Climber climber = new Climber();
-	// private final Intake intake = new Intake();
-	// private final Shooter shooter = new Shooter();
-	// private final Trapper trapper = new Trapper();
+	private final Climber climber = new Climber();
+	private final Intake intake = new Intake();
+	private final Feeder feeder = new Feeder();
+	private final Shooter shooter = new Shooter();
+	private final Trapper trapper = new Trapper();
 	private final Vision vision = new Vision(chassis);
 
 	// The driver's controller
 	XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 	XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
 
+	IntakeNote intakeNote = new IntakeNote(intake, feeder, shooter);
+	ShootNote shootNote = new ShootNote(feeder, shooter);
+
+	private final ShuffleboardTab chassisTab = Shuffleboard.getTab("Chassis");
+	private final ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
+	private final ShuffleboardTab feederTab = Shuffleboard.getTab("Feeder");
+	private final ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
+	private final ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
+	private final ShuffleboardTab trapperTab = Shuffleboard.getTab("Trapper");
+
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
 	public RobotContainer() {
+
+		chassisTab.add("Chassis", chassis);
+		intakeTab.add("Intake", intake);
+		feederTab.add("Feeder", feeder);
+		shooterTab.add("Shooter", shooter);
+		climberTab.add("Climber", climber);
+		trapperTab.add("Trapper", trapper);
+
+		intakeTab.add("IntakeNote", intakeNote);
+		shooterTab.add("ShootNote", shootNote);
+
 		// Configure the button bindings
 		configureButtonBindings();
 
@@ -55,8 +84,8 @@ public class RobotContainer {
 						() -> chassis.drive(
 								-MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
 								-MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-								-MathUtil.applyDeadband(m_driverController.getRightX() , OIConstants.kDriveDeadband),
-								true, true),
+								-MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+								true, false),
 						chassis));
 	}
 
@@ -84,6 +113,17 @@ public class RobotContainer {
 				.whileTrue(new RunCommand(
 						() -> vision.trackAprilTag(),
 						vision));
+
+		new JoystickButton(m_driverController, Button.kY.value).debounce(1)
+				.onTrue(new RunCommand(
+						() -> chassis.zeroYaw(),
+						chassis));
+
+		new JoystickButton(m_operatorController, Button.kX.value).debounce(1)
+				.onTrue(intakeNote);
+
+		new JoystickButton(m_operatorController, Button.kY.value).debounce(1)
+				.onTrue(shootNote);
 	}
 
 	/**

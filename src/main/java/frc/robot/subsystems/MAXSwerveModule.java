@@ -180,6 +180,19 @@ public class MAXSwerveModule {
     m_drivingEncoder.setPosition(0);
   }
 
+  public double getDriveVel() {
+    return m_drivingEncoder.getVelocity();
+  }
+
+  public double getDrivePosFactor() {
+    return m_drivingEncoder.getPositionConversionFactor();
+  }
+
+  public double getDriveVelFactor() {
+    return m_drivingEncoder.getVelocityConversionFactor();
+  }
+
+
   // ----- Simulation   //TODO Add Simulation
 
   // public void simulationUpdate(

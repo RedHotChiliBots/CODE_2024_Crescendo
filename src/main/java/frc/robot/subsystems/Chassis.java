@@ -1,3 +1,4 @@
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -5,10 +6,6 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
 
 // import edu.wpi.first.hal.SimDevice;  //TODO Add Simulation
 import edu.wpi.first.math.Matrix;
@@ -26,28 +23,29 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 // import edu.wpi.first.math.system.plant.DCMotor; //TODO Add Simulation
+
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.WPIUtilJNI;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
 // import edu.wpi.first.wpilibj.ADXRS450_Gyro; //TODO Add Simulation
 //import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 // import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim; //TODO Add Simulation
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import frc.robot.Constants.CANIdConstants;
 import frc.robot.Constants.ChassisConstants;
 import frc.robot.Constants.SwerveModuleConstants;
-import frc.robot.Constants.SwerveModuleConstants;
 import frc.utils.SwerveUtils;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Chassis extends SubsystemBase {
-
-private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId, MotorType.kBrushless);
-  private final RelativeEncoder frontLeftEncoder = frontLeft.getEncoder();
-  private final SparkPIDController frontLeftPIDController = frontLeft.getPIDController();
-
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       CANIdConstants.kFrontLeftDrivingCanId,
@@ -72,7 +70,12 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
   // ==============================================================
   // Initialize NavX AHRS board
   // Alternatively: I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB
-  private final AHRS ahrs = new AHRS(SPI.Port.kMXP);
+  private AHRS ahrs = null;
+
+  private double pitchOffset = 0.0;
+  private double rollOffset = 0.0;
+
+  private PowerDistribution pdh = new PowerDistribution(CANIdConstants.kPDHCanID, ModuleType.kRev);
 
   // The gyro sensor
   // private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
@@ -110,13 +113,38 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
   // ==============================================================
   // Define Shuffleboard data - Chassis Tab
   private final ShuffleboardTab chassisTab = Shuffleboard.getTab("Chassis");
-
   private final GenericEntry sbAngle = chassisTab.addPersistent("Angle", 0)
+      .withWidget("Text View").withPosition(3, 0).withSize(2, 1).getEntry();
+  private final GenericEntry sbFusedHeading = chassisTab.addPersistent("FusedHeading", 0)
+      .withWidget("Text View").withPosition(3, 1).withSize(2, 1).getEntry();
+  private final GenericEntry sbCompassHeading = chassisTab.addPersistent("CompassHeading", 0)
+      .withWidget("Text View").withPosition(3, 2).withSize(2, 1).getEntry();
+  private final GenericEntry sbRotDegree = chassisTab.addPersistent("Rotation2d", 0)
+      .withWidget("Text View").withPosition(3, 3).withSize(2, 1).getEntry();
+  private final GenericEntry sbPitch = chassisTab.addPersistent("Pitch", 0)
       .withWidget("Text View").withPosition(5, 0).withSize(2, 1).getEntry();
+  private final GenericEntry sbRoll = chassisTab.addPersistent("Roll", 0)
+      .withWidget("Text View").withPosition(5, 1).withSize(2, 1).getEntry();
+  private final GenericEntry sbYaw = chassisTab.addPersistent("Yaw", 0)
+      .withWidget("Text View").withPosition(5, 2).withSize(2, 1).getEntry();
 
   /** Creates a new DriveSubsystem. */
   public Chassis() {
     System.out.println("+++++ Starting Chassis Constructor +++++");
+
+    // ==============================================================
+    // Initialize Rev PDH
+    pdh.clearStickyFaults();
+
+    // ==============================================================
+    // Initialize NavX AHRS board
+    // Alternatively: I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB
+    try {
+      ahrs = new AHRS(SPI.Port.kMXP, (byte) 100); // 100 Hz
+      ahrs.enableBoardlevelYawReset(true);
+    } catch (RuntimeException ex) {
+      DriverStation.reportError("Error instantiating navX-MXP:  " + ex.getMessage(), true);
+    }
 
     // Define the standard deviations for the pose estimator, which determine how
     // fast the pose estimate converges to the vision measurement. This should
@@ -127,7 +155,7 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
 
     poseEstimator = new SwerveDrivePoseEstimator(
         ChassisConstants.kDriveKinematics,
-        getGyroYaw(),
+        getRotation2d(),
         getModulePositions(),
         new Pose2d(),
         stateStdDevs,
@@ -147,15 +175,28 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
     // ChassisConstants.kSteerGearRatio,
     // ChassisConstants.kDriveKinematics);
 
+    ahrs.reset();
+    zeroYaw();
+    resetPose(getPose());
+
+    pitchOffset = Math.toRadians(-getPitch());
+    rollOffset = Math.toRadians(-getRoll());
+
     System.out.println("----- Ending Chassis Constructor -----");
   }
 
   @Override
   public void periodic() {
-    sbAngle.setDouble(getAngle().getDegrees());
+    sbAngle.setDouble(getAngle());
+    sbYaw.setDouble(getYaw());
+    sbPitch.setDouble(getPitch());
+    sbRoll.setDouble(getRoll());
+    sbFusedHeading.setDouble(getFusedHeading());
+    sbCompassHeading.setDouble(getCompassHeading());
+    sbRotDegree.setDouble(getRotation2d().getDegrees());
 
     // Update the odometry of the swerve drive using the wheel encoders and gyro.
-    poseEstimator.update(getGyroYaw(), getModulePositions());
+    poseEstimator.update(getRotation2d(), getModulePositions());
 
     // Update the odometry in the periodic block
     // m_odometry.update( //TODO Remove Odometry
@@ -183,6 +224,11 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
     }
 
     SmartDashboard.putNumberArray("swerve/status", stateAdv);
+    SmartDashboard.putNumber("swerve/velocity-rpm", m_frontLeft.getDriveVel());
+    SmartDashboard.putNumber("swerve/posfactorC", SwerveModuleConstants.kDrivingEncoderPositionFactor);
+    SmartDashboard.putNumber("swerve/velfactorC", SwerveModuleConstants.kDrivingEncoderVelocityFactor);
+    SmartDashboard.putNumber("swerve/posfactorE", m_frontLeft.getDrivePosFactor());
+    SmartDashboard.putNumber("swerve/velfactorE", m_frontLeft.getDriveVelFactor());
   }
 
   /**
@@ -246,7 +292,7 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
     // gyroSim.setRate(0);
     // }
 
-    poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose);
+    poseEstimator.resetPosition(getRotation2d(), getModulePositions(), pose);
   }
 
   /** Get the estimated pose of the swerve drive on the field. */
@@ -255,13 +301,33 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
   }
 
   /** Raw gyro yaw (this may not match the field heading!). */
-  public Rotation2d getGyroYaw() {
-    return ahrs.getRotation2d();
+  public double getYaw() {
+    return ahrs.getYaw();
+  }
+
+  public double getPitch() {
+    return Math.toDegrees(SwerveUtils.WrapAngle(Math.toRadians(ahrs.getPitch()) + pitchOffset));
+  }
+
+  public double getRoll() {
+    return Math.toDegrees(SwerveUtils.WrapAngle(Math.toRadians(-ahrs.getRoll()) + rollOffset));
   }
 
   public Rotation2d getRotation2d() {
-    // Negating the angle because WPILib gyros are CW positive.
     return ahrs.getRotation2d();
+  }
+
+  public double getCompassHeading() {
+    return ahrs.getCompassHeading();
+  }
+
+  public double getFusedHeading() {
+    return ahrs.getFusedHeading();
+  }
+
+  public double getAngle() {
+    // Negating the angle because WPILib gyros are CW positive.
+    return ahrs.getAngle();
   }
 
   /**
@@ -456,17 +522,8 @@ private final CANSparkMax frontLeft = new CANSparkMax(CANIdConstants.kLeft1CANId
   }
 
   /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
-    ahrs.reset();
-  }
-
-  /**
-   * Returns the heading of the robot.
-   *
-   * @return the robot's heading in degrees, from -180 to 180
-   */
-  public double getHeading() {
-    return Rotation2d.fromDegrees(-ahrs.getAngle()).getDegrees();
+  public void zeroYaw() {
+    ahrs.zeroYaw();
   }
 
   /**
