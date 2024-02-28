@@ -5,19 +5,16 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.TrapperConstants;
+import frc.robot.subsystems.Trapper;
 
-import frc.robot.subsystems.Chassis;
-import frc.robot.subsystems.Vision;
+public class TrapClawOpen extends Command {
+  /** Creates a new TrapClawOpen. */
 
-public class AutoTrackAprilTag extends Command {
-  Chassis chassis;
-  Vision vision;
-  int targetId;
+  private Trapper trapper = null;
 
-  /** Creates a new AutonTrackAprilTag. */
-  public AutoTrackAprilTag(Chassis chassis, Vision vision) {
-    this.chassis = chassis;
-    this.vision = vision;
+  public TrapClawOpen(Trapper trapper) {
+    this.trapper = trapper;
 
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -25,28 +22,20 @@ public class AutoTrackAprilTag extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    trapper.setClaw(TrapperConstants.kGripOpen);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    if (vision.getHasTargets()) {
-
-      double[] spd = vision.trackAprilTag();
-
-      // Use our forward/turn speeds to control the drivetrain
-      chassis.drive(spd[0], spd[1], 0.0, true, false);
-    }
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return vision.atDistTarget();
+    return true;
   }
 }

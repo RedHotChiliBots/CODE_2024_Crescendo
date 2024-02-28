@@ -6,7 +6,6 @@ import java.util.OptionalInt;
 
 import frc.robot.Constants;
 import frc.robot.Constants.ChassisConstants;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.subsystems.Chassis;
 

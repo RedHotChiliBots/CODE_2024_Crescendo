@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+
 import frc.robot.subsystems.Chassis;
 
 public class StopChassis extends Command {
@@ -13,7 +14,9 @@ public class StopChassis extends Command {
 
   public StopChassis(Chassis chassis) {
     this.chassis = chassis;
+    
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(chassis);
   }
 
   // Called when the command is initially scheduled.
@@ -24,11 +27,13 @@ public class StopChassis extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override

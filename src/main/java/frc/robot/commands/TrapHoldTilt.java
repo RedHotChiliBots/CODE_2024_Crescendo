@@ -5,48 +5,39 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Trapper;
 
-import frc.robot.subsystems.Chassis;
-import frc.robot.subsystems.Vision;
+public class TrapHoldTilt extends Command {
+  /** Creates a new TrapClawOpen. */
 
-public class AutoTrackAprilTag extends Command {
-  Chassis chassis;
-  Vision vision;
-  int targetId;
+  private Trapper trapper = null;
+  private double deg = 0.0;
 
-  /** Creates a new AutonTrackAprilTag. */
-  public AutoTrackAprilTag(Chassis chassis, Vision vision) {
-    this.chassis = chassis;
-    this.vision = vision;
+  public TrapHoldTilt(Trapper trapper, double deg) {
+    this.trapper = trapper;
+    this.deg = deg;
 
     // Use addRequirements() here to declare subsystem dependencies.
+    // Claw should not interrup Trap.  No dependency on Trap.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    trapper.holdTilt(deg);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    if (vision.getHasTargets()) {
-
-      double[] spd = vision.trackAprilTag();
-
-      // Use our forward/turn speeds to control the drivetrain
-      chassis.drive(spd[0], spd[1], 0.0, true, false);
-    }
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return vision.atDistTarget();
+    return true;
   }
 }

@@ -8,6 +8,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -19,21 +36,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.Constants.ANSIConstants;
 import frc.utils.VisionUtils;
 
 public class Vision extends SubsystemBase {
@@ -148,9 +151,9 @@ public class Vision extends SubsystemBase {
     this.chassis = chassis;
 
     if (camera.getName() == VisionConstants.kCameraName) {
-      System.out.println(ANSIConstants.ANSI_GREEN + "Camera is configured." + ANSIConstants.ANSI_RESET);
+      System.out.println("Camera IS configured.");
     } else {
-      System.out.println(ANSIConstants.ANSI_RED + "Camera was not configured properly." + ANSIConstants.ANSI_RESET);
+      DriverStation.reportError("Camera was not configured properly.", false);
     }
 
     photonEstimator = new PhotonPoseEstimator(VisionConstants.kTagLayout,
@@ -159,10 +162,9 @@ public class Vision extends SubsystemBase {
     photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
     if (photonEstimator.getRobotToCameraTransform().equals(VisionConstants.kRobotToCam)) {
-      System.out.println(ANSIConstants.ANSI_GREEN + "PhotonPoseEstimator is configured." + ANSIConstants.ANSI_RESET);
+      System.out.println("PhotonPoseEstimator IS configured.");
     } else {
-      System.out.println(
-          ANSIConstants.ANSI_RED + "PhotonPoseEstimator was not configured properly." + ANSIConstants.ANSI_RESET);
+      DriverStation.reportError("PhotonPoseEstimator was not configured properly.", false);
     }
 
     // ----- Simulation
@@ -214,11 +216,13 @@ public class Vision extends SubsystemBase {
       chassis.resetPose(estPose);
 
       if (estPose.equals(chassis.getPose())) {
-        System.out.println(ANSIConstants.ANSI_GREEN + "Robot pose initialized." + ANSIConstants.ANSI_RESET);
+        System.out.println("Robot pose initialized.");
       } else {
-        System.out.println(ANSIConstants.ANSI_RED + "Robot pose was not initialized." + ANSIConstants.ANSI_RESET);
+        DriverStation.reportError("Robot pose was not initialized.", false);
       }
-      System.out.println(ANSIConstants.ANSI_RED + "Robot pose could not be determined." + ANSIConstants.ANSI_RESET);
+    } else {
+      chassis.resetPose(new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0.0)));
+      DriverStation.reportError("Robot pose could not be determined.  Setting to ((0,0),0)", false);
     }
 
     setTargetId(15);
