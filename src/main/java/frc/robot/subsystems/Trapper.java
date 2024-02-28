@@ -140,13 +140,13 @@ public class Trapper extends SubsystemBase {
   }
 
   public void setTiltSP(double deg) {
-    tiltSetPoint = MathUtil.clamp(deg, TrapperConstants.kMinTiltDeg,
-        TrapperConstants.kMaxTiltDeg);
+    tiltSetPoint = Math.toRadians(MathUtil.clamp(deg, TrapperConstants.kMinTiltDeg,
+        TrapperConstants.kMaxTiltDeg));
   }
 
   public void holdTilt(double deg) {
     setTiltSP(deg);
-    tiltPIDController.setReference(deg, CANSparkMax.ControlType.kPosition);
+    tiltPIDController.setReference(getTiltSP(), CANSparkMax.ControlType.kPosition);
   }
 
   public void setClaw(double pos) {
@@ -177,7 +177,7 @@ public class Trapper extends SubsystemBase {
   }
 
   public double getTiltSP() {
-    return tiltSetPoint;
+    return Math.toDegrees(tiltSetPoint);
   }
 
   public double getLeftClawPos() {

@@ -14,11 +14,17 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.TrapperConstants;
 import frc.robot.autos.Autos;
+import frc.robot.commands.ClimberLift;
 import frc.robot.commands.IntakeNote;
 import frc.robot.commands.ShootNote;
+import frc.robot.commands.ShooterTilt;
+import frc.robot.commands.TrapperLift;
+import frc.robot.commands.TrapperTilt;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Climber;
@@ -51,6 +57,15 @@ public class RobotContainer {
 	IntakeNote intakeNote = new IntakeNote(intake, feeder, shooter);
 	ShootNote shootNote = new ShootNote(feeder, shooter);
 
+	ClimberLift climberLiftTop = new ClimberLift(climber, ClimberConstants.kMaxClimbPos);
+	ClimberLift climberLiftBot = new ClimberLift(climber, ClimberConstants.kMinClimbPos);
+	ShooterTilt shooterTiltTop = new ShooterTilt(shooter, ShooterConstants.kMaxTiltPos);
+	ShooterTilt shooterTiltBot = new ShooterTilt(shooter, ShooterConstants.kMinTiltPos);
+	TrapperLift trapperLiftTop = new TrapperLift(trapper, TrapperConstants.kMaxLiftLen);
+	TrapperLift trapperLiftBot = new TrapperLift(trapper, TrapperConstants.kMinLiftLen);
+	TrapperTilt trapperTiltTop = new TrapperTilt(trapper, TrapperConstants.kMaxTiltDeg);
+	TrapperTilt trapperTiltBot = new TrapperTilt(trapper, TrapperConstants.kMinTiltDeg);
+
 	private final ShuffleboardTab chassisTab = Shuffleboard.getTab("Chassis");
 	private final ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
 	private final ShuffleboardTab feederTab = Shuffleboard.getTab("Feeder");
@@ -72,6 +87,15 @@ public class RobotContainer {
 
 		intakeTab.add("IntakeNote", intakeNote);
 		shooterTab.add("ShootNote", shootNote);
+
+		shooterTab.add("ShooterTiltTop", shooterTiltTop);
+		shooterTab.add("ShooterTiltBot", shooterTiltBot);
+		trapperTab.add("TrapperLiftTop", trapperLiftTop);
+		trapperTab.add("TrapperLiftBot", trapperLiftBot);
+		climberTab.add("ClimberLiftTop", climberLiftTop);
+		climberTab.add("ClimberLiftBot", climberLiftBot);
+		trapperTab.add("TrapperTiltTop", trapperTiltTop);
+		trapperTab.add("TrapperTiltBot", trapperTiltBot);
 
 		// Configure the button bindings
 		configureButtonBindings();

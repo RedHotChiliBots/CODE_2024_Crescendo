@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -48,7 +47,7 @@ public class Intake extends SubsystemBase {
     intakeEncoder.setPositionConversionFactor(IntakeConstants.kIntakeEncoderPositionFactor);
     intakeEncoder.setVelocityConversionFactor(IntakeConstants.kIntakeEncoderVelocityFactor);
 
-    intakePIDController.setFeedbackDevice(intakeEncoder);
+//    intakePIDController.setFeedbackDevice(intakeEncoder);
     intakePIDController.setP(IntakeConstants.kIntakeP);
     intakePIDController.setI(IntakeConstants.kIntakeI);
     intakePIDController.setD(IntakeConstants.kIntakeD);
@@ -71,9 +70,9 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    sbVel.setDouble(getCurrVel());
+    sbVel.setDouble(getVelocity());
     sbVelSP.setDouble(getVelocitySP());
-    sbPos.setDouble(getCurrPos());
+    sbPos.setDouble(getPosition());
     sbPosSP.setDouble(getPositionSP());
   }
 
@@ -100,19 +99,20 @@ public class Intake extends SubsystemBase {
 
   public void holdVelocity(double vel) {
     setVelocitySP(vel);
-    intakePIDController.setReference(velSetPoint, ControlType.kVelocity);
+    intake.set(IntakeConstants.kIntakeVelocity);
+   // intakePIDController.setReference(getVelocitySP(), CANSparkMax.ControlType.kVelocity);
   }
 
   public void holdPosition(double pos) {
     setPositionSP(pos);
-    intakePIDController.setReference(posSetPoint, CANSparkMax.ControlType.kPosition);
+    intakePIDController.setReference(getPositionSP(), CANSparkMax.ControlType.kPosition);
   }
 
-  public double getCurrVel() {
+  public double getVelocity() {
     return intakeEncoder.getVelocity();
   }
 
-  public double getCurrPos() {
+  public double getPosition() {
     return intakeEncoder.getPosition();
   }
 }

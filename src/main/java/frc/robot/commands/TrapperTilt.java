@@ -7,24 +7,24 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Trapper;
 
-public class TrapHoldPos extends Command {
+public class TrapperTilt extends Command {
   /** Creates a new TrapClawOpen. */
 
   private Trapper trapper = null;
-  private double pos = 0.0;
+  private double deg = 0.0;
 
-  public TrapHoldPos(Trapper trapper, double pos) {
+  public TrapperTilt(Trapper trapper, double deg) {
     this.trapper = trapper;
-    this.pos = pos;
+    this.deg = deg;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    // Claw should not interrup Trap.  No dependency on Trap.
+    // Tilt should not interrup Shooter.  No dependency on Shooter.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    trapper.holdLift(pos);
+    trapper.holdTilt(deg);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

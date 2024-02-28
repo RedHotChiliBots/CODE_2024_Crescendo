@@ -16,7 +16,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 
@@ -152,19 +151,19 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kFF = 0.0;
-    public static final double kMinOutput = 0.0;
-    public static final double kMaxOutput = 0.0;
+    public static final double kMinOutput = -1.0;
+    public static final double kMaxOutput = 1.0;
 
-    public static final boolean kLeft1Inverted = false;
+    public static final boolean kLeft1Inverted = true;
     public static final IdleMode kLeft1IdleMode = IdleMode.kCoast;
 
-    public static final boolean kLeft2Inverted = false;
+    public static final boolean kLeft2Inverted = true;
     public static final IdleMode kLeft2IdleMode = IdleMode.kCoast;
 
-    public static final boolean kRight1Inverted = false;
+    public static final boolean kRight1Inverted = true;
     public static final IdleMode kRight1IdleMode = IdleMode.kCoast;
 
-    public static final boolean kRight2Inverted = false;
+    public static final boolean kRight2Inverted = true;
     public static final IdleMode kRight2IdleMode = IdleMode.kCoast;
   }
 
@@ -183,10 +182,10 @@ public final class Constants {
     public static final double kFeederEncoderPositionFactor = kFeederGearRatio;
     public static final double kFeederEncoderVelocityFactor = kFeederEncoderPositionFactor / 60.0;
 
-    public static final boolean kFeederMotorInverted = false;
+    public static final boolean kFeederMotorInverted = true;
 
-    public static final double kFeederP = 0.00008;
-    public static final double kFeederI = 0.0000004;
+    public static final double kFeederP = 0.1;
+    public static final double kFeederI = 0.0;
     public static final double kFeederD = 0.0;
     public static final double kFeederIz = 0.0;
     public static final double kFeederFF = 0.0;
@@ -213,12 +212,12 @@ public final class Constants {
 
     public static final boolean kIntakeMotorInverted = false;
 
-    public static final double kIntakeP = 0.00008;
-    public static final double kIntakeI = 0.0000004;
+    public static final double kIntakeP = 1.0;   // 0.00008;
+    public static final double kIntakeI = 0.0;
     public static final double kIntakeD = 0.0;
     public static final double kIntakeFF = 0.0;
-    public static final double kIntakeMinOutput = 0.0;
-    public static final double kIntakeMaxOutput = 0.0;
+    public static final double kIntakeMinOutput = -1.0;
+    public static final double kIntakeMaxOutput = 1.0;
 
     public static final IdleMode kIntakeMotorIdleMode = IdleMode.kBrake;
     public static final int kIntakeMotorCurrentLimit = 20;
@@ -259,7 +258,7 @@ public final class Constants {
 
     public static final double kTiltEncoderVelocityFactor = kTiltEncoderPositionFactor / 60.0;
 
-    public static final boolean kTiltMotorInverted = false;
+    public static final boolean kTiltMotorInverted = true;
 
     public static final double kTiltP = 0.00008;
     public static final double kTiltI = 0.0000004;
@@ -274,10 +273,10 @@ public final class Constants {
     public static final double kLeftEncoderPositionFactor = 1.0;
     public static final double kLeftEncoderVelocityFactor = kLeftEncoderPositionFactor / 60.0;
 
-    public static final boolean kLeftMotorInverted = false;
+    public static final boolean kLeftMotorInverted = true;
 
-    public static final double kLeftP = 0.0005;
-    public static final double kLeftI = 0.000005;
+    public static final double kLeftP = 1.0;
+    public static final double kLeftI = 0.0;
     public static final double kLeftD = 0.0;
     public static final double kLeftIz = 0.0;
     public static final double kLeftFF = 0.0;
@@ -288,7 +287,7 @@ public final class Constants {
     public static final int kLeftMotorCurrentLimit = 20;
 
     public static final double kRightEncoderPositionFactor = 1.0;
-    public static final double kRightEncoderVelocityFactor = kRightEncoderPositionFactor / 60.0;
+    public static final double kRightEncoderVelocityFactor = 1.0; //kRightEncoderPositionFactor / 60.0;
 
     public static final boolean kRightMotorInverted = true;
 
@@ -300,16 +299,16 @@ public final class Constants {
     public static final double kRangePos = 20.0; // inches
     public static final double kOffsetPos = -1.0; // inches
 
-    public static final double kMaxTiltDeg = 65.0;
-    public static final double kMinTiltDeg = 30.0;
+    public static final double kMaxTiltDeg = 90.0;
+    public static final double kMinTiltDeg = 0.0;
     public static final double kTiltTollerance = 1.0;
 
     public static final double kMaxLiftLen = 20.0;
     public static final double kMinLiftLen = 0.0;
     public static final double kLiftTollerance = 1.0;
 
-    public static final double kMaxClawDeg = 20.0;
-    public static final double kMinClawDeg = -20.0;
+    public static final double kMaxClawDeg = 90.0;
+    public static final double kMinClawDeg = 0.0;
 
     public static final double kGripOpen = 0.0;
     public static final double kGripClose = 0.0;

@@ -142,7 +142,7 @@ public class Shooter extends SubsystemBase {
   public void setTiltSP(double deg) {
     tiltSetPoint = MathUtil.clamp(deg, ShooterConstants.kMinTiltDeg,
         ShooterConstants.kMaxTiltDeg);
-    tiltPIDController.setReference(tiltSetPoint, ControlType.kPosition);
+    tiltPIDController.setReference(getTiltSP(), ControlType.kPosition);
   }
 
   public double getTiltSP() {
