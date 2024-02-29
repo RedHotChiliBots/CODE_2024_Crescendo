@@ -19,6 +19,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TrapperConstants;
 import frc.robot.autos.Autos;
+import frc.robot.commands.TrapperClaw;
 import frc.robot.commands.ClimberLift;
 import frc.robot.commands.IntakeNote;
 import frc.robot.commands.ShootNote;
@@ -64,8 +65,10 @@ public class RobotContainer {
 	TrapperLift trapperLiftTop = new TrapperLift(trapper, TrapperConstants.kMaxLiftLen);
 	TrapperLift trapperLiftBot = new TrapperLift(trapper, TrapperConstants.kMinLiftLen);
 	TrapperTilt trapperTiltTop = new TrapperTilt(trapper, TrapperConstants.kMaxTiltDeg);
-	TrapperTilt trapperTiltBot = new TrapperTilt(trapper, TrapperConstants.kMinTiltDeg);
+	TrapperClaw trapperClawOpen = new TrapperClaw(trapper, TrapperConstants.kGripOpen);
+	TrapperClaw trapperClawClose = new TrapperClaw(trapper, TrapperConstants.kGripClose);
 
+	TrapperTilt trapperTiltBot = new TrapperTilt(trapper, TrapperConstants.kMinTiltDeg);
 	private final ShuffleboardTab chassisTab = Shuffleboard.getTab("Chassis");
 	private final ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
 	private final ShuffleboardTab feederTab = Shuffleboard.getTab("Feeder");
@@ -96,6 +99,8 @@ public class RobotContainer {
 		climberTab.add("ClimberLiftBot", climberLiftBot);
 		trapperTab.add("TrapperTiltTop", trapperTiltTop);
 		trapperTab.add("TrapperTiltBot", trapperTiltBot);
+		trapperTab.add("TrapperClawOpen", trapperClawOpen);
+		trapperTab.add("TrapperClawClose", trapperClawClose);
 
 		// Configure the button bindings
 		configureButtonBindings();

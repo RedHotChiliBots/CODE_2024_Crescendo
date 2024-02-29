@@ -455,7 +455,7 @@
   {
     "name": "/Shuffleboard/Trapper/Tilt Pos",
     "type": "double",
-    "value": 2.0,
+    "value": -5.6999473057890304e+17,
     "properties": {
       "persistent": true
     }

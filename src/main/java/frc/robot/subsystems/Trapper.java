@@ -149,11 +149,15 @@ public class Trapper extends SubsystemBase {
     tiltPIDController.setReference(getTiltSP(), CANSparkMax.ControlType.kPosition);
   }
 
-  public void setClaw(double pos) {
+  public void setClawSP(double pos) {
     clawSetPoint = MathUtil.clamp(pos, TrapperConstants.kMinClawDeg,
         TrapperConstants.kMaxClawDeg);
-    leftClaw.set(clawSetPoint);
-    rightClaw.set(clawSetPoint);
+  }
+
+  public void setClaw(double pos) {
+    setClawSP(pos);
+    leftClaw.set(getClawSP());
+    rightClaw.set(getClawSP());
   }
 
   public double getClawSP() {
