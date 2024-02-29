@@ -47,7 +47,7 @@ public class Intake extends SubsystemBase {
     intakeEncoder.setPositionConversionFactor(IntakeConstants.kIntakeEncoderPositionFactor);
     intakeEncoder.setVelocityConversionFactor(IntakeConstants.kIntakeEncoderVelocityFactor);
 
-//    intakePIDController.setFeedbackDevice(intakeEncoder);
+    // intakePIDController.setFeedbackDevice(intakeEncoder);
     intakePIDController.setP(IntakeConstants.kIntakeP);
     intakePIDController.setI(IntakeConstants.kIntakeI);
     intakePIDController.setD(IntakeConstants.kIntakeD);
@@ -63,7 +63,7 @@ public class Intake extends SubsystemBase {
 
     intake.stopMotor();
     setVelocitySP(0.0);
-    
+
     System.out.println("----- Ending Intake Constructor -----");
   }
 
@@ -97,10 +97,11 @@ public class Intake extends SubsystemBase {
     return (posSetPoint);
   }
 
-  public void holdVelocity(double vel) {
+  public void setVelocity(double vel) {
     setVelocitySP(vel);
     intake.set(IntakeConstants.kIntakeVelocity);
-   // intakePIDController.setReference(getVelocitySP(), CANSparkMax.ControlType.kVelocity);
+    // intakePIDController.setReference(getVelocitySP(),
+    // CANSparkMax.ControlType.kVelocity);
   }
 
   public void holdPosition(double pos) {

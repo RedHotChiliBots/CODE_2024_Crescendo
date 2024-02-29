@@ -120,12 +120,12 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    sbVel.setDouble(getCurrVel());
+    sbVel.setDouble(getVelocity());
     sbVelSP.setDouble(getVelocitySP());
-    sbPos.setDouble(getCurrPos());
+    sbPos.setDouble(getPosition());
     sbPosSP.setDouble(getPositionSP());
-    sbTiltPos.setDouble(getCurrTilt());
-    sbTiltVolt.setDouble(getTiltVoltage());
+    sbTiltPos.setDouble(getTiltPos());
+    sbTiltVolt.setDouble(getTiltVolt());
     sbTiltSP.setDouble(getTiltSP());
     sbNote.setBoolean(isNoteDetected());
   }
@@ -159,7 +159,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean atVelocity() {
-    return ShooterConstants.kShootTollerance > Math.abs(velSetPoint - leaderEncoder.getVelocity());
+    return ShooterConstants.kShootTollerance > Math.abs(getVelocitySP() - leaderEncoder.getVelocity());
   }
 
   public void setPositionSP(double pos) {
@@ -170,34 +170,35 @@ public class Shooter extends SubsystemBase {
     return (posSetPoint);
   }
 
-  public void holdVelocity(double vel) {
+  public void setVelocity(double vel) {
     setVelocitySP(vel);
-    leaderPIDController.setReference(getVelocitySP(), ControlType.kVelocity);
+    leader.set(getVelocitySP());
+    //leaderPIDController.setReference(getVelocitySP(), ControlType.kVelocity);
   }
 
   public void holdTilt(double deg) {
     setTiltSP(deg);
-    tiltPIDController.setReference(tiltSetPoint, ControlType.kVelocity);
+    tiltPIDController.setReference(tiltSetPoint, ControlType.kPosition);
   }
 
   public void holdPosition(double pos) {
     setPositionSP(pos);
-    leaderPIDController.setReference(posSetPoint, CANSparkMax.ControlType.kPosition);
+    leaderPIDController.setReference(getPositionSP(), CANSparkMax.ControlType.kPosition);
   }
 
-  public double getCurrVel() {
+  public double getVelocity() {
     return leaderEncoder.getVelocity();
   }
 
-  public double getCurrPos() {
+  public double getPosition() {
     return leaderEncoder.getPosition();
   }
 
-  public double getCurrTilt() {
+  public double getTiltPos() {
     return tiltEncoder.getPosition();
   }
 
-  public double getTiltVoltage() {
+  public double getTiltVolt() {
     return tiltEncoder.getVoltage();
   }
 }

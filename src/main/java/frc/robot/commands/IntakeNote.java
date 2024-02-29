@@ -30,7 +30,7 @@ public class IntakeNote extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intake.holdVelocity(IntakeConstants.kIntakeVelocity);
+    intake.setVelocity(IntakeConstants.kIntakeVelocity);
     feeder.holdVelocity(FeederConstants.kFeederVelocity);
   }
 

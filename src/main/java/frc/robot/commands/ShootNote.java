@@ -30,7 +30,7 @@ public class ShootNote extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    shooter.holdVelocity(ShooterConstants.kShootVelocity);
+    shooter.setVelocity(ShooterConstants.kShootVelocity);
     timer.reset();
   }
 

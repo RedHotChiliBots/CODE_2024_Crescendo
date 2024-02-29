@@ -111,10 +111,10 @@ public class Climber extends SubsystemBase {
 
     sbLeftPos.setDouble(getLeftPosition());
     sbLeftVolt.setDouble(getLeftVoltage());
-    sbLeftPosSP.setDouble(getSetPoint());
+    sbLeftPosSP.setDouble(getPositionSP());
     sbRightPos.setDouble(getRightPosition());
     sbRightVolt.setDouble(getRightVoltage());
-    sbRightPosSP.setDouble(getSetPoint());
+    sbRightPosSP.setDouble(getPositionSP());
   }
 
   public void stopClimber() {
@@ -127,13 +127,13 @@ public class Climber extends SubsystemBase {
         ClimberConstants.kMaxClimbPos);
   }
 
-  public void holdClimb(double pos) {
+  public void holdClimbPos(double pos) {
     setClimbSP(pos);
     leftPIDController.setReference(posSetPoint, CANSparkMax.ControlType.kPosition);
     rightPIDController.setReference(posSetPoint, CANSparkMax.ControlType.kPosition);
   }
 
-  public double getSetPoint() {
+  public double getPositionSP() {
     return (posSetPoint);
   }
 
