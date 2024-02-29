@@ -130,13 +130,13 @@ public class Trapper extends SubsystemBase {
   }
 
   public void setLiftSP(double pos) {
-    liftSetPoint = MathUtil.clamp(pos, TrapperConstants.kMinLiftLen,
-        TrapperConstants.kMaxLiftLen);
+    liftSetPoint = MathUtil.clamp(pos, TrapperConstants.kMinLiftLen + TrapperConstants.kPotMin,
+        TrapperConstants.kMaxLiftLen + TrapperConstants.kPotMin);
   }
 
   public void holdLift(double pos) {
     setLiftSP(pos);
-    liftPIDController.setReference(liftSetPoint, ControlType.kPosition);
+    liftPIDController.setReference(getLiftSP(), ControlType.kPosition);
   }
 
   public void setTiltSP(double deg) {

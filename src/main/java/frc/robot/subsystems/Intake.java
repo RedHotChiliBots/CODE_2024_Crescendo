@@ -99,9 +99,8 @@ public class Intake extends SubsystemBase {
 
   public void setVelocity(double vel) {
     setVelocitySP(vel);
-    intake.set(IntakeConstants.kIntakeVelocity);
-    // intakePIDController.setReference(getVelocitySP(),
-    // CANSparkMax.ControlType.kVelocity);
+    //intake.set(IntakeConstants.kIntakeVelocity);
+    intakePIDController.setReference(getVelocitySP(), CANSparkMax.ControlType.kVelocity);
   }
 
   public void holdPosition(double pos) {

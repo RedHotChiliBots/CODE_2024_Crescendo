@@ -139,10 +139,9 @@ public class Shooter extends SubsystemBase {
     return noteDetect.get();
   }
 
-  public void setTiltSP(double deg) {
-    tiltSetPoint = MathUtil.clamp(deg, ShooterConstants.kMinTiltDeg,
-        ShooterConstants.kMaxTiltDeg);
-    tiltPIDController.setReference(getTiltSP(), ControlType.kPosition);
+  public void setTiltSP(double pos) {
+    tiltSetPoint = MathUtil.clamp(pos, ShooterConstants.kMinTiltPos + ShooterConstants.kPotMin, ShooterConstants.kMaxTiltPos + ShooterConstants.kPotMin);
+    //tiltPIDController.setReference(getTiltSP(), ControlType.kPosition);
   }
 
   public double getTiltSP() {
@@ -162,6 +161,10 @@ public class Shooter extends SubsystemBase {
     return ShooterConstants.kShootTollerance > Math.abs(getVelocitySP() - leaderEncoder.getVelocity());
   }
 
+  public boolean atTiltPos() {
+    return ShooterConstants.kTiltTollerance > Math.abs(getTiltSP() - getTiltPos());
+  }
+
   public void setPositionSP(double pos) {
     posSetPoint = pos;
   }
@@ -178,7 +181,7 @@ public class Shooter extends SubsystemBase {
 
   public void holdTilt(double deg) {
     setTiltSP(deg);
-    tiltPIDController.setReference(tiltSetPoint, ControlType.kPosition);
+    tiltPIDController.setReference(getTiltSP(), ControlType.kPosition);
   }
 
   public void holdPosition(double pos) {

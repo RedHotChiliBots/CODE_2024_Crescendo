@@ -129,12 +129,12 @@ public class Climber extends SubsystemBase {
 
   public void holdClimbPos(double pos) {
     setClimbSP(pos);
-    leftPIDController.setReference(posSetPoint, CANSparkMax.ControlType.kPosition);
-    rightPIDController.setReference(posSetPoint, CANSparkMax.ControlType.kPosition);
+    leftPIDController.setReference(getPositionSP(), CANSparkMax.ControlType.kPosition);
+//    rightPIDController.setReference(getPositionSP(), CANSparkMax.ControlType.kPosition);
   }
 
   public double getPositionSP() {
-    return (posSetPoint);
+    return posSetPoint;
   }
 
   public double getLeftPosition() {

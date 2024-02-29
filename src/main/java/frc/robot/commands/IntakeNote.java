@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -32,6 +33,7 @@ public class IntakeNote extends Command {
   public void initialize() {
     intake.setVelocity(IntakeConstants.kIntakeVelocity);
     feeder.holdVelocity(FeederConstants.kFeederVelocity);
+    shooter.holdTilt(((ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0) + ShooterConstants.kPotMin);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

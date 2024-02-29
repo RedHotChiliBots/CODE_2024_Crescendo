@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.TrapperConstants;
 import frc.robot.subsystems.Trapper;
 
 public class TrapperLift extends Command {
@@ -15,7 +16,7 @@ public class TrapperLift extends Command {
 
   public TrapperLift(Trapper trapper, double deg) {
     this.trapper = trapper;
-    this.deg = deg;
+    this.deg = deg + TrapperConstants.kPotMin;
 
     // Use addRequirements() here to declare subsystem dependencies.
     // Tilt should not interrup Shooter.  No dependency on Shooter.

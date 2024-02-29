@@ -56,19 +56,20 @@ public class RobotContainer {
 	XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
 
 	IntakeNote intakeNote = new IntakeNote(intake, feeder, shooter);
-	ShootNote shootNote = new ShootNote(feeder, shooter);
+	ShootNote shootNote = new ShootNote(intake, feeder, shooter);
 
 	ClimberLift climberLiftTop = new ClimberLift(climber, ClimberConstants.kMaxClimbPos);
 	ClimberLift climberLiftBot = new ClimberLift(climber, ClimberConstants.kMinClimbPos);
 	ShooterTilt shooterTiltTop = new ShooterTilt(shooter, ShooterConstants.kMaxTiltPos);
+	ShooterTilt shooterTiltMid = new ShooterTilt(shooter, (ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0);
 	ShooterTilt shooterTiltBot = new ShooterTilt(shooter, ShooterConstants.kMinTiltPos);
 	TrapperLift trapperLiftTop = new TrapperLift(trapper, TrapperConstants.kMaxLiftLen);
 	TrapperLift trapperLiftBot = new TrapperLift(trapper, TrapperConstants.kMinLiftLen);
 	TrapperTilt trapperTiltTop = new TrapperTilt(trapper, TrapperConstants.kMaxTiltDeg);
+	TrapperTilt trapperTiltBot = new TrapperTilt(trapper, TrapperConstants.kMinTiltDeg);
 	TrapperClaw trapperClawOpen = new TrapperClaw(trapper, TrapperConstants.kGripOpen);
 	TrapperClaw trapperClawClose = new TrapperClaw(trapper, TrapperConstants.kGripClose);
 
-	TrapperTilt trapperTiltBot = new TrapperTilt(trapper, TrapperConstants.kMinTiltDeg);
 	private final ShuffleboardTab chassisTab = Shuffleboard.getTab("Chassis");
 	private final ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
 	private final ShuffleboardTab feederTab = Shuffleboard.getTab("Feeder");
@@ -92,6 +93,7 @@ public class RobotContainer {
 		shooterTab.add("ShootNote", shootNote);
 
 		shooterTab.add("ShooterTiltTop", shooterTiltTop);
+		shooterTab.add("ShooterTiltMid", shooterTiltMid);
 		shooterTab.add("ShooterTiltBot", shooterTiltBot);
 		trapperTab.add("TrapperLiftTop", trapperLiftTop);
 		trapperTab.add("TrapperLiftBot", trapperLiftBot);
