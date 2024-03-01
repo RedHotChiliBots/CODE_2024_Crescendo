@@ -17,7 +17,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAnalogSensor;
 import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
 
 import frc.robot.Constants.CANIdConstants;
 import frc.robot.Constants.DigitalIOConstants;
@@ -141,7 +140,8 @@ public class Shooter extends SubsystemBase {
 
   public void setTiltSP(double pos) {
     tiltSetPoint = MathUtil.clamp(pos, ShooterConstants.kMinTiltPos + ShooterConstants.kPotMin, ShooterConstants.kMaxTiltPos + ShooterConstants.kPotMin);
-    //tiltPIDController.setReference(getTiltSP(), ControlType.kPosition);
+    //tiltPIDController.setReference(getTiltSP(),
+    // CANSparkMax.ControlType.kPosition);
   }
 
   public double getTiltSP() {
@@ -176,12 +176,13 @@ public class Shooter extends SubsystemBase {
   public void setVelocity(double vel) {
     setVelocitySP(vel);
     leader.set(getVelocitySP());
-    //leaderPIDController.setReference(getVelocitySP(), ControlType.kVelocity);
+    //leaderPIDController.setReference(getVelocitySP(),
+    // CANSparkMax.ControlType.kVelocity);
   }
 
   public void holdTilt(double deg) {
     setTiltSP(deg);
-    tiltPIDController.setReference(getTiltSP(), ControlType.kPosition);
+    tiltPIDController.setReference(getTiltSP(), CANSparkMax.ControlType.kPosition);
   }
 
   public void holdPosition(double pos) {

@@ -17,7 +17,6 @@ import com.revrobotics.SparkAnalogSensor;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
 
 import frc.robot.Constants.CANIdConstants;
 import frc.robot.Constants.PWMConstants;
@@ -136,7 +135,7 @@ public class Trapper extends SubsystemBase {
 
   public void holdLift(double pos) {
     setLiftSP(pos);
-    liftPIDController.setReference(getLiftSP(), ControlType.kPosition);
+    liftPIDController.setReference(getLiftSP(), CANSparkMax.ControlType.kPosition);
   }
 
   public void setTiltSP(double deg) {
