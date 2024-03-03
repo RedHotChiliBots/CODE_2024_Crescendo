@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
@@ -29,6 +30,7 @@ public class Feeder extends SubsystemBase {
       .withWidget("Text View").withPosition(2, 1).withSize(2, 1).getEntry();
   private final GenericEntry sbPosSP = feederTab.addPersistent("Position SP", 0)
       .withWidget("Text View").withPosition(4, 1).withSize(2, 1).getEntry();
+
   private final CANSparkMax feeder = new CANSparkMax(CANIdConstants.kFeederCANId, MotorType.kBrushless);
 
   private final RelativeEncoder feederEncoder = feeder.getEncoder();
@@ -42,6 +44,15 @@ public class Feeder extends SubsystemBase {
 
     feeder.restoreFactoryDefaults();
     feeder.clearFaults();
+
+      // CAN Status frames
+    feeder.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    feeder.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+    feeder.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+    feeder.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 0);
+    feeder.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+    feeder.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
+    feeder.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
 
     feederEncoder.setPositionConversionFactor(FeederConstants.kFeederEncoderPositionFactor);
     feederEncoder.setVelocityConversionFactor(FeederConstants.kFeederEncoderVelocityFactor);

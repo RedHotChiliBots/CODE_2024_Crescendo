@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
@@ -43,6 +44,15 @@ public class Intake extends SubsystemBase {
 
     intake.restoreFactoryDefaults();
     intake.clearFaults();
+
+          // CAN Status frames
+    intake.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    intake.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+    intake.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+    intake.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 0);
+    intake.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+    intake.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
+    intake.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
 
     intakeEncoder.setPositionConversionFactor(IntakeConstants.kIntakeEncoderPositionFactor);
     intakeEncoder.setVelocityConversionFactor(IntakeConstants.kIntakeEncoderVelocityFactor);

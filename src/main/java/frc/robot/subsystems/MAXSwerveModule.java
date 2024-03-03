@@ -9,9 +9,12 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.EncoderType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.SparkRelativeEncoder;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
@@ -31,12 +34,11 @@ public class MAXSwerveModule {
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
-      // --- simulation    //TODO Add simulation
-    // private final EncoderSim driveEncoderSim;
-    // private double driveCurrentSim = 0;
-    // private final EncoderSim steerEncoderSim;
-    // private double steerCurrentSim = 0;
-
+  // --- simulation //TODO Add simulation
+  // private final EncoderSim driveEncoderSim;
+  // private double driveCurrentSim = 0;
+  // private final EncoderSim steerEncoderSim;
+  // private double steerCurrentSim = 0;
 
   /**
    * Constructs a MAXSwerveModule and configures the driving and turning motor,
@@ -53,8 +55,30 @@ public class MAXSwerveModule {
     m_drivingSparkMax.restoreFactoryDefaults();
     m_turningSparkMax.restoreFactoryDefaults();
 
+    // CAN Status frames
+    m_drivingSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    m_turningSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+
+    m_drivingSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+    m_turningSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 100);
+
+    m_drivingSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+    m_turningSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+
+    m_drivingSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 0);
+    m_turningSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 0);
+
+    m_drivingSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+    m_turningSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+
+    m_drivingSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
+    m_turningSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 50);
+    m_drivingSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
+    m_turningSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 50);
+
     // Setup encoders and PID controllers for the driving and turning SPARKS MAX.
-    m_drivingEncoder = m_drivingSparkMax.getEncoder();
+    //m_drivingEncoder = m_drivingSparkMax.getEncoder(SparkRelativeEncoder.Type.kQuadrature, 7168);
+     m_drivingEncoder = m_drivingSparkMax.getEncoder();
     m_turningEncoder = m_turningSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
     m_drivingPIDController = m_drivingSparkMax.getPIDController();
     m_turningPIDController = m_turningSparkMax.getPIDController();
@@ -122,8 +146,8 @@ public class MAXSwerveModule {
     m_chassisAngularOffset = chassisAngularOffset;
     m_desiredState.angle = new Rotation2d(m_turningEncoder.getPosition());
     m_drivingEncoder.setPosition(0);
-    
-    // --- Simulation   //TODO Add Simulation
+
+    // --- Simulation //TODO Add Simulation
     // driveEncoderSim = new EncoderSim(driveEncoder);
     // steerEncoderSim = new EncoderSim(steerEncoder);
   }
@@ -192,29 +216,28 @@ public class MAXSwerveModule {
     return m_drivingEncoder.getVelocityConversionFactor();
   }
 
-
-  // ----- Simulation   //TODO Add Simulation
+  // ----- Simulation //TODO Add Simulation
 
   // public void simulationUpdate(
-  //     double driveEncoderDist,
-  //     double driveEncoderRate,
-  //     double driveCurrent,
-  //     double steerEncoderDist,
-  //     double steerEncoderRate,
-  //     double steerCurrent) {
-  //   driveEncoderSim.setDistance(driveEncoderDist);
-  //   driveEncoderSim.setRate(driveEncoderRate);
-  //   this.driveCurrentSim = driveCurrent;
-  //   steerEncoderSim.setDistance(steerEncoderDist);
-  //   steerEncoderSim.setRate(steerEncoderRate);
-  //   this.steerCurrentSim = steerCurrent;
+  // double driveEncoderDist,
+  // double driveEncoderRate,
+  // double driveCurrent,
+  // double steerEncoderDist,
+  // double steerEncoderRate,
+  // double steerCurrent) {
+  // driveEncoderSim.setDistance(driveEncoderDist);
+  // driveEncoderSim.setRate(driveEncoderRate);
+  // this.driveCurrentSim = driveCurrent;
+  // steerEncoderSim.setDistance(steerEncoderDist);
+  // steerEncoderSim.setRate(steerEncoderRate);
+  // this.steerCurrentSim = steerCurrent;
   // }
 
   // public double getDriveCurrentSim() {
-  //   return driveCurrentSim;
+  // return driveCurrentSim;
   // }
 
   // public double getSteerCurrentSim() {
-  //   return steerCurrentSim;
+  // return steerCurrentSim;
   // }
 }

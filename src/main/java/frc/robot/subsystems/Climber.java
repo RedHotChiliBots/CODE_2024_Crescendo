@@ -8,12 +8,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAnalogSensor;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import frc.robot.Constants.CANIdConstants;
 import frc.robot.Constants.ClimberConstants;
@@ -60,8 +62,44 @@ public class Climber extends SubsystemBase {
     rightFollower.restoreFactoryDefaults();
     rightFollower.clearFaults();
 
+    // CAN Status frames
+    leftLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    leftLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+    leftLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+    leftLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 20);
+    leftLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+    leftLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
+    leftLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
+
+    rightLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    rightLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+    rightLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+    rightLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 20);
+    rightLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+    rightLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
+    rightLeader.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
+
+    leftFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    leftFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 200);
+    leftFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 200);
+    leftFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 0);
+    leftFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+    leftFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
+    leftFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
+
+    rightFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    rightFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 200);
+    rightFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 200);
+    rightFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 0);
+    rightFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+    rightFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
+    rightFollower.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
+
     leftEncoder.setPositionConversionFactor(ClimberConstants.kClimberEncoderPositionFactor);
     rightEncoder.setPositionConversionFactor(ClimberConstants.kClimberEncoderPositionFactor);
+
+    leftEncoder.setInverted(true);
+    rightEncoder.setInverted(true);
 
     leftPIDController.setFeedbackDevice(leftEncoder);
     leftPIDController.setP(ClimberConstants.kP);
@@ -81,18 +119,20 @@ public class Climber extends SubsystemBase {
 
     leftLeader.setInverted(ClimberConstants.kLeft1Inverted);
     leftLeader.setIdleMode(ClimberConstants.kLeft1IdleMode);
+    // leftFollower.setInverted(ClimberConstants.kLeft2Inverted);
     leftFollower.setIdleMode(ClimberConstants.kLeft2IdleMode);
     leftLeader.setSmartCurrentLimit(ClimberConstants.kCurrentLimit);
     leftFollower.setSmartCurrentLimit(ClimberConstants.kCurrentLimit);
 
     rightLeader.setInverted(ClimberConstants.kRight1Inverted);
     rightLeader.setIdleMode(ClimberConstants.kRight1IdleMode);
+    // rightFollower.setInverted(ClimberConstants.kRight2Inverted);
     rightFollower.setIdleMode(ClimberConstants.kRight2IdleMode);
     rightLeader.setSmartCurrentLimit(ClimberConstants.kCurrentLimit);
     rightFollower.setSmartCurrentLimit(ClimberConstants.kCurrentLimit);
 
-    leftFollower.follow(leftLeader, true);
-    rightFollower.follow(rightLeader, true);
+    leftFollower.follow(leftLeader, false);
+    rightFollower.follow(rightLeader, false);
 
     leftLeader.burnFlash();
     leftFollower.burnFlash();
@@ -115,6 +155,9 @@ public class Climber extends SubsystemBase {
     sbRightPos.setDouble(getRightPosition());
     sbRightVolt.setDouble(getRightVoltage());
     sbRightPosSP.setDouble(getPositionSP());
+
+    SmartDashboard.putNumber("Leader Power", leftLeader.get());
+    SmartDashboard.putNumber("Follower Power", leftFollower.get());
   }
 
   public void stopClimber() {
@@ -129,9 +172,15 @@ public class Climber extends SubsystemBase {
 
   public void holdClimbPos(double pos) {
     setClimbSP(pos);
-    leftPIDController.setReference(getPositionSP(), CANSparkMax.ControlType.kPosition);
-//    rightPIDController.setReference(getPositionSP(), CANSparkMax.ControlType.kPosition);
+    leftPIDController.setReference(getPositionSP() + ClimberConstants.kLeftPotMin, CANSparkMax.ControlType.kPosition);
+    rightPIDController.setReference(getPositionSP() + ClimberConstants.kRightPotMin, CANSparkMax.ControlType.kPosition);
   }
+
+  public void climb(double pos) {
+    leftLeader.set(pos);
+    rightLeader.set(pos);
+  }
+
 
   public double getPositionSP() {
     return posSetPoint;

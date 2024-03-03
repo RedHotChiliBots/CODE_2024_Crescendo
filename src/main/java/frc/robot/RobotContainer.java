@@ -19,12 +19,17 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TrapperConstants;
 import frc.robot.autos.Autos;
-import frc.robot.commands.TrapperClaw;
+import frc.robot.commands.TrapperCloseClaw;
+import frc.robot.commands.ClimbStop;
+//import frc.robot.commands.AutonChassisDrive;
 import frc.robot.commands.ClimberLift;
 import frc.robot.commands.IntakeNote;
+import frc.robot.commands.JustClimb;
 import frc.robot.commands.ShootNote;
 import frc.robot.commands.ShooterTilt;
+import frc.robot.commands.ShooterTiltStick;
 import frc.robot.commands.TrapperLift;
+import frc.robot.commands.TrapperOpenClaw;
 import frc.robot.commands.TrapperTilt;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Vision;
@@ -43,33 +48,45 @@ import frc.robot.subsystems.Trapper;
 public class RobotContainer {
 	// The robot's subsystems
 	private final Chassis chassis = new Chassis();
-	private final Autos auton = new Autos(chassis);
 	private final Climber climber = new Climber();
 	private final Intake intake = new Intake();
 	private final Feeder feeder = new Feeder();
 	private final Shooter shooter = new Shooter();
 	private final Trapper trapper = new Trapper();
+	private final Autos auton = new Autos(chassis, intake, feeder, shooter);
 	private final Vision vision = new Vision(chassis);
 
 	// The driver's controller
 	XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 	XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
 
+	// AutonChassisDrive autonChassisDrive = new AutonChassisDrive(chassis, 3.0);
+
 	IntakeNote intakeNote = new IntakeNote(intake, feeder, shooter);
 	ShootNote shootNote = new ShootNote(intake, feeder, shooter);
 
 	ClimberLift climberLiftTop = new ClimberLift(climber, ClimberConstants.kMaxClimbPos);
+	ClimberLift climberLiftMid = new ClimberLift(climber,
+			((ClimberConstants.kMaxClimbPos + ClimberConstants.kMinClimbPos) / 2.0) - 1.5);
 	ClimberLift climberLiftBot = new ClimberLift(climber, ClimberConstants.kMinClimbPos);
 	ShooterTilt shooterTiltTop = new ShooterTilt(shooter, ShooterConstants.kMaxTiltPos);
-	ShooterTilt shooterTiltMid = new ShooterTilt(shooter, (ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0);
+	ShooterTilt shooterTiltMid = new ShooterTilt(shooter,
+			(ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0);
 	ShooterTilt shooterTiltBot = new ShooterTilt(shooter, ShooterConstants.kMinTiltPos);
 	TrapperLift trapperLiftTop = new TrapperLift(trapper, TrapperConstants.kMaxLiftLen);
 	TrapperLift trapperLiftBot = new TrapperLift(trapper, TrapperConstants.kMinLiftLen);
 	TrapperTilt trapperTiltTop = new TrapperTilt(trapper, TrapperConstants.kMaxTiltDeg);
 	TrapperTilt trapperTiltBot = new TrapperTilt(trapper, TrapperConstants.kMinTiltDeg);
-	TrapperClaw trapperClawOpen = new TrapperClaw(trapper, TrapperConstants.kGripOpen);
-	TrapperClaw trapperClawClose = new TrapperClaw(trapper, TrapperConstants.kGripClose);
 
+	JustClimb climbUp = new JustClimb(climber, 0.20);
+	JustClimb climbDn = new JustClimb(climber, -0.20);
+	ClimbStop climbStop = new ClimbStop(climber);
+
+	TrapperOpenClaw trapperClawOpen = new TrapperOpenClaw(trapper);
+	TrapperCloseClaw trapperClawClose = new TrapperCloseClaw(trapper);
+	ShooterTiltStick shooterTiltStick = new ShooterTiltStick(shooter, m_driverController.getLeftY());
+
+	private final ShuffleboardTab compTab = Shuffleboard.getTab("Competition");
 	private final ShuffleboardTab chassisTab = Shuffleboard.getTab("Chassis");
 	private final ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
 	private final ShuffleboardTab feederTab = Shuffleboard.getTab("Feeder");
@@ -92,12 +109,24 @@ public class RobotContainer {
 		intakeTab.add("IntakeNote", intakeNote);
 		shooterTab.add("ShootNote", shootNote);
 
+		compTab.add("IntakeNote", intakeNote);
+		compTab.add("ShootNote", shootNote);
+
+		// compTab.add("Climb Up", climbUp);
+		// compTab.add("Climb Dn", climbDn);
+		// compTab.add("Climb Stop", climbStop);
+
+		compTab.add("ShooterTiltTop", shooterTiltTop);
+		compTab.add("ShooterTiltMid", shooterTiltMid);
+		compTab.add("ShooterTiltBot", shooterTiltBot);
+
 		shooterTab.add("ShooterTiltTop", shooterTiltTop);
 		shooterTab.add("ShooterTiltMid", shooterTiltMid);
 		shooterTab.add("ShooterTiltBot", shooterTiltBot);
 		trapperTab.add("TrapperLiftTop", trapperLiftTop);
 		trapperTab.add("TrapperLiftBot", trapperLiftBot);
 		climberTab.add("ClimberLiftTop", climberLiftTop);
+		climberTab.add("ClimberLiftMid", climberLiftMid);
 		climberTab.add("ClimberLiftBot", climberLiftBot);
 		trapperTab.add("TrapperTiltTop", trapperTiltTop);
 		trapperTab.add("TrapperTiltBot", trapperTiltBot);
@@ -118,6 +147,20 @@ public class RobotContainer {
 								-MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
 								true, false),
 						chassis));
+
+		// shooter.setDefaultCommand(
+		// 		// The left stick controls translation of the robot.
+		// 		// Turning is controlled by the X axis of the right stick.
+		// 		new RunCommand(
+		// 				() -> shooter.tiltTrackStick(m_operatorController.getLeftY()),
+		// 				shooter));
+
+		climber.setDefaultCommand(
+				// The left stick controls translation of the robot.
+				// Turning is controlled by the X axis of the right stick.
+				new RunCommand(
+						() -> climber.stopClimber(),
+						climber));
 	}
 
 	/**
@@ -150,11 +193,35 @@ public class RobotContainer {
 						() -> chassis.zeroYaw(),
 						chassis));
 
-		new JoystickButton(m_operatorController, Button.kX.value).debounce(1)
+		// new JoystickButton(m_operatorController, Button.kX.value).debounce(1)
+		// .onTrue(intakeNote);
+
+		// new JoystickButton(m_operatorController, Button.kY.value).debounce(1)
+		// .onTrue(shootNote);
+
+		new JoystickButton(m_operatorController, Button.kRightBumper.value).debounce(1)
+				.onTrue(shootNote);
+
+		new JoystickButton(m_operatorController, Button.kLeftBumper.value).debounce(1)
 				.onTrue(intakeNote);
 
-		new JoystickButton(m_operatorController, Button.kY.value).debounce(1)
-				.onTrue(shootNote);
+		// new JoystickButton(m_operatorController, Button.kA.value).debounce(1)
+		// 		.onTrue(climberLiftTop);
+
+		// // Using Mid until Trap is working and out of way of chain
+		// new JoystickButton(m_operatorController, Button.kY.value).debounce(1)
+		// 		.onTrue(climberLiftMid);
+
+		new JoystickButton(m_operatorController, Button.kX.value)
+				.whileTrue(new RunCommand(
+						() -> climber.climb(0.15),
+						climber));
+
+		new JoystickButton(m_operatorController, Button.kB.value)
+				.whileTrue(new RunCommand(
+						() -> climber.climb(-0.15),
+						climber));
+
 	}
 
 	/**

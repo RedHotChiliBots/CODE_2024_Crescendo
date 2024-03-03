@@ -28,7 +28,8 @@ public class ShootNote extends Command {
     this.shooter = shooter;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    //addRequirements(feeder, shooter);
+    // shooter.setVelocity(ShooterConstants.kShootVelocity);
+    addRequirements(feeder, shooter);
   }
 
   // Called when the command is initially scheduled.
@@ -36,6 +37,7 @@ public class ShootNote extends Command {
   public void initialize() {
     oneTime = false;
     shooter.setVelocity(ShooterConstants.kShootVelocity);
+    shooter.holdTilt(ShooterConstants.kMaxTiltPos + ShooterConstants.kPotMin);
     timer.start();
     timer.reset();
   }
@@ -43,7 +45,7 @@ public class ShootNote extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (timer.hasElapsed(1.0) && !oneTime) {
+    if (timer.hasElapsed(0.5) && !oneTime) {
       feeder.holdVelocity(FeederConstants.kFeederVelocity);
       intake.setVelocity(IntakeConstants.kIntakeVelocity);
       oneTime = true;
@@ -63,6 +65,6 @@ public class ShootNote extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return oneTime && timer.hasElapsed(2.0);
+    return oneTime && timer.hasElapsed(1.0);
   }
 }

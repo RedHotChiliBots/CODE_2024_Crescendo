@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -67,6 +68,30 @@ public class Shooter extends SubsystemBase {
     leader.clearFaults();
     follower.restoreFactoryDefaults();
     follower.clearFaults();
+    
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 20);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
+
+    leader.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    leader.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+    leader.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+    leader.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 0);
+    leader.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+    leader.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
+    leader.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
+
+    follower.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    follower.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 200);
+    follower.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 200);
+    follower.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 0);
+    follower.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+    follower.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
+    follower.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
 
     tiltEncoder.setPositionConversionFactor(ShooterConstants.kTiltEncoderPositionFactor);
     // tiltEncoder.setVelocityConversionFactor(ShooterConstants.kTiltEncoderVelocityFactor);
@@ -139,8 +164,9 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setTiltSP(double pos) {
-    tiltSetPoint = MathUtil.clamp(pos, ShooterConstants.kMinTiltPos + ShooterConstants.kPotMin, ShooterConstants.kMaxTiltPos + ShooterConstants.kPotMin);
-    //tiltPIDController.setReference(getTiltSP(),
+    tiltSetPoint = MathUtil.clamp(pos, ShooterConstants.kMinTiltPos + ShooterConstants.kPotMin,
+        ShooterConstants.kMaxTiltPos + ShooterConstants.kPotMin);
+    // tiltPIDController.setReference(getTiltSP(),
     // CANSparkMax.ControlType.kPosition);
   }
 
@@ -176,13 +202,19 @@ public class Shooter extends SubsystemBase {
   public void setVelocity(double vel) {
     setVelocitySP(vel);
     leader.set(getVelocitySP());
-    //leaderPIDController.setReference(getVelocitySP(),
+    // leaderPIDController.setReference(getVelocitySP(),
     // CANSparkMax.ControlType.kVelocity);
   }
 
   public void holdTilt(double deg) {
     setTiltSP(deg);
     tiltPIDController.setReference(getTiltSP(), CANSparkMax.ControlType.kPosition);
+  }
+
+  public void tiltTrackStick(double inc) {
+    double pos = getTiltPos();
+    pos += (inc * 0.01);
+    holdTilt(pos);
   }
 
   public void holdPosition(double pos) {

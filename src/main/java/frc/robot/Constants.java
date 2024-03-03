@@ -68,7 +68,7 @@ public final class Constants {
     // Drive/Turn CAN IDs
     public static final int kRearRightDrivingCanId = 5;
     public static final int kRearLeftDrivingCanId = 10;
-    public static final int kFrontLeftDrivingCanId = 15;
+    public static final int kFrontLeftDrivingCanId = 14;
     public static final int kFrontRightDrivingCanId = 20;
 
     public static final int kRearRightTurningCanId = 6;
@@ -131,6 +131,8 @@ public final class Constants {
     public static final double kMaxPotVolt = 3.3;
     public static final double kMinPotVolt = 0.0;
 
+    public static final double kRightPotMin = 1.0;
+    public static final double kLeftPotMin = 1.0;
     public static final double kMaxClimbPos = 18.0;
     public static final double kMinClimbPos = 0.0;
 
@@ -147,24 +149,22 @@ public final class Constants {
 
     public static final int kCurrentLimit = 40;
 
-    public static final double kP = 0.00005;
+    public static final double kP = 0.0275;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kFF = 0.0;
     public static final double kMinOutput = -1.0;
     public static final double kMaxOutput = 1.0;
 
-    public static final boolean kLeft1Inverted = true;
-    public static final IdleMode kLeft1IdleMode = IdleMode.kCoast;
-
+    public static final boolean kLeft1Inverted = false;
+    public static final IdleMode kLeft1IdleMode = IdleMode.kBrake;
     public static final boolean kLeft2Inverted = true;
-    public static final IdleMode kLeft2IdleMode = IdleMode.kCoast;
+    public static final IdleMode kLeft2IdleMode = IdleMode.kBrake;
 
-    public static final boolean kRight1Inverted = true;
-    public static final IdleMode kRight1IdleMode = IdleMode.kCoast;
-
+    public static final boolean kRight1Inverted = false;
+    public static final IdleMode kRight1IdleMode = IdleMode.kBrake;
     public static final boolean kRight2Inverted = true;
-    public static final IdleMode kRight2IdleMode = IdleMode.kCoast;
+    public static final IdleMode kRight2IdleMode = IdleMode.kBrake;
   }
 
   public static final class FeederConstants {
@@ -212,7 +212,7 @@ public final class Constants {
 
     public static final boolean kIntakeMotorInverted = true;
 
-    public static final double kIntakeP = 1.0;   // 0.00008;
+    public static final double kIntakeP = 1.0; // 0.00008;
     public static final double kIntakeI = 0.0;
     public static final double kIntakeD = 0.0;
     public static final double kIntakeFF = 0.0;
@@ -269,7 +269,7 @@ public final class Constants {
     public static final double kTiltMinOutput = -1.0;
     public static final double kTiltMaxOutput = 1.0;
 
-    public static final IdleMode kTiltMotorIdleMode = IdleMode.kCoast;
+    public static final IdleMode kTiltMotorIdleMode = IdleMode.kBrake;
     public static final int kTiltMotorCurrentLimit = 20;
 
     public static final double kLeftEncoderPositionFactor = 1.0;
@@ -289,7 +289,7 @@ public final class Constants {
     public static final int kLeftMotorCurrentLimit = 40;
 
     public static final double kRightEncoderPositionFactor = 1.0;
-    public static final double kRightEncoderVelocityFactor = 1.0; //kRightEncoderPositionFactor / 60.0;
+    public static final double kRightEncoderVelocityFactor = 1.0; // kRightEncoderPositionFactor / 60.0;
 
     public static final boolean kRightMotorInverted = true;
 
@@ -314,7 +314,7 @@ public final class Constants {
     public static final double kMinClawDeg = 0.0;
 
     public static final double kGripOpen = 0.0;
-    public static final double kGripClose = 0.0;
+    public static final double kGripClose = 180.0;
 
     public static final double kMaxShaftRevs = 10.0;
     public static final double kMaxPotVolt = 3.3;
@@ -343,7 +343,7 @@ public final class Constants {
     public static final double kLiftMinOutput = -1.0;
     public static final double kLiftMaxOutput = 1.0;
 
-    public static final IdleMode kLiftMotorIdleMode = IdleMode.kCoast;
+    public static final IdleMode kLiftMotorIdleMode = IdleMode.kBrake;
     public static final int kLiftMotorCurrentLimit = 40;
 
     public static final double kTiltGearRatio = 25.0;

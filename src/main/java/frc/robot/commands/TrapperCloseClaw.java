@@ -7,13 +7,13 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Trapper;
 
-public class TrapperClaw extends Command {
+public class TrapperCloseClaw extends Command {
   /** Creates a new TrapClawOpen. */
 
   private Trapper trapper = null;
   private double pos = 0.0;
 
-  public TrapperClaw(Trapper trapper, double pos) {
+  public TrapperCloseClaw(Trapper trapper) {
     this.trapper = trapper;
     this.pos = pos;
 
@@ -23,7 +23,7 @@ public class TrapperClaw extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    trapper.setClaw(pos);
+    trapper.closeClaw();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

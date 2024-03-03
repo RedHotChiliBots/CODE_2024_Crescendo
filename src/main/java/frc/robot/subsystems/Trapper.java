@@ -104,8 +104,9 @@ public class Trapper extends SubsystemBase {
     setLiftSP(TrapperConstants.kMinLiftLen);
     setTiltSP(TrapperConstants.kMinTiltDeg);
 
-    leftClaw.set(TrapperConstants.kGripOpen);
-    rightClaw.set(TrapperConstants.kGripOpen);
+    // leftClaw.set(TrapperConstants.kGripOpen);
+    // rightClaw.set(TrapperConstants.kGripOpen);
+    closeClaw();
 
     System.out.println("----- Ending Trapper Constructor -----");
   }
@@ -129,13 +130,13 @@ public class Trapper extends SubsystemBase {
   }
 
   public void setLiftSP(double pos) {
-    liftSetPoint = MathUtil.clamp(pos, TrapperConstants.kMinLiftLen + TrapperConstants.kPotMin,
-        TrapperConstants.kMaxLiftLen + TrapperConstants.kPotMin);
+    liftSetPoint = MathUtil.clamp(pos, TrapperConstants.kMinLiftLen,
+        TrapperConstants.kMaxLiftLen);
   }
 
   public void holdLift(double pos) {
     setLiftSP(pos);
-    liftPIDController.setReference(getLiftSP(), CANSparkMax.ControlType.kPosition);
+    liftPIDController.setReference(getLiftSP() + TrapperConstants.kPotMin, CANSparkMax.ControlType.kPosition);
   }
 
   public void setTiltSP(double deg) {
@@ -153,10 +154,16 @@ public class Trapper extends SubsystemBase {
         TrapperConstants.kMaxClawDeg);
   }
 
-  public void setClaw(double pos) {
-    setClawSP(pos);
-    leftClaw.set(getClawSP());
-    rightClaw.set(getClawSP());
+  public void openClaw() {
+    //setClawSP(pos);
+    leftClaw.set(0.0);  //getClawSP());
+    rightClaw.set(1.0);  //getClawSP());
+  }
+
+  public void closeClaw() {
+    //setClawSP(pos);
+    leftClaw.set(1.0);  //getClawSP());
+    rightClaw.set(0.0);  //getClawSP());
   }
 
   public double getClawSP() {

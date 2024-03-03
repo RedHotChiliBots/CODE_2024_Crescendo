@@ -4,41 +4,46 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.TrapperConstants;
-import frc.robot.subsystems.Trapper;
+import frc.robot.subsystems.Chassis;
 
-public class TrapperLift extends Command {
-  /** Creates a new TrapClawOpen. */
+public class ChassisDrive extends Command {
+  /** Creates a new ChassisDrive. */
 
-  private Trapper trapper = null;
-  private double deg = 0.0;
+  private Chassis chassis = null;
+  private double sec = 0.0;
+  private final Timer timer = new Timer();
 
-  public TrapperLift(Trapper trapper, double deg) {
-    this.trapper = trapper;
-    this.deg = deg;
+  public ChassisDrive(Chassis chassis, double sec) {
+    this.chassis = chassis;
+    this.sec = sec;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    // Tilt should not interrup Shooter.  No dependency on Shooter.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    trapper.holdTilt(deg);
+    timer.start();
+    timer.reset();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    chassis.drive(1.0, 0.0, 0.0, false, true);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    chassis.stopChassis();
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return timer.hasElapsed(sec);
   }
 }

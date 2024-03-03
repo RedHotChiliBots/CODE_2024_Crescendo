@@ -7,7 +7,11 @@ import java.util.OptionalInt;
 import frc.robot.Constants;
 import frc.robot.Constants.ChassisConstants;
 import frc.robot.Constants.SwerveModuleConstants;
+import frc.robot.commands.AutonShootLeave;
 import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -76,7 +80,7 @@ public class Autos {
 	int dsMatchNumber = DriverStation.getMatchNumber();
 	double dsMatchTime = DriverStation.getMatchTime();
 
-	public Autos(Chassis chassis) {
+	public Autos(Chassis chassis, Intake intake, Feeder feeder, Shooter shooter) {
 		System.out.println("+++++ Starting Autos Constructor +++++");
 
 		String match = dsAlliance + " " + dsLocation + " / " + dsEventName + " " + dsMatchNumber;
@@ -138,13 +142,13 @@ public class Autos {
 		// Generate Auto commands
 		// Note: Named commands used in Auto command must be defined
 		// before defining the Auto command
-		// cmdAutoZigZag3m = new PathPlannerAuto("ZigZag3m");
+		AutonShootLeave autoShootLeave = new AutonShootLeave(chassis, intake, feeder, shooter);
 
 		// ********************************************
 		// Initialize auto command chooser with auton commands
 		chooser = AutoBuilder.buildAutoChooser();
 
-		// chooser.addOption("Traj ZigZag3Cmd", swerveControllerCommand);
+		chooser.setDefaultOption("Shoot N Leave", autoShootLeave);
 		// chooser.addOption("Path ZigZag3Cmd", cmdZigZag3m);
 		// chooser.addOption("Auto ZigZag3Cmd", cmdAutoZigZag3m);
 
