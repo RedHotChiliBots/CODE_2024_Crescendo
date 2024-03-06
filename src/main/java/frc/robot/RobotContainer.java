@@ -76,12 +76,14 @@ public class RobotContainer {
 			(ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0);
 	ShooterTilt shooterTiltBot = new ShooterTilt(shooter, ShooterConstants.kMinTiltPos);
 	TrapperLift trapperLiftTop = new TrapperLift(trapper, TrapperConstants.kMaxLiftLen);
+	TrapperLift trapperLiftMid = new TrapperLift(trapper,
+			(TrapperConstants.kMinLiftLen + TrapperConstants.kMaxTiltDeg) / 2.0);
 	TrapperLift trapperLiftBot = new TrapperLift(trapper, TrapperConstants.kMinLiftLen);
 	TrapperTilt trapperTiltTop = new TrapperTilt(trapper, TrapperConstants.kMaxTiltDeg);
 	TrapperTilt trapperTiltBot = new TrapperTilt(trapper, TrapperConstants.kMinTiltDeg);
 
-	JustClimb climbUp = new JustClimb(climber, 0.20);
-	JustClimb climbDn = new JustClimb(climber, -0.20);
+	JustClimb climbUp = new JustClimb(climber, chassis, 0.20);
+	JustClimb climbDn = new JustClimb(climber, chassis, -0.20);
 	ClimberStop climbStop = new ClimberStop(climber);
 	TrapperClaw trapperClawOpen = new TrapperClaw(trapper, CLAW.OPEN);
 	TrapperClaw trapperClawClose = new TrapperClaw(trapper, CLAW.CLOSE);
@@ -124,13 +126,19 @@ public class RobotContainer {
 		shooterTab.add("ShooterTiltTop", shooterTiltTop);
 		shooterTab.add("ShooterTiltMid", shooterTiltMid);
 		shooterTab.add("ShooterTiltBot", shooterTiltBot);
-		trapperTab.add("TrapperLiftTop", trapperLiftTop);
-		trapperTab.add("TrapperLiftBot", trapperLiftBot);
+
 		climberTab.add("ClimberLiftTop", climberLiftTop);
 		climberTab.add("ClimberLiftMid", climberLiftMid);
 		climberTab.add("ClimberLiftBot", climberLiftBot);
+		
+		trapperTab.add("TrapperLiftTop", trapperLiftTop);
+		trapperTab.add("TrapperLiftMid", trapperLiftMid);
+		trapperTab.add("TrapperLiftBot", trapperLiftBot);
+
 		trapperTab.add("TrapperTiltTop", trapperTiltTop);
+//		trapperTab.add("TrapperTiltMid", trapperTiltMid);
 		trapperTab.add("TrapperTiltBot", trapperTiltBot);
+
 		trapperTab.add("TrapperClawOpen", trapperClawOpen);
 		trapperTab.add("TrapperClawClose", trapperClawClose);
 
@@ -150,18 +158,14 @@ public class RobotContainer {
 						chassis));
 
 		// shooter.setDefaultCommand(
-		// 		// The left stick controls translation of the robot.
-		// 		// Turning is controlled by the X axis of the right stick.
-		// 		new RunCommand(
-		// 				() -> shooter.tiltTrackStick(m_operatorController.getLeftY()),
-		// 				shooter));
+		// new RunCommand(
+		// () -> shooter.tiltTrackStick(m_operatorController.getLeftY()),
+		// shooter));
 
-		climber.setDefaultCommand(
-				// The left stick controls translation of the robot.
-				// Turning is controlled by the X axis of the right stick.
-				new RunCommand(
-						() -> climber.stopClimber(),
-						climber));
+		climber.setDefaultCommand(new ClimberStop(climber));
+				// new RunCommand(
+				// 		() -> climber.stopClimber(),
+				// 		climber));
 	}
 
 	/**
@@ -200,21 +204,21 @@ public class RobotContainer {
 		// new JoystickButton(m_operatorController, Button.kY.value).debounce(1)
 		// .onTrue(shootNote);
 
-		new JoystickButton(m_operatorController, Button.kRightBumper.value)	//.debounce(1)
+		new JoystickButton(m_operatorController, Button.kRightBumper.value) // .debounce(1)
 				.onTrue(shootNote);
 
-		new JoystickButton(m_operatorController, Button.kLeftBumper.value)	//.debounce(1)
+		new JoystickButton(m_operatorController, Button.kLeftBumper.value) // .debounce(1)
 				.onTrue(intakeNote);
 
-		new JoystickButton(m_operatorController, Button.kStart.value)	//.debounce(1)
+		new JoystickButton(m_operatorController, Button.kStart.value) // .debounce(1)
 				.onTrue(intakeStop);
 
 		// new JoystickButton(m_operatorController, Button.kA.value).debounce(1)
-		// 		.onTrue(climberLiftTop);
+		// .onTrue(climberLiftTop);
 
 		// // Using Mid until Trap is working and out of way of chain
 		// new JoystickButton(m_operatorController, Button.kY.value).debounce(1)
-		// 		.onTrue(climberLiftMid);
+		// .onTrue(climberLiftMid);
 
 		new JoystickButton(m_operatorController, Button.kX.value)
 				.whileTrue(new RunCommand(

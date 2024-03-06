@@ -37,7 +37,7 @@ public class ShootNote extends Command {
   public void initialize() {
     oneTime = false;
     shooter.holdVelocity(ShooterConstants.kShootVelocity);
-    shooter.holdTilt(ShooterConstants.kMaxTiltPos + ShooterConstants.kPotMin);
+    shooter.holdTilt(ShooterConstants.kMaxTiltPos);
     timer.start();
     timer.reset();
   }

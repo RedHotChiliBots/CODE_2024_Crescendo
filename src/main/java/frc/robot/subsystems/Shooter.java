@@ -160,12 +160,11 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isNoteDetected() {
-    return noteDetect.get();
+    return !noteDetect.get();
   }
 
   public void setTiltSP(double pos) {
-    tiltSetPoint = MathUtil.clamp(pos, ShooterConstants.kMinTiltPos + ShooterConstants.kPotMin,
-        ShooterConstants.kMaxTiltPos + ShooterConstants.kPotMin);
+    tiltSetPoint = MathUtil.clamp(pos, ShooterConstants.kMinTiltPos, ShooterConstants.kMaxTiltPos);
   }
 
   public double getTiltSP() {
@@ -211,9 +210,9 @@ public class Shooter extends SubsystemBase {
     leaderPIDController.setReference(getVelocitySP(), CANSparkFlex.ControlType.kVelocity);
   }
 
-  public void holdTilt(double deg) {
-    setTiltSP(deg);
-    tiltPIDController.setReference(getTiltSP(), CANSparkMax.ControlType.kPosition);
+  public void holdTilt(double pos) {
+    setTiltSP(pos);
+    tiltPIDController.setReference(getTiltSP() + ShooterConstants.kTiltPotAdj, CANSparkMax.ControlType.kPosition);
   }
 
   public void tiltTrackStick(double inc) {

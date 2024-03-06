@@ -42,8 +42,6 @@ public class Trapper extends SubsystemBase {
       .withWidget("Text View").withPosition(2, 2).withSize(2, 1).getEntry();
   private final GenericEntry sbRightClawPos = trapperTab.addPersistent("RightClaw Pos", 0)
       .withWidget("Text View").withPosition(4, 2).withSize(2, 1).getEntry();
-  private final GenericEntry sbClawPosSP = trapperTab.addPersistent("Claw SP", 0)
-      .withWidget("Text View").withPosition(6, 2).withSize(2, 1).getEntry();
 
   private final Servo topClaw = new Servo(PWMConstants.kTopServoID);
   private final Servo botClaw = new Servo(PWMConstants.kBotServoID);
@@ -59,7 +57,6 @@ public class Trapper extends SubsystemBase {
 
   private double liftSetPoint = 0.0;
   private double tiltSetPoint = 0.0;
-  private double clawSetPoint = 0.0;
 
   public enum CLAW {
     OPEN,
@@ -81,7 +78,7 @@ public class Trapper extends SubsystemBase {
     lift.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
     lift.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
     lift.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
-    lift.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 0);
+    lift.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 20);
     lift.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
     lift.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
     lift.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
@@ -91,8 +88,8 @@ public class Trapper extends SubsystemBase {
     tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
     tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 0);
     tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
-    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
-    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 200);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 200);
 
     liftEncoder.setPositionConversionFactor(TrapperConstants.kLiftEncoderPositionFactor);
     tiltEncoder.setPositionConversionFactor(TrapperConstants.kTiltEncoderPositionFactor);
@@ -148,7 +145,6 @@ public class Trapper extends SubsystemBase {
     sbTiltPosSP.setDouble(getTiltSP());
     sbLeftClawPos.setDouble(getLeftClawPos());
     sbRightClawPos.setDouble(getRightClawPos());
-    sbClawPosSP.setDouble(getClawSP());
   }
 
   public void stopTrapper() {
@@ -163,7 +159,7 @@ public class Trapper extends SubsystemBase {
 
   public void holdLift(double pos) {
     setLiftSP(pos);
-    liftPIDController.setReference(getLiftSP() + TrapperConstants.kPotMin, CANSparkMax.ControlType.kPosition);
+    liftPIDController.setReference(getLiftSP() + TrapperConstants.kLiftPotAdj, CANSparkMax.ControlType.kPosition);
   }
 
   public void setTiltSP(double deg) {
@@ -176,23 +172,16 @@ public class Trapper extends SubsystemBase {
     tiltPIDController.setReference(getTiltSP(), CANSparkMax.ControlType.kPosition);
   }
 
-  public void setClawSP(double pos) {
-    clawSetPoint = MathUtil.clamp(pos, TrapperConstants.kMinClawDeg,
-        TrapperConstants.kMaxClawDeg);
-  }
-
   public void holdClaw(CLAW clawPos) {
     switch (clawPos) {
       case OPEN:
-        // setClawSP(pos);
-        topClaw.set(TrapperConstants.kTopClawOpen); // getClawSP());
-        botClaw.set(TrapperConstants.kBotClawOpen); // getClawSP());
+        topClaw.setAngle(TrapperConstants.kTopClawOpen);
+        botClaw.setAngle(TrapperConstants.kBotClawOpen);
         break;
 
       case CLOSE:
-        // setClawSP(pos);
-        topClaw.set(TrapperConstants.kTopClawClose); // getClawSP());
-        botClaw.set(TrapperConstants.kBotClawClose); // getClawSP());
+        topClaw.setAngle(TrapperConstants.kTopClawClose);
+        botClaw.setAngle(TrapperConstants.kBotClawClose);
         break;
 
       case NA:
@@ -202,10 +191,6 @@ public class Trapper extends SubsystemBase {
       default:
         DriverStation.reportError("Unknown value for CLAW", true);
     }
-  }
-
-  public double getClawSP() {
-    return clawSetPoint;
   }
 
   public double getLiftPosition() {
@@ -229,10 +214,10 @@ public class Trapper extends SubsystemBase {
   }
 
   public double getLeftClawPos() {
-    return topClaw.get();
+    return topClaw.getAngle();
   }
 
   public double getRightClawPos() {
-    return botClaw.get();
+    return botClaw.getAngle();
   }
 }

@@ -181,7 +181,6 @@ public class Climber extends SubsystemBase {
     rightLeader.set(pos);
   }
 
-
   public double getPositionSP() {
     return posSetPoint;
   }

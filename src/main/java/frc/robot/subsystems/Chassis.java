@@ -179,6 +179,8 @@ public class Chassis extends SubsystemBase {
     zeroYaw();
     resetPose(getPose());
 
+    setChannelOff();
+
     pitchOffset = Math.toRadians(-getPitch());
     rollOffset = Math.toRadians(-getRoll());
 
@@ -229,6 +231,14 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putNumber("swerve/velfactorC", SwerveModuleConstants.kDrivingEncoderVelocityFactor);
     SmartDashboard.putNumber("swerve/posfactorE", m_frontLeft.getDrivePosFactor());
     SmartDashboard.putNumber("swerve/velfactorE", m_frontLeft.getDriveVelFactor());
+  }
+
+  public void setChannelOn() {
+    pdh.setSwitchableChannel(true);
+  }
+
+  public void setChannelOff() {
+    pdh.setSwitchableChannel(false);
   }
 
   /**

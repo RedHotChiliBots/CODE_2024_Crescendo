@@ -226,11 +226,11 @@ public final class Constants {
   public static final class ShooterConstants {
     public static final double kMaxShootRPM = MotorConstants.kVortexFreeSpeedRpm;
     public static final double kMinShootRPM = -MotorConstants.kVortexFreeSpeedRpm;
-    public static final double kShootVelocity = MotorConstants.kVortexFreeSpeedRpm * 0.8;
+    public static final double kShootVelocity = MotorConstants.kVortexFreeSpeedRpm * 0.9;
 
     public static final double kMaxTiltDeg = 65.0;
     public static final double kMinTiltDeg = 30.0;
-    public static final double kTiltTollerance = 1.0;
+    public static final double kTiltTollerance = 0.5;
     public static final double kShootTollerance = 50.0;
 
     public static final double kGearRatio = 25.0;
@@ -239,9 +239,10 @@ public final class Constants {
     public static final double kMaxPotVolt = 3.3;
     public static final double kMinPotVolt = 0.0;
 
-    public static final double kPotMin = 1.07;
+    public static final double kTiltPotAdj = 1.07;
     public static final double kMaxTiltPos = 4.875;
     public static final double kMinTiltPos = 0.0;
+    public static final double kMidTiltPos = (ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0;
 
     public static final double kSprocketDia = 1.5;
     public static final double kDistPerShaftRev = kSprocketDia * Math.PI;
@@ -305,7 +306,7 @@ public final class Constants {
     public static final double kMinTiltDeg = 0.0;
     public static final double kTiltTollerance = 1.0;
 
-    public static final double kPotMin = 2.0;
+    public static final double kLiftPotAdj = 4.1;
     public static final double kMaxLiftLen = 25.0;
     public static final double kMinLiftLen = 0.0;
     public static final double kLiftTollerance = 1.0;
@@ -338,7 +339,7 @@ public final class Constants {
 
     public static final boolean kLiftMotorInverted = false;
 
-    public static final double kLiftP = 0.0005;
+    public static final double kLiftP = 0.005;
     public static final double kLiftI = 0;
     public static final double kLiftD = 0;
     public static final double kLiftFF = 0;
@@ -357,12 +358,12 @@ public final class Constants {
 
     public static final boolean kTiltMotorInverted = false;
 
-    public static final double kTiltP = 0;
+    public static final double kTiltP = 0.00005;
     public static final double kTiltI = 0;
     public static final double kTiltD = 0;
     public static final double kTiltFF = 0;
-    public static final double kTiltMinOutput = 0;
-    public static final double kTiltMaxOutput = 0;
+    public static final double kTiltMinOutput = -1.0;
+    public static final double kTiltMaxOutput = 1.0;
 
     public static final IdleMode kTiltMotorIdleMode = IdleMode.kBrake;
     public static final int kTiltMotorCurrentLimit = 40;

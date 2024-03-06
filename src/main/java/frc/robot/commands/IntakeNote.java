@@ -33,7 +33,7 @@ public class IntakeNote extends Command {
   public void initialize() {
     intake.holdVelocity(IntakeConstants.kIntakeVelocity);
     feeder.holdVelocity(FeederConstants.kFeederVelocity);
-    shooter.holdTilt(((ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0) + ShooterConstants.kPotMin);
+    shooter.holdTilt(ShooterConstants.kMidTiltPos);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
