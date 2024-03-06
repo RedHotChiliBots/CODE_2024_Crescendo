@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -44,8 +45,8 @@ public class Trapper extends SubsystemBase {
   private final GenericEntry sbClawPosSP = trapperTab.addPersistent("Claw SP", 0)
       .withWidget("Text View").withPosition(6, 2).withSize(2, 1).getEntry();
 
-  private final Servo leftClaw = new Servo(PWMConstants.kLeftServoID);
-  private final Servo rightClaw = new Servo(PWMConstants.kRightServoID);
+  private final Servo topClaw = new Servo(PWMConstants.kTopServoID);
+  private final Servo botClaw = new Servo(PWMConstants.kBotServoID);
 
   private final CANSparkMax lift = new CANSparkMax(CANIdConstants.kLiftTrapCANId, MotorType.kBrushless);
   private final CANSparkMax tilt = new CANSparkMax(CANIdConstants.kTiltTrapCANId, MotorType.kBrushless);
@@ -59,6 +60,14 @@ public class Trapper extends SubsystemBase {
   private double liftSetPoint = 0.0;
   private double tiltSetPoint = 0.0;
   private double clawSetPoint = 0.0;
+
+  public enum CLAW {
+    OPEN,
+    CLOSE,
+    NA
+  }
+
+  public CLAW clawPos = CLAW.NA;
 
   public Trapper() {
     System.out.println("+++++ Starting Trapper Constructor +++++");
@@ -124,7 +133,7 @@ public class Trapper extends SubsystemBase {
 
     // leftClaw.set(TrapperConstants.kGripOpen);
     // rightClaw.set(TrapperConstants.kGripOpen);
-    closeClaw();
+    holdClaw(CLAW.CLOSE);
 
     System.out.println("----- Ending Trapper Constructor -----");
   }
@@ -172,16 +181,27 @@ public class Trapper extends SubsystemBase {
         TrapperConstants.kMaxClawDeg);
   }
 
-  public void openClaw() {
-    //setClawSP(pos);
-    leftClaw.set(0.0);  //getClawSP());
-    rightClaw.set(1.0);  //getClawSP());
-  }
+  public void holdClaw(CLAW clawPos) {
+    switch (clawPos) {
+      case OPEN:
+        // setClawSP(pos);
+        topClaw.set(TrapperConstants.kTopClawOpen); // getClawSP());
+        botClaw.set(TrapperConstants.kBotClawOpen); // getClawSP());
+        break;
 
-  public void closeClaw() {
-    //setClawSP(pos);
-    leftClaw.set(1.0);  //getClawSP());
-    rightClaw.set(0.0);  //getClawSP());
+      case CLOSE:
+        // setClawSP(pos);
+        topClaw.set(TrapperConstants.kTopClawClose); // getClawSP());
+        botClaw.set(TrapperConstants.kBotClawClose); // getClawSP());
+        break;
+
+      case NA:
+        DriverStation.reportError("Invalid value for CLAW", true);
+        break;
+
+      default:
+        DriverStation.reportError("Unknown value for CLAW", true);
+    }
   }
 
   public double getClawSP() {
@@ -209,10 +229,10 @@ public class Trapper extends SubsystemBase {
   }
 
   public double getLeftClawPos() {
-    return leftClaw.get();
+    return topClaw.get();
   }
 
   public double getRightClawPos() {
-    return rightClaw.get();
+    return botClaw.get();
   }
 }

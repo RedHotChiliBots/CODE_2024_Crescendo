@@ -45,7 +45,7 @@ public class Intake extends SubsystemBase {
     intake.restoreFactoryDefaults();
     intake.clearFaults();
 
-          // CAN Status frames
+    // CAN Status frames
     intake.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
     intake.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
     intake.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
@@ -107,9 +107,9 @@ public class Intake extends SubsystemBase {
     return (posSetPoint);
   }
 
-  public void setVelocity(double vel) {
+  public void holdVelocity(double vel) {
     setVelocitySP(vel);
-    //intake.set(IntakeConstants.kIntakeVelocity);
+    // intake.set(IntakeConstants.kIntakeVelocity);
     intakePIDController.setReference(getVelocitySP(), CANSparkMax.ControlType.kVelocity);
   }
 

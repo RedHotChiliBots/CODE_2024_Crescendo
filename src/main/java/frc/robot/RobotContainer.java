@@ -19,8 +19,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TrapperConstants;
 import frc.robot.autos.Autos;
-import frc.robot.commands.TrapperCloseClaw;
-import frc.robot.commands.ClimbStop;
+import frc.robot.commands.ClimbrStop;
 //import frc.robot.commands.AutonChassisDrive;
 import frc.robot.commands.ClimberLift;
 import frc.robot.commands.IntakeNote;
@@ -30,10 +29,11 @@ import frc.robot.commands.ShootNote;
 import frc.robot.commands.ShooterTilt;
 import frc.robot.commands.ShooterTiltStick;
 import frc.robot.commands.TrapperLift;
-import frc.robot.commands.TrapperOpenClaw;
+import frc.robot.commands.TrapperClaw;
 import frc.robot.commands.TrapperTilt;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Trapper.CLAW;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
@@ -63,7 +63,7 @@ public class RobotContainer {
 
 	// AutonChassisDrive autonChassisDrive = new AutonChassisDrive(chassis, 3.0);
 
-	IntakeStop intakeStop = new IntakeStop(intake, feeder, shooter);
+	IntakeStop intakeStop = new IntakeStop(intake, feeder);
 	IntakeNote intakeNote = new IntakeNote(intake, feeder, shooter);
 	ShootNote shootNote = new ShootNote(intake, feeder, shooter);
 
@@ -82,10 +82,10 @@ public class RobotContainer {
 
 	JustClimb climbUp = new JustClimb(climber, 0.20);
 	JustClimb climbDn = new JustClimb(climber, -0.20);
-	ClimbStop climbStop = new ClimbStop(climber);
+	ClimbrStop climbStop = new ClimbrStop(climber);
 
-	TrapperOpenClaw trapperClawOpen = new TrapperOpenClaw(trapper);
-	TrapperCloseClaw trapperClawClose = new TrapperCloseClaw(trapper);
+	TrapperClaw trapperClawOpen = new TrapperClaw(trapper, CLAW.OPEN);
+	TrapperClaw trapperClawClose = new TrapperClaw(trapper, CLAW.CLOSE);
 	ShooterTiltStick shooterTiltStick = new ShooterTiltStick(shooter, m_driverController.getLeftY());
 
 	private final ShuffleboardTab compTab = Shuffleboard.getTab("Competition");
@@ -226,7 +226,6 @@ public class RobotContainer {
 				.whileTrue(new RunCommand(
 						() -> climber.climb(-0.40),
 						climber));
-
 	}
 
 	/**

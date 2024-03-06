@@ -113,8 +113,8 @@ public final class Constants {
   }
 
   public static final class PWMConstants {
-    public static final int kLeftServoID = 0;
-    public static final int kRightServoID = 1;
+    public static final int kTopServoID = 0;
+    public static final int kBotServoID = 1;
   }
 
   public static final class MotorConstants {
@@ -313,8 +313,10 @@ public final class Constants {
     public static final double kMaxClawDeg = 90.0;
     public static final double kMinClawDeg = 0.0;
 
-    public static final double kGripOpen = 0.0;
-    public static final double kGripClose = 180.0;
+    public static final double kTopClawOpen = 0.0;
+    public static final double kTopClawClose = 180.0;
+    public static final double kBotClawOpen = 180.0;
+    public static final double kBotClawClose = 0.0;
 
     public static final double kMaxShaftRevs = 10.0;
     public static final double kMaxPotVolt = 3.3;

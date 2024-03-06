@@ -31,7 +31,7 @@ public class IntakeNote extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intake.setVelocity(IntakeConstants.kIntakeVelocity);
+    intake.holdVelocity(IntakeConstants.kIntakeVelocity);
     feeder.holdVelocity(FeederConstants.kFeederVelocity);
     shooter.holdTilt(((ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0) + ShooterConstants.kPotMin);
   }

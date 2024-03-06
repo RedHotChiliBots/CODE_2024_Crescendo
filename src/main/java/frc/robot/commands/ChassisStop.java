@@ -5,26 +5,24 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Climber;
 
-public class ClimbStop extends Command {
-  /** Creates a new TrapClawOpen. */
+import frc.robot.subsystems.Chassis;
 
-  private Climber climber = null;
-  private double pos = 0.0;
+public class ChassisStop extends Command {
+  /** Creates a new StopChassis. */
+  Chassis chassis = null;
 
-  public ClimbStop(Climber climber) {
-    this.climber = climber;
-    this.pos = pos;
-
+  public ChassisStop(Chassis chassis) {
+    this.chassis = chassis;
+    
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(climber);
+    addRequirements(chassis);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    climber.stopClimber();
+    chassis.stopChassis();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
