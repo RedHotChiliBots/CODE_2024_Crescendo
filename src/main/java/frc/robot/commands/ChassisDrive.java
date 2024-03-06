@@ -20,6 +20,7 @@ public class ChassisDrive extends Command {
     this.sec = sec;
 
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(chassis);
   }
 
   // Called when the command is initially scheduled.
@@ -32,7 +33,7 @@ public class ChassisDrive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    chassis.drive(1.0, 0.0, 0.0, false, true);
+    chassis.drive(0.5, 0.0, 0.0, true, true);
   }
 
   // Called once the command ends or is interrupted.

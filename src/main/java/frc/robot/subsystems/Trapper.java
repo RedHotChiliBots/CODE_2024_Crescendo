@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.SparkAnalogSensor;
 import com.revrobotics.CANSparkMax;
@@ -66,6 +67,23 @@ public class Trapper extends SubsystemBase {
     lift.clearFaults();
     tilt.restoreFactoryDefaults();
     tilt.clearFaults();
+
+    // CAN Status frames
+    lift.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    lift.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+    lift.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+    lift.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 0);
+    lift.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+    lift.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
+    lift.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
+
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 0);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 0);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 0);
+    tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 0);
 
     liftEncoder.setPositionConversionFactor(TrapperConstants.kLiftEncoderPositionFactor);
     tiltEncoder.setPositionConversionFactor(TrapperConstants.kTiltEncoderPositionFactor);

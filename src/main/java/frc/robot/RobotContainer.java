@@ -24,6 +24,7 @@ import frc.robot.commands.ClimbStop;
 //import frc.robot.commands.AutonChassisDrive;
 import frc.robot.commands.ClimberLift;
 import frc.robot.commands.IntakeNote;
+import frc.robot.commands.IntakeStop;
 import frc.robot.commands.JustClimb;
 import frc.robot.commands.ShootNote;
 import frc.robot.commands.ShooterTilt;
@@ -62,6 +63,7 @@ public class RobotContainer {
 
 	// AutonChassisDrive autonChassisDrive = new AutonChassisDrive(chassis, 3.0);
 
+	IntakeStop intakeStop = new IntakeStop(intake, feeder, shooter);
 	IntakeNote intakeNote = new IntakeNote(intake, feeder, shooter);
 	ShootNote shootNote = new ShootNote(intake, feeder, shooter);
 
@@ -199,11 +201,14 @@ public class RobotContainer {
 		// new JoystickButton(m_operatorController, Button.kY.value).debounce(1)
 		// .onTrue(shootNote);
 
-		new JoystickButton(m_operatorController, Button.kRightBumper.value).debounce(1)
+		new JoystickButton(m_operatorController, Button.kRightBumper.value)	//.debounce(1)
 				.onTrue(shootNote);
 
-		new JoystickButton(m_operatorController, Button.kLeftBumper.value).debounce(1)
+		new JoystickButton(m_operatorController, Button.kLeftBumper.value)	//.debounce(1)
 				.onTrue(intakeNote);
+
+		new JoystickButton(m_operatorController, Button.kStart.value)	//.debounce(1)
+				.onTrue(intakeStop);
 
 		// new JoystickButton(m_operatorController, Button.kA.value).debounce(1)
 		// 		.onTrue(climberLiftTop);
@@ -214,12 +219,12 @@ public class RobotContainer {
 
 		new JoystickButton(m_operatorController, Button.kX.value)
 				.whileTrue(new RunCommand(
-						() -> climber.climb(0.15),
+						() -> climber.climb(0.25),
 						climber));
 
 		new JoystickButton(m_operatorController, Button.kB.value)
 				.whileTrue(new RunCommand(
-						() -> climber.climb(-0.15),
+						() -> climber.climb(-0.40),
 						climber));
 
 	}

@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
@@ -23,8 +24,9 @@ public class AutonShootLeave extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new ShootNote(intake, feeder, shooter),
-      new ChassisDrive(chassis, 1.0)
+      new WaitCommand(1.0),
+      new ShootNote(intake, feeder, shooter)
+      //new ChassisDrive(chassis, 2.0)
     );
   }
 }

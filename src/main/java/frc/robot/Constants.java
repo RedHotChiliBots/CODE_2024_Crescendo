@@ -68,7 +68,7 @@ public final class Constants {
     // Drive/Turn CAN IDs
     public static final int kRearRightDrivingCanId = 5;
     public static final int kRearLeftDrivingCanId = 10;
-    public static final int kFrontLeftDrivingCanId = 14;
+    public static final int kFrontLeftDrivingCanId = 15;
     public static final int kFrontRightDrivingCanId = 20;
 
     public static final int kRearRightTurningCanId = 6;
@@ -370,7 +370,7 @@ public final class Constants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(19.3 * 3.0);
-    public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+    public static final double kMaxAngularSpeed = 12 * Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.2; // radians per second
     public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
