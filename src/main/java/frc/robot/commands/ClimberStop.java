@@ -7,12 +7,12 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber;
 
-public class ClimbrStop extends Command {
+public class ClimberStop extends Command {
   /** Creates a new TrapClawOpen. */
 
   private Climber climber = null;
 
-  public ClimbrStop(Climber climber) {
+  public ClimberStop(Climber climber) {
     this.climber = climber;
 
     // Use addRequirements() here to declare subsystem dependencies.

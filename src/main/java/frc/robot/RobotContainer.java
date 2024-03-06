@@ -19,7 +19,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TrapperConstants;
 import frc.robot.autos.Autos;
-import frc.robot.commands.ClimbrStop;
+import frc.robot.commands.ClimberStop;
 //import frc.robot.commands.AutonChassisDrive;
 import frc.robot.commands.ClimberLift;
 import frc.robot.commands.IntakeNote;
@@ -82,8 +82,7 @@ public class RobotContainer {
 
 	JustClimb climbUp = new JustClimb(climber, 0.20);
 	JustClimb climbDn = new JustClimb(climber, -0.20);
-	ClimbrStop climbStop = new ClimbrStop(climber);
-
+	ClimberStop climbStop = new ClimberStop(climber);
 	TrapperClaw trapperClawOpen = new TrapperClaw(trapper, CLAW.OPEN);
 	TrapperClaw trapperClawClose = new TrapperClaw(trapper, CLAW.CLOSE);
 	ShooterTiltStick shooterTiltStick = new ShooterTiltStick(shooter, m_driverController.getLeftY());

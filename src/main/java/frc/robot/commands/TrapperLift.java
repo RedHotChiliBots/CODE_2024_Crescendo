@@ -11,11 +11,11 @@ public class TrapperLift extends Command {
   /** Creates a new TrapClawOpen. */
 
   private Trapper trapper = null;
-  private double deg = 0.0;
+  private double len = 0.0;
 
-  public TrapperLift(Trapper trapper, double deg) {
+  public TrapperLift(Trapper trapper, double len) {
     this.trapper = trapper;
-    this.deg = deg;
+    this.len = len;
 
     // Use addRequirements() here to declare subsystem dependencies.
     // Tilt should not interrup Shooter.  No dependency on Shooter.
@@ -24,7 +24,7 @@ public class TrapperLift extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    trapper.holdTilt(deg);
+    trapper.holdLift(len);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
