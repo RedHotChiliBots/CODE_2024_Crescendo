@@ -16,9 +16,6 @@ import frc.robot.subsystems.Shooter;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class AutonShootLeave extends SequentialCommandGroup {
   /** Creates a new AutonShootLeave. */
-  private Intake intake = null;
-  private Feeder feeder = null;
-  private Shooter shooter = null;
 
   public AutonShootLeave(Chassis chassis, Intake intake, Feeder feeder, Shooter shooter) {
     // Add your commands in the addCommands() call, e.g.

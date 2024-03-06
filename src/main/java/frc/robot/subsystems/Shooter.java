@@ -68,7 +68,7 @@ public class Shooter extends SubsystemBase {
     leader.clearFaults();
     follower.restoreFactoryDefaults();
     follower.clearFaults();
-    
+
     tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
     tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
     tilt.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
@@ -166,8 +166,6 @@ public class Shooter extends SubsystemBase {
   public void setTiltSP(double pos) {
     tiltSetPoint = MathUtil.clamp(pos, ShooterConstants.kMinTiltPos + ShooterConstants.kPotMin,
         ShooterConstants.kMaxTiltPos + ShooterConstants.kPotMin);
-    // tiltPIDController.setReference(getTiltSP(),
-    // CANSparkMax.ControlType.kPosition);
   }
 
   public double getTiltSP() {
@@ -183,14 +181,6 @@ public class Shooter extends SubsystemBase {
     return velSetPoint;
   }
 
-  public boolean atVelocity() {
-    return ShooterConstants.kShootTollerance > Math.abs(getVelocitySP() - leaderEncoder.getVelocity());
-  }
-
-  public boolean atTiltPos() {
-    return ShooterConstants.kTiltTollerance > Math.abs(getTiltSP() - getTiltPos());
-  }
-
   public void setPositionSP(double pos) {
     posSetPoint = pos;
   }
@@ -199,11 +189,26 @@ public class Shooter extends SubsystemBase {
     return (posSetPoint);
   }
 
-  public void setVelocity(double vel) {
+  public boolean atVelocity() {
+    return ShooterConstants.kShootTollerance > Math.abs(getVelocitySP() - getVelocity());
+  }
+
+  public boolean atPosition() {
+    return ShooterConstants.kShootTollerance > Math.abs(getPositionSP() - getPosition());
+  }
+
+  public boolean atTiltPos() {
+    return ShooterConstants.kTiltTollerance > Math.abs(getTiltSP() - getTiltPos());
+  }
+
+  public void holdPosition(double pos) {
+    setPositionSP(pos);
+    leaderPIDController.setReference(getPositionSP(), CANSparkFlex.ControlType.kPosition);
+  }
+
+  public void holdVelocity(double vel) {
     setVelocitySP(vel);
-    leader.set(getVelocitySP());
-    // leaderPIDController.setReference(getVelocitySP(),
-    // CANSparkMax.ControlType.kVelocity);
+    leaderPIDController.setReference(getVelocitySP(), CANSparkFlex.ControlType.kVelocity);
   }
 
   public void holdTilt(double deg) {
@@ -215,11 +220,6 @@ public class Shooter extends SubsystemBase {
     double pos = getTiltPos();
     pos += (inc * 0.01);
     holdTilt(pos);
-  }
-
-  public void holdPosition(double pos) {
-    setPositionSP(pos);
-    leaderPIDController.setReference(getPositionSP(), CANSparkMax.ControlType.kPosition);
   }
 
   public double getVelocity() {
@@ -236,5 +236,11 @@ public class Shooter extends SubsystemBase {
 
   public double getTiltVolt() {
     return tiltEncoder.getVoltage();
+  }
+
+  public void moveToTrapPos() {
+    stopShooter();
+    double pos = getPosition() + 100.0;
+    holdPosition(pos);
   }
 }

@@ -11,11 +11,9 @@ public class ClimbStop extends Command {
   /** Creates a new TrapClawOpen. */
 
   private Climber climber = null;
-  private double pos = 0.0;
 
   public ClimbStop(Climber climber) {
     this.climber = climber;
-    this.pos = pos;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(climber);

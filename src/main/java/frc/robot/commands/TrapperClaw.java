@@ -6,16 +6,17 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Trapper;
+import frc.robot.subsystems.Trapper.CLAW;
 
-public class TrapperCloseClaw extends Command {
+public class TrapperClaw extends Command {
   /** Creates a new TrapClawOpen. */
 
   private Trapper trapper = null;
-  private double pos = 0.0;
+  private CLAW clawPos = CLAW.NA;
 
-  public TrapperCloseClaw(Trapper trapper) {
+  public TrapperClaw(Trapper trapper, CLAW clawPos) {
     this.trapper = trapper;
-    this.pos = pos;
+    this.clawPos = clawPos;
 
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -23,7 +24,7 @@ public class TrapperCloseClaw extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    trapper.closeClaw();
+    trapper.holdClaw(clawPos);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

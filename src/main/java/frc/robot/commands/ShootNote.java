@@ -36,7 +36,7 @@ public class ShootNote extends Command {
   @Override
   public void initialize() {
     oneTime = false;
-    shooter.setVelocity(ShooterConstants.kShootVelocity);
+    shooter.holdVelocity(ShooterConstants.kShootVelocity);
     shooter.holdTilt(ShooterConstants.kMaxTiltPos + ShooterConstants.kPotMin);
     timer.start();
     timer.reset();
@@ -47,7 +47,7 @@ public class ShootNote extends Command {
   public void execute() {
     if (timer.hasElapsed(0.6) && !oneTime) {
       feeder.holdVelocity(FeederConstants.kFeederVelocity);
-      intake.setVelocity(IntakeConstants.kIntakeVelocity);
+      intake.holdVelocity(IntakeConstants.kIntakeVelocity);
       oneTime = true;
       timer.reset();
       timer.restart();
