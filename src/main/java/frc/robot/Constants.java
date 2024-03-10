@@ -102,7 +102,8 @@ public final class Constants {
   }
 
   public static final class DigitalIOConstants {
-    public static final int kShooterNoteDetect = 0;
+    public static final int kIntakeNoteDetect = 0;
+    public static final int kIntakeNoteCapture = 1;
   }
 
   public static final class AnalogConstants {
@@ -302,21 +303,23 @@ public final class Constants {
     public static final double kRangePos = 20.0; // inches
     public static final double kOffsetPos = -1.0; // inches
 
-    public static final double kMaxTiltDeg = 90.0;
-    public static final double kMinTiltDeg = 0.0;
+    public static final double kMaxTiltDeg = 180.0;
+    public static final double kMidTiltDeg = (TrapperConstants.kMinTiltDeg + TrapperConstants.kMaxTiltDeg) / 2.0;
+    public static final double kMinTiltDeg = 90.0;
     public static final double kTiltTollerance = 1.0;
 
-    public static final double kLiftPotAdj = 4.1;
-    public static final double kMaxLiftLen = 25.0;
+    public static final double kLiftPotAdj = 4.5;
+    public static final double kMaxLiftLen = 19.5;
+    public static final double kMidLiftLen = (TrapperConstants.kMinLiftLen + TrapperConstants.kMaxLiftLen) / 2.0;
     public static final double kMinLiftLen = 0.0;
-    public static final double kLiftTollerance = 1.0;
+    public static final double kLiftTollerance = 0.25;
 
-    public static final double kMaxClawDeg = 90.0;
-    public static final double kMinClawDeg = 0.0;
+    // public static final double kMaxClawDeg = 90.0;
+    // public static final double kMinClawDeg = 0.0;
 
     public static final double kTopClawOpen = 0.0;
-    public static final double kTopClawClose = 180.0;
-    public static final double kBotClawOpen = 180.0;
+    public static final double kTopClawClose = 185.0;
+    public static final double kBotClawOpen = 185.0;
     public static final double kBotClawClose = 0.0;
 
     public static final double kMaxShaftRevs = 10.0;
@@ -337,10 +340,10 @@ public final class Constants {
 
     public static final double kLiftEncoderPositionFactor = kDistPerVolt;
 
-    public static final boolean kLiftMotorInverted = false;
+    public static final boolean kLiftMotorInverted = true;
 
-    public static final double kLiftP = 0.005;
-    public static final double kLiftI = 0;
+    public static final double kLiftP = 0.079;
+    public static final double kLiftI = 0.000001;
     public static final double kLiftD = 0;
     public static final double kLiftFF = 0;
     public static final double kLiftMinOutput = -1.0;
@@ -353,13 +356,16 @@ public final class Constants {
     public static final double kTiltRotationsPerDegree = kTiltGearRatio / 360.0;
     public static final double kTiltDegreesPerRotation = 360.0 / kTiltGearRatio;
 
-    public static final double kTiltEncoderPositionFactor = 1.0 / kTiltGearRatio;
+    public static final double kTiltEncoderPositionFactor = 2.0 * Math.PI;
     public static final double kTiltEncoderVelocityFactor = kTiltEncoderPositionFactor / 60.0;
+
+    public static final boolean kTiltEncoderInverted = true;
+    public static final double kTiltZeroOffset = Math.toRadians(247.0);
 
     public static final boolean kTiltMotorInverted = false;
 
-    public static final double kTiltP = 0.00005;
-    public static final double kTiltI = 0;
+    public static final double kTiltP = 0.115;
+    public static final double kTiltI = 0.00005;
     public static final double kTiltD = 0;
     public static final double kTiltFF = 0;
     public static final double kTiltMinOutput = -1.0;
@@ -520,32 +526,34 @@ public final class Constants {
   public static final class VisionConstants {
     public static final String kCameraName = "LimeLight";
 
-    // Camera mounted facing forward on front perimeter and six inches off floor
-    // (Note: this is the prototype robot, needs to be modified for competition
-    // robot)
+    // Camera mounted facing forward on front perimeter
+    // The following number are derived from the CAD model
+    // 21.5" off floor, 8.96" left of center, 13.67 forward of center
+    // Limelight 2 FOV 59.6 x 49.7 degrees
     public static final Transform3d kRobotToCam = new Transform3d(
-        new Translation3d(Units.inchesToMeters(30.0 / 2.0), 0.0, Units.inchesToMeters(6.0)),
-        new Rotation3d(0.0, 0.0, 0.0));
+        new Translation3d(Units.inchesToMeters(8.96),
+            Units.inchesToMeters(13.67),
+            Units.inchesToMeters(21.5)),
+        new Rotation3d(0.0, 49.7 / 2.0, 0.0));
 
     // Layout of AprilTags on the 2024 field
     public static final AprilTagFieldLayout kTagLayout = AprilTagFields.kDefaultField.loadAprilTagLayoutField();
 
-    // Standard deviations of vision estimated poses, which affect the correction
-    // rate
+    // Standard deviations of vision estimated poses, which affect the correction rate
     // (Fake values. Experiment and determine estimation noise on actual robot)
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
 
     // Constants such as camera and target height stored. Change per robot and goal!
-    public static final double kCameraHeight = Units.inchesToMeters(6.0);
+    public static final double kCameraHeight = Units.inchesToMeters(21.5);
     public static final double kTargetHeight = 1.32; // Tag height off floor in meters
     // Units.inchesToMeters(18.75);
 
     // Angle between horizontal and the camera.
-    public static final double kCameraPitch = Units.degreesToRadians(0);
+    public static final double kCameraPitch = Units.degreesToRadians(49.7 / 2.0);
 
     // How far from the target we want to be
-    public static final double kTargetDist = Units.feetToMeters(2);
+    public static final double kTargetDist = Units.feetToMeters(2.0);
 
     public static final double kRange2Rumble = Units.feetToMeters(20.0);
 

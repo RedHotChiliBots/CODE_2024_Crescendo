@@ -75,11 +75,14 @@ public class RobotContainer {
 	ShooterTilt shooterTiltMid = new ShooterTilt(shooter,
 			(ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0);
 	ShooterTilt shooterTiltBot = new ShooterTilt(shooter, ShooterConstants.kMinTiltPos);
+
 	TrapperLift trapperLiftTop = new TrapperLift(trapper, TrapperConstants.kMaxLiftLen);
-	TrapperLift trapperLiftMid = new TrapperLift(trapper,
-			(TrapperConstants.kMinLiftLen + TrapperConstants.kMaxTiltDeg) / 2.0);
+	TrapperLift trapperLiftMid = new TrapperLift(trapper, TrapperConstants.kMidLiftLen);
 	TrapperLift trapperLiftBot = new TrapperLift(trapper, TrapperConstants.kMinLiftLen);
+
 	TrapperTilt trapperTiltTop = new TrapperTilt(trapper, TrapperConstants.kMaxTiltDeg);
+	TrapperTilt trapperTiltMid = new TrapperTilt(trapper,
+			(TrapperConstants.kMaxTiltDeg + TrapperConstants.kMinTiltDeg) / 2.0);
 	TrapperTilt trapperTiltBot = new TrapperTilt(trapper, TrapperConstants.kMinTiltDeg);
 
 	JustClimb climbUp = new JustClimb(climber, chassis, 0.20);
@@ -136,7 +139,7 @@ public class RobotContainer {
 		trapperTab.add("TrapperLiftBot", trapperLiftBot);
 
 		trapperTab.add("TrapperTiltTop", trapperTiltTop);
-//		trapperTab.add("TrapperTiltMid", trapperTiltMid);
+		trapperTab.add("TrapperTiltMid", trapperTiltMid);
 		trapperTab.add("TrapperTiltBot", trapperTiltBot);
 
 		trapperTab.add("TrapperClawOpen", trapperClawOpen);

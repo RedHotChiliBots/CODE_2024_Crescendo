@@ -93,6 +93,8 @@ public class Trapper extends SubsystemBase {
 
     liftEncoder.setPositionConversionFactor(TrapperConstants.kLiftEncoderPositionFactor);
     tiltEncoder.setPositionConversionFactor(TrapperConstants.kTiltEncoderPositionFactor);
+    tiltEncoder.setInverted(TrapperConstants.kTiltEncoderInverted);
+    tiltEncoder.setZeroOffset(TrapperConstants.kTiltZeroOffset);
 
     liftPIDController.setFeedbackDevice(liftEncoder);
     liftPIDController.setP(TrapperConstants.kLiftP);
@@ -138,11 +140,11 @@ public class Trapper extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    sbLiftPos.setDouble(getLiftPosition());
+    sbLiftPos.setDouble(getLiftPosition() - TrapperConstants.kLiftPotAdj);
     sbLiftVolt.setDouble(getLiftVoltage());
     sbLiftPosSP.setDouble(getLiftSP());
-    sbTiltPos.setDouble(getTiltPosition());
-    sbTiltPosSP.setDouble(getTiltSP());
+    sbTiltPos.setDouble(Math.toDegrees(getTiltPosition()));
+    sbTiltPosSP.setDouble(Math.toDegrees(getTiltSP()));
     sbLeftClawPos.setDouble(getLeftClawPos());
     sbRightClawPos.setDouble(getRightClawPos());
   }
@@ -167,8 +169,8 @@ public class Trapper extends SubsystemBase {
         TrapperConstants.kMaxTiltDeg));
   }
 
-  public void holdTilt(double deg) {
-    setTiltSP(deg);
+  public void holdTilt(double rad) {
+    setTiltSP(rad);
     tiltPIDController.setReference(getTiltSP(), CANSparkMax.ControlType.kPosition);
   }
 
@@ -210,7 +212,7 @@ public class Trapper extends SubsystemBase {
   }
 
   public double getTiltSP() {
-    return Math.toDegrees(tiltSetPoint);
+    return tiltSetPoint;
   }
 
   public double getLeftClawPos() {

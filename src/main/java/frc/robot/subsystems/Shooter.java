@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,7 +19,6 @@ import com.revrobotics.SparkAnalogSensor;
 import com.revrobotics.SparkPIDController;
 
 import frc.robot.Constants.CANIdConstants;
-import frc.robot.Constants.DigitalIOConstants;
 import frc.robot.Constants.ShooterConstants;
 
 public class Shooter extends SubsystemBase {
@@ -40,8 +38,6 @@ public class Shooter extends SubsystemBase {
       .withWidget("Text View").withPosition(2, 3).withSize(2, 1).getEntry();
   private final GenericEntry sbTiltSP = shooterTab.addPersistent("Tilt SP", 0)
       .withWidget("Text View").withPosition(4, 2).withSize(2, 1).getEntry();
-  private final GenericEntry sbNote = shooterTab.addPersistent("Note Detect", false)
-      .withWidget("Boolean Box").withPosition(0, 0).withSize(1, 1).getEntry();
 
   private final CANSparkMax tilt = new CANSparkMax(CANIdConstants.kTiltShooterCANID, MotorType.kBrushless);
   private final CANSparkFlex leader = new CANSparkFlex(CANIdConstants.kLeftShooterCANID, MotorType.kBrushless);
@@ -53,7 +49,6 @@ public class Shooter extends SubsystemBase {
   private final SparkAnalogSensor tiltEncoder = tilt.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
   private final SparkPIDController tiltPIDController = tilt.getPIDController();
 
-  private final DigitalInput noteDetect = new DigitalInput(DigitalIOConstants.kShooterNoteDetect);
 
   private double tiltSetPoint = 0.0;
   private double velSetPoint = 0.0;
@@ -151,16 +146,11 @@ public class Shooter extends SubsystemBase {
     sbTiltPos.setDouble(getTiltPos());
     sbTiltVolt.setDouble(getTiltVolt());
     sbTiltSP.setDouble(getTiltSP());
-    sbNote.setBoolean(isNoteDetected());
   }
 
   public void stopShooter() {
     leader.stopMotor();
     tilt.stopMotor();
-  }
-
-  public boolean isNoteDetected() {
-    return !noteDetect.get();
   }
 
   public void setTiltSP(double pos) {

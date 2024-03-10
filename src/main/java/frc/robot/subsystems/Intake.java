@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,6 +18,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 
 import frc.robot.Constants.CANIdConstants;
+import frc.robot.Constants.DigitalIOConstants;
 import frc.robot.Constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
@@ -30,11 +32,16 @@ public class Intake extends SubsystemBase {
       .withWidget("Text View").withPosition(2, 1).withSize(2, 1).getEntry();
   private final GenericEntry sbPosSP = intakeTab.addPersistent("Position SP", 0)
       .withWidget("Text View").withPosition(4, 1).withSize(2, 1).getEntry();
+  private final GenericEntry sbNote = intakeTab.addPersistent("Note Detect", false)
+      .withWidget("Boolean Box").withPosition(0, 0).withSize(1, 1).getEntry();
 
   private final CANSparkMax intake = new CANSparkMax(CANIdConstants.kIntakeCANId, MotorType.kBrushless);
 
   private final RelativeEncoder intakeEncoder = intake.getEncoder();
   private final SparkPIDController intakePIDController = intake.getPIDController();
+
+  private final DigitalInput noteDetect = new DigitalInput(DigitalIOConstants.kIntakeNoteDetect);
+  private final DigitalInput noteCapture = new DigitalInput(DigitalIOConstants.kIntakeNoteCapture);
 
   private double velSetPoint = 0.0;
   private double posSetPoint = 0.0;
@@ -84,6 +91,15 @@ public class Intake extends SubsystemBase {
     sbVelSP.setDouble(getVelocitySP());
     sbPos.setDouble(getPosition());
     sbPosSP.setDouble(getPositionSP());
+    sbNote.setBoolean(isNoteDetected());
+  }
+
+  public boolean isNoteDetected() {
+    return !noteDetect.get();
+  }
+
+  public boolean isNoteCaptured() {
+    return !noteCapture.get();
   }
 
   public void stopIntake() {
