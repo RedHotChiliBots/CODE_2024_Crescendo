@@ -24,6 +24,7 @@ import frc.robot.Constants.IntakeConstants;
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private final ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
+  private final ShuffleboardTab compTab = Shuffleboard.getTab("Competition");
   private final GenericEntry sbVel = intakeTab.addPersistent("Velocity", 0)
       .withWidget("Text View").withPosition(2, 0).withSize(2, 1).getEntry();
   private final GenericEntry sbVelSP = intakeTab.addPersistent("Velocity SP", 0)
@@ -32,16 +33,18 @@ public class Intake extends SubsystemBase {
       .withWidget("Text View").withPosition(2, 1).withSize(2, 1).getEntry();
   private final GenericEntry sbPosSP = intakeTab.addPersistent("Position SP", 0)
       .withWidget("Text View").withPosition(4, 1).withSize(2, 1).getEntry();
-  private final GenericEntry sbNote = intakeTab.addPersistent("Note Detect", false)
-      .withWidget("Boolean Box").withPosition(0, 0).withSize(1, 1).getEntry();
+  private final GenericEntry sbNoteDetect = intakeTab.addPersistent("Note Detect", false)
+      .withWidget("Boolean Box").withPosition(0, 1).withSize(1, 1).getEntry();
+  private final GenericEntry sbNoteCapture= compTab.addPersistent("Note Capture", false)
+      .withWidget("Boolean Box").withPosition(1, 2).withSize(1, 1).getEntry();
 
   private final CANSparkMax intake = new CANSparkMax(CANIdConstants.kIntakeCANId, MotorType.kBrushless);
 
   private final RelativeEncoder intakeEncoder = intake.getEncoder();
   private final SparkPIDController intakePIDController = intake.getPIDController();
 
-  private final DigitalInput noteDetect = new DigitalInput(DigitalIOConstants.kIntakeNoteDetect);
-  private final DigitalInput noteCapture = new DigitalInput(DigitalIOConstants.kIntakeNoteCapture);
+  private final DigitalInput noteDetected = new DigitalInput(DigitalIOConstants.kIntakeNoteDetect);
+  private final DigitalInput noteCaptured = new DigitalInput(DigitalIOConstants.kIntakeNoteCapture);
 
   private double velSetPoint = 0.0;
   private double posSetPoint = 0.0;
@@ -91,15 +94,16 @@ public class Intake extends SubsystemBase {
     sbVelSP.setDouble(getVelocitySP());
     sbPos.setDouble(getPosition());
     sbPosSP.setDouble(getPositionSP());
-    sbNote.setBoolean(isNoteDetected());
+    sbNoteDetect.setBoolean(isNoteDetected());
+    sbNoteCapture.setBoolean(isNoteCaptured());
   }
 
   public boolean isNoteDetected() {
-    return !noteDetect.get();
+    return !noteDetected.get();
   }
 
   public boolean isNoteCaptured() {
-    return !noteCapture.get();
+    return !noteCaptured.get();
   }
 
   public void stopIntake() {

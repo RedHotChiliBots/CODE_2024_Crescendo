@@ -13,31 +13,37 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Trapper;
+import frc.robot.subsystems.Trapper.CLAW;
 
-public class ShootNote extends Command {
+public class ShootPosNote extends Command {
+  Trapper trapper = null;
   Intake intake = null;
   Feeder feeder = null;
   Shooter shooter = null;
   Timer timer = new Timer();
-  boolean oneTime = false;
+  boolean finished = false;
+  double pos = 0.0;
+  int state = 0;
 
   /** Creates a new ShootNote. */
-  public ShootNote(Intake intake, Feeder feeder, Shooter shooter) {
+  public ShootPosNote(Trapper trapper, Intake intake, Feeder feeder, Shooter shooter) {
+    this.trapper = trapper;
     this.intake = intake;
     this.feeder = feeder;
     this.shooter = shooter;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    // shooter.setVelocity(ShooterConstants.kShootVelocity);
+    // shooter.setVelocity(ShooterConsktants.kShootVelocity);
     addRequirements(feeder);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    oneTime = false;
-    shooter.holdVelocity(ShooterConstants.kShootVelocity);
-    shooter.setTiltSP(ShooterConstants.kMaxTiltPos);
+    finished = false;
+    state = 0;
+    feeder.holdVelocity(FeederConstants.kFeederVelocity);
     timer.start();
     timer.reset();
   }
@@ -45,19 +51,33 @@ public class ShootNote extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (timer.hasElapsed(0.6) && !oneTime) {
-      feeder.holdVelocity(FeederConstants.kFeederVelocity);
-      intake.holdVelocity(IntakeConstants.kIntakeVelocity);
-      oneTime = true;
-      timer.reset();
-      timer.restart();
+    switch (state) {
+      case 0:
+        if (timer.hasElapsed(2.0)) {
+          shooter.holdVelocity(ShooterConstants.kMoveVelocity);
+          state++;
+        }
+        break;
+
+      case 1:
+        if (!intake.isNoteDetected()) {
+          shooter.holdPosition(shooter.getPosition());
+          state++;
+        }
+        break;
+
+      case 2:
+        trapper.holdClaw(CLAW.CLOSE);
+        finished = true;
+        break;
+
+      default:
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.stopIntake();
     feeder.stopFeeder();
     shooter.stopShooter();
   }
@@ -65,6 +85,6 @@ public class ShootNote extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return oneTime && timer.hasElapsed(1.5);
+    return finished;
   }
 }
