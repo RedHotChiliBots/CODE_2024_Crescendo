@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.Constants.FeederConstants;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
@@ -61,6 +60,7 @@ public class ShootPosNote extends Command {
 
       case 1:
         if (!intake.isNoteDetected()) {
+          feeder.stopFeeder();
           shooter.holdPosition(shooter.getPosition());
           state++;
         }
@@ -78,7 +78,6 @@ public class ShootPosNote extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    feeder.stopFeeder();
     shooter.stopShooter();
   }
 
