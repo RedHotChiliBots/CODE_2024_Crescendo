@@ -6,13 +6,14 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkAnalogSensor;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
@@ -26,14 +27,10 @@ public class Climber extends SubsystemBase {
   private final ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
   private final GenericEntry sbLeftPos = climberTab.addPersistent("Left Pos", 0)
       .withWidget("Text View").withPosition(2, 0).withSize(2, 1).getEntry();
-  private final GenericEntry sbLeftVolt = climberTab.addPersistent("Left Volt", 0)
-      .withWidget("Text View").withPosition(6, 0).withSize(2, 1).getEntry();
   private final GenericEntry sbLeftPosSP = climberTab.addPersistent("Left Pos SP", 0)
       .withWidget("Text View").withPosition(4, 0).withSize(2, 1).getEntry();
   private final GenericEntry sbRightPos = climberTab.addPersistent("Right Pos", 0)
       .withWidget("Text View").withPosition(2, 1).withSize(2, 1).getEntry();
-  private final GenericEntry sbRightVolt = climberTab.addPersistent("Right Volt", 0)
-      .withWidget("Text View").withPosition(6, 1).withSize(2, 1).getEntry();
   private final GenericEntry sbRightPosSP = climberTab.addPersistent("Right Pos SP", 0)
       .withWidget("Text View").withPosition(4, 1).withSize(2, 1).getEntry();
 
@@ -42,13 +39,19 @@ public class Climber extends SubsystemBase {
   private final CANSparkMax rightLeader = new CANSparkMax(CANIdConstants.kRight1CANId, MotorType.kBrushless);
   private final CANSparkMax rightFollower = new CANSparkMax(CANIdConstants.kRight2CANId, MotorType.kBrushless);
 
-  private final SparkAnalogSensor leftEncoder = leftLeader.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
-  private final SparkAnalogSensor rightEncoder = rightLeader.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
+  private final RelativeEncoder leftEncoder = leftLeader.getEncoder();
+  private final RelativeEncoder rightEncoder = rightLeader.getEncoder();
+  // private final SparkAnalogSensor leftEncoder =
+  // leftLeader.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
+  // private final SparkAnalogSensor rightEncoder =
+  // rightLeader.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
 
   private final SparkPIDController leftPIDController = leftLeader.getPIDController();
   private final SparkPIDController rightPIDController = rightLeader.getPIDController();
 
   private double posSetPoint = ClimberConstants.kMinClimbPos;
+
+  private final Relay brake = new Relay(0);
 
   public Climber() {
     System.out.println("+++++ Starting Climber Constructor +++++");
@@ -98,8 +101,8 @@ public class Climber extends SubsystemBase {
     leftEncoder.setPositionConversionFactor(ClimberConstants.kClimberEncoderPositionFactor);
     rightEncoder.setPositionConversionFactor(ClimberConstants.kClimberEncoderPositionFactor);
 
-    leftEncoder.setInverted(true);
-    rightEncoder.setInverted(true);
+    // leftEncoder.setInverted(true);
+    // rightEncoder.setInverted(true);
 
     leftPIDController.setFeedbackDevice(leftEncoder);
     leftPIDController.setP(ClimberConstants.kP);
@@ -140,7 +143,10 @@ public class Climber extends SubsystemBase {
     rightFollower.burnFlash();
 
     stopClimber();
+    initClimber();
     setClimbSP(ClimberConstants.kMinClimbPos);
+
+    brake.set(Relay.Value.kOff);
 
     System.out.println("----- Ending Climber Constructor -----");
   }
@@ -150,19 +156,30 @@ public class Climber extends SubsystemBase {
     // This method will be called once per scheduler run
 
     sbLeftPos.setDouble(getLeftPosition());
-    sbLeftVolt.setDouble(getLeftVoltage());
     sbLeftPosSP.setDouble(getPositionSP());
     sbRightPos.setDouble(getRightPosition());
-    sbRightVolt.setDouble(getRightVoltage());
     sbRightPosSP.setDouble(getPositionSP());
 
     SmartDashboard.putNumber("Leader Power", leftLeader.get());
     SmartDashboard.putNumber("Follower Power", leftFollower.get());
   }
 
+  public void initClimber() {
+    leftEncoder.setPosition(ClimberConstants.kMinClimbPos);
+    rightEncoder.setPosition(ClimberConstants.kMinClimbPos);
+  }
+
   public void stopClimber() {
     leftLeader.stopMotor();
     rightLeader.stopMotor();
+  }
+
+  public void setBrakeOn() {
+    brake.set(Relay.Value.kOn);
+  }
+
+  public void setBrakeOff() {
+    brake.set(Relay.Value.kOff);
   }
 
   public void setClimbSP(double pos) {
@@ -172,13 +189,17 @@ public class Climber extends SubsystemBase {
 
   public void holdClimbPos(double pos) {
     setClimbSP(pos);
-    leftPIDController.setReference(getPositionSP() + ClimberConstants.kLeftPotMin, CANSparkMax.ControlType.kPosition);
-    rightPIDController.setReference(getPositionSP() + ClimberConstants.kRightPotMin, CANSparkMax.ControlType.kPosition);
+    leftPIDController.setReference(getPositionSP(), CANSparkMax.ControlType.kPosition);
+    rightPIDController.setReference(getPositionSP(), CANSparkMax.ControlType.kPosition);
   }
 
-  public void climb(double pos) {
-    leftLeader.set(pos);
-    rightLeader.set(pos);
+  public boolean atClimberSP() {
+    return ClimberConstants.kClimberTollerance > Math.abs(getLeftPosition() - getPositionSP());
+  }
+
+  public void climb(double spd) {
+    leftLeader.set(spd);
+    rightLeader.set(spd);
   }
 
   public double getPositionSP() {
@@ -191,13 +212,5 @@ public class Climber extends SubsystemBase {
 
   public double getRightPosition() {
     return rightEncoder.getPosition();
-  }
-
-  public double getLeftVoltage() {
-    return leftEncoder.getVoltage();
-  }
-
-  public double getRightVoltage() {
-    return rightEncoder.getVoltage();
   }
 }

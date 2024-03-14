@@ -231,6 +231,7 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putNumber("swerve/velfactorC", SwerveModuleConstants.kDrivingEncoderVelocityFactor);
     SmartDashboard.putNumber("swerve/posfactorE", m_frontLeft.getDrivePosFactor());
     SmartDashboard.putNumber("swerve/velfactorE", m_frontLeft.getDriveVelFactor());
+//    SmartDashboard.putBoolean("pdh/channel", pdh.getSwitchableChannel());
   }
 
   public void setChannelOn() {

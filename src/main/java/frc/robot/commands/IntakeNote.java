@@ -25,7 +25,7 @@ public class IntakeNote extends Command {
     this.shooter = shooter;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intake, feeder, shooter);
+    addRequirements(intake, feeder);
   }
 
   // Called when the command is initially scheduled.
@@ -33,7 +33,7 @@ public class IntakeNote extends Command {
   public void initialize() {
     intake.holdVelocity(IntakeConstants.kIntakeVelocity);
     feeder.holdVelocity(FeederConstants.kFeederVelocity);
-    shooter.holdTilt(ShooterConstants.kMidTiltPos);
+    shooter.setTiltSP(ShooterConstants.kMidTiltPos);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

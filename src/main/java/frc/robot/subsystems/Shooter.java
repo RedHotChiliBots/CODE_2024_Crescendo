@@ -132,6 +132,8 @@ public class Shooter extends SubsystemBase {
     stopShooter();
     setVelocitySP(0.0);
 
+    setTiltSP(ShooterConstants.kMaxTiltPos);
+
     System.out.println("----- Ending Shooter Constructor -----");
   }
 
@@ -191,7 +193,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void holdPosition(double pos) {
-    setPositionSP(pos);
+//    setPositionSP(pos);
     leaderPIDController.setReference(getPositionSP(), CANSparkFlex.ControlType.kPosition);
   }
 
@@ -201,7 +203,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void holdTilt(double pos) {
-    setTiltSP(pos);
+//    setTiltSP(pos);
     tiltPIDController.setReference(getTiltSP() + ShooterConstants.kTiltPotAdj, CANSparkMax.ControlType.kPosition);
   }
 

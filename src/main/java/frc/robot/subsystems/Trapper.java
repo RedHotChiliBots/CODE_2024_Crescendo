@@ -55,8 +55,9 @@ public class Trapper extends SubsystemBase {
   private final SparkAbsoluteEncoder tiltEncoder = tilt.getAbsoluteEncoder(Type.kDutyCycle);
   private final SparkPIDController tiltPIDController = tilt.getPIDController();
 
-  private double liftSetPoint = 0.0;
-  private double tiltSetPoint = 0.0;
+  private double liftSetPoint = getLiftPosition();
+  private double tiltSetPoint = getTiltPosition();
+  private CLAW clawSetPoint = CLAW.CLOSE;
 
   public enum CLAW {
     OPEN,
@@ -127,12 +128,10 @@ public class Trapper extends SubsystemBase {
     lift.stopMotor();
     tilt.stopMotor();
 
+    setTiltSP(TrapperConstants.kMidTiltDeg);
     setLiftSP(TrapperConstants.kMinLiftLen);
-    setTiltSP(TrapperConstants.kMinTiltDeg);
 
-    // leftClaw.set(TrapperConstants.kGripOpen);
-    // rightClaw.set(TrapperConstants.kGripOpen);
-    holdClaw(CLAW.CLOSE);
+    holdClaw(CLAW.OPEN);
 
     System.out.println("----- Ending Trapper Constructor -----");
   }
@@ -143,8 +142,8 @@ public class Trapper extends SubsystemBase {
     sbLiftPos.setDouble(getLiftPosition() - TrapperConstants.kLiftPotAdj);
     sbLiftVolt.setDouble(getLiftVoltage());
     sbLiftPosSP.setDouble(getLiftSP());
-    sbTiltPos.setDouble(Math.toDegrees(getTiltPosition()));
-    sbTiltPosSP.setDouble(Math.toDegrees(getTiltSP()));
+    sbTiltPos.setDouble(getTiltPosition());
+    sbTiltPosSP.setDouble(getTiltSP());
     sbLeftClawPos.setDouble(getLeftClawPos());
     sbRightClawPos.setDouble(getRightClawPos());
   }
@@ -152,6 +151,14 @@ public class Trapper extends SubsystemBase {
   public void stopTrapper() {
     lift.stopMotor();
     tilt.stopMotor();
+  }
+
+  public boolean atLiftSP() {
+    return Math.abs(getLiftPosition() - getLiftSP()) < TrapperConstants.kLiftTollerance;
+  }
+
+  public boolean atTiltSP() {
+    return Math.abs(getTiltPosition() - getTiltSP()) < TrapperConstants.kTiltTollerance;
   }
 
   public void setLiftSP(double pos) {
@@ -165,13 +172,12 @@ public class Trapper extends SubsystemBase {
   }
 
   public void setTiltSP(double deg) {
-    tiltSetPoint = Math.toRadians(MathUtil.clamp(deg, TrapperConstants.kMinTiltDeg,
-        TrapperConstants.kMaxTiltDeg));
+    tiltSetPoint = MathUtil.clamp(deg, TrapperConstants.kMinTiltDeg, TrapperConstants.kMaxTiltDeg);
   }
 
-  public void holdTilt(double rad) {
-    setTiltSP(rad);
-    tiltPIDController.setReference(getTiltSP(), CANSparkMax.ControlType.kPosition);
+  public void holdTilt(double deg) {
+//    setTiltSP(deg);
+    tiltPIDController.setReference(Math.toRadians(getTiltSP()), CANSparkMax.ControlType.kPosition);
   }
 
   public void holdClaw(CLAW clawPos) {

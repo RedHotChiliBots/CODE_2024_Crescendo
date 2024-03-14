@@ -5,24 +5,30 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Climber;
 
-public class ShooterTilt extends Command {
+public class JustClimbTest extends Command {
   /** Creates a new TrapClawOpen. */
 
-  private Shooter shooter = null;
+  private Climber climber = null;
+  private double pos = 0.0;
 
-  public ShooterTilt(Shooter shooter) {
-    this.shooter = shooter;
+  public JustClimbTest(Climber climber, double pos) {
+    this.climber = climber;
+    this.pos = pos;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(shooter);
+    addRequirements(climber);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    shooter.holdTilt(shooter.getTiltSP());
+    if (pos > 0.0) {
+    climber.setBrakeOn();
+    } else if (pos < 0.0) {
+     climber.setBrakeOff();
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.

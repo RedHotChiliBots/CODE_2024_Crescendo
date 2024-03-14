@@ -11,33 +11,33 @@ public class TrapperLift extends Command {
   /** Creates a new TrapClawOpen. */
 
   private Trapper trapper = null;
-  private double len = 0.0;
 
-  public TrapperLift(Trapper trapper, double len) {
+  public TrapperLift(Trapper trapper) {
     this.trapper = trapper;
-    this.len = len;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    // Tilt should not interrup Shooter.  No dependency on Shooter.
+    // Tilt should not interrup Shooter. No dependency on Shooter.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    trapper.holdLift(len);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    trapper.holdLift(trapper.getLiftSP());
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return false;
   }
 }

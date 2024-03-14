@@ -29,7 +29,7 @@ public class ShootNote extends Command {
 
     // Use addRequirements() here to declare subsystem dependencies.
     // shooter.setVelocity(ShooterConstants.kShootVelocity);
-    addRequirements(feeder, shooter);
+    addRequirements(feeder);
   }
 
   // Called when the command is initially scheduled.
@@ -37,7 +37,7 @@ public class ShootNote extends Command {
   public void initialize() {
     oneTime = false;
     shooter.holdVelocity(ShooterConstants.kShootVelocity);
-    shooter.holdTilt(ShooterConstants.kMaxTiltPos);
+    shooter.setTiltSP(ShooterConstants.kMaxTiltPos);
     timer.start();
     timer.reset();
   }

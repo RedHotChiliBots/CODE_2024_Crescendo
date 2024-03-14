@@ -135,18 +135,25 @@ public final class Constants {
     public static final double kRightPotMin = 1.0;
     public static final double kLeftPotMin = 1.0;
     public static final double kMaxClimbPos = 18.0;
+    public static final double kMidClimbPos = (ClimberConstants.kMaxClimbPos + ClimberConstants.kMinClimbPos) / 2.0;
     public static final double kMinClimbPos = 0.0;
 
-    public static final double kBarrelDia = 0.75;
-    public static final double kDistPerShaftRev = kBarrelDia * Math.PI;
-    public static final double kDistPerMotorRev = kDistPerShaftRev / kGearRatio;
-    public static final double kShaftRevsPerVolt = kMaxShaftRevs / kMaxPotVolt;
-    public static final double kMotorRevsPerVolt = kMaxMotorRevs / kMaxPotVolt;
-    public static final double kDistPerVolt = kDistPerMotorRev * kMotorRevsPerVolt;
-    public static final double kMaxShaftRot = kMaxClimbPos / kDistPerShaftRev;
-    public static final double kMaxMotorRot = kMaxClimbPos / kDistPerMotorRev;
+    // public static final double kBarrelDia = 0.75;
+    // public static final double kDistPerShaftRev = kBarrelDia * Math.PI;
+    
+    public static final double kClimbBarrelDia = 0.75;
+    public static final double kInchPerRev = (Math.PI * kClimbBarrelDia) / kGearRatio;
 
-    public static final double kClimberEncoderPositionFactor = kDistPerVolt;
+    // public static final double kDistPerMotorRev = kDistPerShaftRev / kGearRatio;
+    // public static final double kShaftRevsPerVolt = kMaxShaftRevs / kMaxPotVolt;
+    // public static final double kMotorRevsPerVolt = kMaxMotorRevs / kMaxPotVolt;
+    // public static final double kDistPerVolt = kDistPerMotorRev * kMotorRevsPerVolt;
+    // public static final double kMaxShaftRot = kMaxClimbPos / kDistPerShaftRev;
+    // public static final double kMaxMotorRot = kMaxClimbPos / kDistPerMotorRev;
+
+    public static final double kClimberEncoderPositionFactor = kInchPerRev;
+//    public static final double kClimberEncoderPositionFactor = kDistPerVolt;
+    public static final double kClimberTollerance = 1.0;
 
     public static final int kCurrentLimit = 40;
 
@@ -157,12 +164,12 @@ public final class Constants {
     public static final double kMinOutput = -1.0;
     public static final double kMaxOutput = 1.0;
 
-    public static final boolean kLeft1Inverted = false;
+    public static final boolean kLeft1Inverted = true;
     public static final IdleMode kLeft1IdleMode = IdleMode.kBrake;
     public static final boolean kLeft2Inverted = true;
     public static final IdleMode kLeft2IdleMode = IdleMode.kBrake;
 
-    public static final boolean kRight1Inverted = false;
+    public static final boolean kRight1Inverted = true;
     public static final IdleMode kRight1IdleMode = IdleMode.kBrake;
     public static final boolean kRight2Inverted = true;
     public static final IdleMode kRight2IdleMode = IdleMode.kBrake;
@@ -230,27 +237,28 @@ public final class Constants {
     public static final double kShootVelocity = MotorConstants.kVortexFreeSpeedRpm * 0.9;
 
     public static final double kMaxTiltDeg = 65.0;
+    public static final double kMidTiltDeg = (ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0;
     public static final double kMinTiltDeg = 30.0;
     public static final double kTiltTollerance = 0.5;
     public static final double kShootTollerance = 50.0;
 
     public static final double kGearRatio = 25.0;
-    public static final double kMaxShaftRevs = 10.0;
+    public static final double kMaxShaftRevs = 9.0;
     public static final double kMaxMotorRevs = kMaxShaftRevs * kGearRatio;
-    public static final double kMaxPotVolt = 3.3;
-    public static final double kMinPotVolt = 0.0;
+    public static final double kMaxPotVolt = 2.86;
+    public static final double kMinPotVolt = 0.0390625;
 
-    public static final double kTiltPotAdj = 1.07;
+    public static final double kTiltPotAdj = 2.973;
     public static final double kMaxTiltPos = 4.875;
     public static final double kMinTiltPos = 0.0;
     public static final double kMidTiltPos = (ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0;
 
-    public static final double kSprocketDia = 1.5;
+    public static final double kSprocketDia = 1.44;
     public static final double kDistPerShaftRev = kSprocketDia * Math.PI;
     public static final double kDistPerMotorRev = kDistPerShaftRev / kGearRatio;
     public static final double kShaftRevsPerVolt = kMaxShaftRevs / kMaxPotVolt;
     public static final double kMotorRevsPerVolt = kMaxMotorRevs / kMaxPotVolt;
-    public static final double kDistPerVolt = kDistPerMotorRev * kMotorRevsPerVolt;
+    public static final double kDistPerVolt = 13.58;  //kDistPerMotorRev * kMotorRevsPerVolt;
     public static final double kVoltPerDist = 1.0 / kDistPerVolt;
     public static final double kMaxShaftRot = kMaxTiltPos / kDistPerShaftRev;
     public static final double kMaxMotorRot = kMaxTiltPos / kDistPerMotorRev;
@@ -291,7 +299,7 @@ public final class Constants {
     public static final int kLeftMotorCurrentLimit = 40;
 
     public static final double kRightEncoderPositionFactor = 1.0;
-    public static final double kRightEncoderVelocityFactor = 1.0; // kRightEncoderPositionFactor / 60.0;
+    public static final double kRightEncoderVelocityFactor = kRightEncoderPositionFactor / 60.0;
 
     public static final boolean kRightMotorInverted = true;
 
@@ -306,7 +314,7 @@ public final class Constants {
     public static final double kMaxTiltDeg = 180.0;
     public static final double kMidTiltDeg = (TrapperConstants.kMinTiltDeg + TrapperConstants.kMaxTiltDeg) / 2.0;
     public static final double kMinTiltDeg = 90.0;
-    public static final double kTiltTollerance = 1.0;
+    public static final double kTiltTollerance = 0.5;
 
     public static final double kLiftPotAdj = 4.5;
     public static final double kMaxLiftLen = 19.5;
@@ -352,7 +360,7 @@ public final class Constants {
     public static final IdleMode kLiftMotorIdleMode = IdleMode.kBrake;
     public static final int kLiftMotorCurrentLimit = 40;
 
-    public static final double kTiltGearRatio = 25.0;
+    public static final double kTiltGearRatio = 100.0;
     public static final double kTiltRotationsPerDegree = kTiltGearRatio / 360.0;
     public static final double kTiltDegreesPerRotation = 360.0 / kTiltGearRatio;
 
