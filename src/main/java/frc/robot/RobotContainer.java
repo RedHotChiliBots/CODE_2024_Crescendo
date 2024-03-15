@@ -228,7 +228,7 @@ public class RobotContainer {
 				.onTrue(new ClimbNTrap(trapper, climber));
 
 		new JoystickButton(m_operatorController, Button.kA.value)
-				.onTrue(new ClimbSetup(trapper, climber));
+				.onTrue(new ClimbSetup(trapper, climber, intake, feeder, shooter));
 
 		new JoystickButton(m_operatorController, Button.kX.value)
 				.whileTrue(new JustClimb(climber, 0.25, -1));

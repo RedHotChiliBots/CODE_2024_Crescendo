@@ -43,6 +43,7 @@ public class ShootPosNote extends Command {
     finished = false;
     state = 0;
     feeder.holdVelocity(FeederConstants.kFeederVelocity);
+    shooter.holdVelocity(ShooterConstants.kMoveVelocity);
     timer.start();
     timer.reset();
   }
@@ -51,14 +52,8 @@ public class ShootPosNote extends Command {
   @Override
   public void execute() {
     switch (state) {
-      case 0:
-        if (timer.hasElapsed(2.0)) {
-          shooter.holdVelocity(ShooterConstants.kMoveVelocity);
-          state++;
-        }
-        break;
 
-      case 1:
+      case 0:
         if (!intake.isNoteDetected()) {
           feeder.stopFeeder();
           shooter.holdPosition(shooter.getPosition());
@@ -66,7 +61,7 @@ public class ShootPosNote extends Command {
         }
         break;
 
-      case 2:
+      case 1:
         trapper.holdClaw(CLAW.CLOSE);
         finished = true;
         break;

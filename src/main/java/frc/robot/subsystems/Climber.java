@@ -194,12 +194,16 @@ public class Climber extends SubsystemBase {
   }
 
   public boolean atClimberSP() {
-    return ClimberConstants.kClimberTollerance > Math.abs(getLeftPosition() - getPositionSP());
+    return ClimberConstants.kClimberTollerance > ((Math.abs(getLeftPosition() - getPositionSP()) + Math.abs(getLeftPosition() - getPositionSP())) / 2.0);
   }
 
-  public void climb(double spd) {
+  public void setClimb(double spd) {
     leftLeader.set(spd);
     rightLeader.set(spd);
+  }
+
+  public double getClimb() {
+    return (leftLeader.get() + rightLeader.get()) / 2.0;
   }
 
   public double getPositionSP() {
