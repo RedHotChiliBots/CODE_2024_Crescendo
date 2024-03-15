@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants.TrapperConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Trapper;
 import frc.robot.subsystems.Trapper.CLAW;
@@ -25,7 +26,7 @@ public class ClimbNTrap extends SequentialCommandGroup {
         new WaitCommand(1.0),
         new ParallelCommandGroup(
             new RunCommand(() -> trapper.setLiftSP(18.0)),
-            new RunCommand(() -> trapper.setTiltSP(120.0))),
+            new RunCommand(() -> trapper.setTiltSP(TrapperConstants.kClearTiltDeg))),
         new WaitCommand(0.5),
         new TrapperClaw(trapper, CLAW.OPEN),
         new WaitCommand(1.0),

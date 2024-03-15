@@ -7,6 +7,8 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.TrapperConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
@@ -24,7 +26,8 @@ public class ClimbSetup extends SequentialCommandGroup {
     addCommands(
         new ShootPosNote(trapper, intake, feeder, shooter),
         new ParallelCommandGroup(
+            new RunCommand(() -> shooter.setTiltSP(ShooterConstants.kMaxTiltPos)),
             new JustClimb(climber, 0.25, 8.0),
-            new RunCommand(() -> trapper.setTiltSP(160.0))));
+            new RunCommand(() -> trapper.setTiltSP(TrapperConstants.kSetupTiltDeg))));
   }
 }

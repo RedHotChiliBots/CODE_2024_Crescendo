@@ -128,7 +128,7 @@ public class Trapper extends SubsystemBase {
     lift.stopMotor();
     tilt.stopMotor();
 
-    setTiltSP(TrapperConstants.kMidTiltDeg);
+    setTiltSP(TrapperConstants.kInitTiltDeg);
     setLiftSP(TrapperConstants.kMinLiftLen);
 
     holdClaw(CLAW.OPEN);

@@ -134,7 +134,7 @@ public final class Constants {
 
     public static final double kRightPotMin = 1.0;
     public static final double kLeftPotMin = 1.0;
-    public static final double kMaxClimbPos = 18.0;
+    public static final double kMaxClimbPos = 12.0;
     public static final double kMidClimbPos = (ClimberConstants.kMaxClimbPos + ClimberConstants.kMinClimbPos) / 2.0;
     public static final double kMinClimbPos = 0.0;
 
@@ -235,7 +235,7 @@ public final class Constants {
     public static final double kMaxShootRPM = MotorConstants.kVortexFreeSpeedRpm;
     public static final double kMinShootRPM = -MotorConstants.kVortexFreeSpeedRpm;
     public static final double kShootVelocity = MotorConstants.kVortexFreeSpeedRpm * 0.9;
-    public static final double kMoveVelocity = MotorConstants.kVortexFreeSpeedRpm * 0.5;
+    public static final double kMoveVelocity = MotorConstants.kVortexFreeSpeedRpm * 0.05;
 
     public static final double kMaxTiltDeg = 65.0;
     public static final double kMidTiltDeg = (ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0;
@@ -315,6 +315,9 @@ public final class Constants {
     public static final double kMaxTiltDeg = 180.0;
     public static final double kMidTiltDeg = (TrapperConstants.kMinTiltDeg + TrapperConstants.kMaxTiltDeg) / 2.0;
     public static final double kMinTiltDeg = 90.0;
+    public static final double kInitTiltDeg = 100.0;
+    public static final double kSetupTiltDeg = 95.0;
+    public static final double kClearTiltDeg = 160.0;
     public static final double kTiltTollerance = 0.5;
 
     public static final double kLiftPotAdj = 4.5;
