@@ -134,7 +134,7 @@ public final class Constants {
 
     public static final double kRightPotMin = 1.0;
     public static final double kLeftPotMin = 1.0;
-    public static final double kMaxClimbPos = 12.0;
+    public static final double kMaxClimbPos = 18.0;
     public static final double kMidClimbPos = (ClimberConstants.kMaxClimbPos + ClimberConstants.kMinClimbPos) / 2.0;
     public static final double kMinClimbPos = 0.0;
 
@@ -180,6 +180,7 @@ public final class Constants {
     public static final double kMinFeederVel = -MotorConstants.kNeoFreeSpeedRpm;
 
     public static final double kFeederVelocity = MotorConstants.kNeoFreeSpeedRpm * 0.8;
+    public static final double kMoveVelocity = MotorConstants.kNeoFreeSpeedRpm * 0.05;
 
     public static final double kFeederGearRatio = 1.0;
     // public static final double kFeederRotationsPerDegree = kFeederGearRatio /
@@ -235,7 +236,7 @@ public final class Constants {
     public static final double kMaxShootRPM = MotorConstants.kVortexFreeSpeedRpm;
     public static final double kMinShootRPM = -MotorConstants.kVortexFreeSpeedRpm;
     public static final double kShootVelocity = MotorConstants.kVortexFreeSpeedRpm * 0.9;
-    public static final double kMoveVelocity = MotorConstants.kVortexFreeSpeedRpm * 0.05;
+    public static final double kMoveVelocity = MotorConstants.kVortexFreeSpeedRpm * 0.01;
 
     public static final double kMaxTiltDeg = 65.0;
     public static final double kMidTiltDeg = (ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0;
@@ -312,12 +313,13 @@ public final class Constants {
     public static final double kRangePos = 20.0; // inches
     public static final double kOffsetPos = -1.0; // inches
 
-    public static final double kMaxTiltDeg = 180.0;
+    public static final double kMaxTiltDeg = 165.0;
     public static final double kMidTiltDeg = (TrapperConstants.kMinTiltDeg + TrapperConstants.kMaxTiltDeg) / 2.0;
-    public static final double kMinTiltDeg = 90.0;
-    public static final double kInitTiltDeg = 100.0;
-    public static final double kSetupTiltDeg = 95.0;
-    public static final double kClearTiltDeg = 160.0;
+    public static final double kMinTiltDeg = 100.0;
+    public static final double kInitTiltDeg = 120.0;
+    public static final double kSetupTiltDeg = 110.0;
+    public static final double kClearTiltDeg = 165.0;
+    public static final double kScoreTiltDeg = 140.0;
     public static final double kTiltTollerance = 0.5;
 
     public static final double kLiftPotAdj = 4.5;
@@ -376,8 +378,8 @@ public final class Constants {
 
     public static final boolean kTiltMotorInverted = false;
 
-    public static final double kTiltP = 0.115;
-    public static final double kTiltI = 0.00005;
+    public static final double kTiltP = 0.13;  //0.115
+    public static final double kTiltI = 0.0;  //0.00005;
     public static final double kTiltD = 0;
     public static final double kTiltFF = 0;
     public static final double kTiltMinOutput = -1.0;
@@ -390,7 +392,7 @@ public final class Constants {
   public static final class ChassisConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(19.3 * 3.0);
+    public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(19.3 * 5.0);
     public static final double kMaxAngularSpeed = 12 * Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.2; // radians per second
@@ -483,8 +485,8 @@ public final class Constants {
     // teeth on the bevel pinion
     // public static final double kDrivingMotorReduction = (45.0 * 22) /
     // (kDrivingMotorPinionTeeth * 15);
-    // public static final double kDrivingMotorReduction = 6.75; // L2
-    public static final double kDrivingMotorReduction = 6.12; // L3
+    public static final double kDrivingMotorReduction = 6.75; // L2
+    // public static final double kDrivingMotorReduction = 6.12; // L3
 
     public static final double kDrivingEncoderPositionFactor = kWheelCircumferenceMeters / kDrivingMotorReduction; // meters
                                                                                                                    // /

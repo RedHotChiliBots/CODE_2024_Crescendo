@@ -8,6 +8,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.ChassisConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.commands.AutonShootLeave;
+import frc.robot.commands.AutonShootStay;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
@@ -87,8 +88,10 @@ public class Autos {
 
 		final GenericEntry sbMatch = compTab.addPersistent("Match Info", "")
 				.withWidget("Text View").withPosition(0, 1).withSize(2, 1).getEntry();
+				
 		sbMatch.getString(match);
-																																															thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+		thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
 		swerveControllerCommand = new SwerveControllerCommand(
 				zigzag3Trajectory,
@@ -143,20 +146,22 @@ public class Autos {
 		// Note: Named commands used in Auto command must be defined
 		// before defining the Auto command
 		AutonShootLeave autoShootLeave = new AutonShootLeave(chassis, intake, feeder, shooter);
+		AutonShootStay autoShootStay = new AutonShootStay(chassis, intake, feeder, shooter);
 
 		// ********************************************
 		// Initialize auto command chooser with auton commands
 		chooser = AutoBuilder.buildAutoChooser();
 
 		chooser.setDefaultOption("Shoot N Leave", autoShootLeave);
-		// chooser.addOption("Path ZigZag3Cmd", cmdZigZag3m);
+		chooser.addOption("Shoot N Stay", autoShootStay);
 		// chooser.addOption("Auto ZigZag3Cmd", cmdAutoZigZag3m);
 
 		// ********************************************
 		// Add Auton Command chooser to Shuffleboard
 		compTab.add("Auton Command", chooser)
 				.withWidget("ComboBox Chooser")
-				.withPosition(0, 1)
+				.withPosition(0, 10
+				)
 				.withSize(4, 1);
 
 		System.out.println("----- Ending Autos Constructor -----");

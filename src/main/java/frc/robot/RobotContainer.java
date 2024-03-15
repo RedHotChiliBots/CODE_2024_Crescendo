@@ -104,12 +104,12 @@ public class RobotContainer {
 	 */
 	public RobotContainer() {
 
-		chassisTab.add("Chassis", chassis);
-		intakeTab.add("Intake", intake);
-		feederTab.add("Feeder", feeder);
-		shooterTab.add("Shooter", shooter);
-		climberTab.add("Climber", climber);
-		trapperTab.add("Trapper", trapper);
+		compTab.add("Chassis", chassis);
+		compTab.add("Intake", intake);
+		compTab.add("Feeder", feeder);
+		compTab.add("Shooter", shooter);
+		compTab.add("Climber", climber);
+		compTab.add("Trapper", trapper);
 
 		intakeTab.add("IntakeNote", intakeNote);
 		shooterTab.add("ShootNote", shootNote);
@@ -230,19 +230,20 @@ public class RobotContainer {
 		new JoystickButton(m_operatorController, Button.kA.value)
 				.onTrue(new ClimbSetup(trapper, climber, intake, feeder, shooter));
 
+		// new JoystickButton(m_operatorController, Button.kY.value)
+		// 		.onTrue(new RunCommand(() -> trapper.setTiltSP(TrapperConstants.kMaxTiltDeg), trapper));
+
 		new JoystickButton(m_operatorController, Button.kX.value)
 				.whileTrue(new JustClimb(climber, 0.25, -1));
 
 		new JoystickButton(m_operatorController, Button.kB.value)
 				.whileTrue(new JustClimb(climber, -0.40, -1)); 
 
-		new JoystickButton(m_driverController, Button.kX.value)
-//				.debounce(1.0)
-				.onTrue(new JustClimb(climber, 0.25, 8.0));
+		// new JoystickButton(m_driverController, Button.kX.value)
+		// 		.onTrue(new JustClimb(climber, 0.25, 8.0));
 
-		new JoystickButton(m_driverController, Button.kB.value)
-//				.debounce(1.0)
-				.onTrue(new JustClimb(climber, -0.40, 4.0)); 
+		// new JoystickButton(m_driverController, Button.kB.value)
+		// 		.onTrue(new JustClimb(climber, -0.40, 4.0)); 
 	}
 
 	/**

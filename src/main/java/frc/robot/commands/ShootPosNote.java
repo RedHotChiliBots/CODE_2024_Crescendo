@@ -6,9 +6,9 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-
 import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.TrapperConstants;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -42,8 +42,10 @@ public class ShootPosNote extends Command {
   public void initialize() {
     finished = false;
     state = 0;
-    feeder.holdVelocity(FeederConstants.kFeederVelocity);
+    feeder.holdVelocity(FeederConstants.kMoveVelocity);
     shooter.holdVelocity(ShooterConstants.kMoveVelocity);
+    trapper.setTiltSP(TrapperConstants.kSetupTiltDeg);
+    shooter.setTiltSP(ShooterConstants.kMaxTiltPos);
     timer.start();
     timer.reset();
   }
@@ -63,11 +65,28 @@ public class ShootPosNote extends Command {
 
       case 1:
         trapper.holdClaw(CLAW.CLOSE);
-        finished = true;
+        // timer.start();
+        timer.reset();
+        state++;
+        break;
+
+      case 2:
+        if (timer.hasElapsed(1.5)) {
+          trapper.setTiltSP(TrapperConstants.kClearTiltDeg);
+          timer.reset();
+          state++;
+        }
+        break;
+
+      case 3:
+        if (timer.hasElapsed(1.5)) {
+          finished = true;
+        }
         break;
 
       default:
     }
+
   }
 
   // Called once the command ends or is interrupted.

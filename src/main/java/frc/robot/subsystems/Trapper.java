@@ -26,22 +26,22 @@ import frc.robot.Constants.TrapperConstants;
 
 public class Trapper extends SubsystemBase {
   /** Creates a new Trapper. */
-
+  private final ShuffleboardTab compTab = Shuffleboard.getTab("Competition");
   private final ShuffleboardTab trapperTab = Shuffleboard.getTab("Trapper");
-  private final GenericEntry sbLiftPos = trapperTab.addPersistent("Lift Pos", 0)
-      .withWidget("Text View").withPosition(2, 0).withSize(2, 1).getEntry();
-  private final GenericEntry sbLiftVolt = trapperTab.addPersistent("Lift Volt", 0)
-      .withWidget("Text View").withPosition(6, 0).withSize(2, 1).getEntry();
-  private final GenericEntry sbLiftPosSP = trapperTab.addPersistent("Lift SP", 0)
+  private final GenericEntry sbLiftPos = compTab.addPersistent("Lift Pos", 0)
       .withWidget("Text View").withPosition(4, 0).withSize(2, 1).getEntry();
-  private final GenericEntry sbTiltPos = trapperTab.addPersistent("Tilt Pos", 0)
-      .withWidget("Text View").withPosition(2, 1).withSize(2, 1).getEntry();
-  private final GenericEntry sbTiltPosSP = trapperTab.addPersistent("Tilt SP", 0)
+  private final GenericEntry sbLiftVolt = compTab.addPersistent("Lift Volt", 0)
       .withWidget("Text View").withPosition(4, 1).withSize(2, 1).getEntry();
-  private final GenericEntry sbLeftClawPos = trapperTab.addPersistent("Left Claw Pos", 0)
-      .withWidget("Text View").withPosition(2, 2).withSize(2, 1).getEntry();
-  private final GenericEntry sbRightClawPos = trapperTab.addPersistent("RightClaw Pos", 0)
+  private final GenericEntry sbLiftPosSP = compTab.addPersistent("Lift SP", 0)
       .withWidget("Text View").withPosition(4, 2).withSize(2, 1).getEntry();
+  private final GenericEntry sbTiltPos = compTab.addPersistent("Tilt Pos", 0)
+      .withWidget("Text View").withPosition(4, 3).withSize(2, 1).getEntry();
+  private final GenericEntry sbTiltPosSP = compTab.addPersistent("Tilt SP", 0)
+      .withWidget("Text View").withPosition(4, 4).withSize(2, 1).getEntry();
+  private final GenericEntry sbLeftClawPos = compTab.addPersistent("Left Claw Pos", 0)
+      .withWidget("Text View").withPosition(4, 5).withSize(2, 1).getEntry();
+  private final GenericEntry sbRightClawPos = compTab.addPersistent("RightClaw Pos", 0)
+      .withWidget("Text View").withPosition(4, 6).withSize(2, 1).getEntry();
 
   private final Servo topClaw = new Servo(PWMConstants.kTopServoID);
   private final Servo botClaw = new Servo(PWMConstants.kBotServoID);

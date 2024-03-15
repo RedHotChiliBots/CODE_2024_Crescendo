@@ -19,6 +19,7 @@ public class TrapperClaw extends Command {
     this.clawPos = clawPos;
 
     // Use addRequirements() here to declare subsystem dependencies.
+    // addRequirements(trapper);
   }
 
   // Called when the command is initially scheduled.

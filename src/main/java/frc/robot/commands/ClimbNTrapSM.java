@@ -16,16 +16,15 @@ import frc.robot.subsystems.Trapper.CLAW;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ClimbNTrap extends SequentialCommandGroup {
+public class ClimbNTrapSM extends SequentialCommandGroup {
   /** Creates a new TrappNClimb. */
-  public ClimbNTrap(Trapper trapper, Climber climber) {
+  public ClimbNTrapSM(Trapper trapper, Climber climber) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        // new JustClimb(climber, -0.40, 4.0),
+        new JustClimb(climber, -0.40, 4.0),
         new WaitCommand(1.0),
         new ParallelCommandGroup(
-            new JustClimb(climber, -0.40, 4.0),
             new RunCommand(() -> trapper.setLiftSP(18.0)),
             new RunCommand(() -> trapper.setTiltSP(TrapperConstants.kScoreTiltDeg))),
         new WaitCommand(0.5),

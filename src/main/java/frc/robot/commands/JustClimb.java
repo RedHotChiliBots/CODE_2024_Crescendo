@@ -61,12 +61,13 @@ public class JustClimb extends Command {
   @Override
   public void execute() {
     if (timer.hasElapsed(0.075)) { // after brief time
+      climber.setClimb(spd); // go UP/DN as intended
+
       double pos = (climber.getLeftPosition() + climber.getLeftPosition()) / 2.0;
-      if ((pos <= ClimberConstants.kMinClimbPos && climber.getClimb() > 0.0) ||
-          (pos >= ClimberConstants.kMaxClimbPos && climber.getClimb() < 0.0) ) {
+      if ((pos <= ClimberConstants.kMinClimbPos && climber.getClimb() < 0.0) ||
+          (pos >= ClimberConstants.kMaxClimbPos && climber.getClimb() > 0.0)) {
         finished = true;
       }
-      climber.setClimb(spd); // go UP/DN as intended
     }
   }
 
