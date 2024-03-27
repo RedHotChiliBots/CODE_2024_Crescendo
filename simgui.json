@@ -1,0 +1,53 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Chassis/Chassis": "Subsystem",
+      "/Shuffleboard/Climber/Climber": "Subsystem",
+      "/Shuffleboard/Climber/ClimberLiftBot": "Command",
+      "/Shuffleboard/Climber/ClimberLiftTop": "Command",
+      "/Shuffleboard/Competition/Auton Command": "String Chooser",
+      "/Shuffleboard/Feeder/Feeder": "Subsystem",
+      "/Shuffleboard/Intake/Intake": "Subsystem",
+      "/Shuffleboard/Intake/IntakeNote": "Command",
+      "/Shuffleboard/Shooter/ShootNote": "Command",
+      "/Shuffleboard/Shooter/Shooter": "Subsystem",
+      "/Shuffleboard/Shooter/ShooterTiltBot": "Command",
+      "/Shuffleboard/Shooter/ShooterTiltTop": "Command",
+      "/Shuffleboard/Trapper/Trapper": "Subsystem",
+      "/Shuffleboard/Trapper/TrapperLiftBot": "Command",
+      "/Shuffleboard/Trapper/TrapperLiftTop": "Command",
+      "/Shuffleboard/Trapper/TrapperTiltBot": "Command",
+      "/Shuffleboard/Trapper/TrapperTiltTop": "Command"
+    }
+  },
+  "NetworkTables": {
+    "persistent": {
+      "Shuffleboard": {
+        "Trapper": {
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "transitory": {
+      "Shuffleboard": {
+        "Chassis": {
+          "open": true
+        },
+        "Vision": {
+          "open": true
+        }
+      },
+      "SmartDashboard": {
+        "open": true
+      },
+      "photonvision": {
+        "open": true
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  }
+}

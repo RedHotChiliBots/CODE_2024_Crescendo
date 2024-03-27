@@ -1,12 +1,18 @@
 package frc.robot.autos;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 import frc.robot.Constants;
 import frc.robot.Constants.ChassisConstants;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.SwerveModuleConstants;
+import frc.robot.commands.AutonShootLeave;
+import frc.robot.commands.AutonShootStay;
 import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -24,7 +30,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -43,6 +50,9 @@ public class Autos {
 	private Command cmdZigZag3m = null;
 	private Command cmdAutoZigZag3m = null;
 	private SwerveControllerCommand swerveControllerCommand = null;
+	private SwerveControllerCommand note1Command = null;
+	private SwerveControllerCommand note2Command = null;
+	private SwerveControllerCommand note3Command = null;
 
 	private TrajectoryConfig config = new TrajectoryConfig(
 			Constants.AutoConstants.kMaxSpeedMetersPerSecond,
@@ -59,6 +69,11 @@ public class Autos {
 			thetaController);
 
 	// An example trajectory to follow. All units in meters.
+	private Trajectory note1Trajectory = null;
+	private Trajectory note2Trajectory = null;
+	private Trajectory note3Trajectory = null;
+
+	// An example trajectory to follow. All units in meters.
 	private Trajectory zigzag3Trajectory = TrajectoryGenerator.generateTrajectory(
 			// Start at the origin facing the +X direction
 			new Pose2d(0, 0, new Rotation2d(0)),
@@ -68,8 +83,74 @@ public class Autos {
 			new Pose2d(3, 0, new Rotation2d(0)),
 			config);
 
-	public Autos(Chassis chassis) {
+	String dsEventName = DriverStation.getEventName();
+	OptionalInt dsLocation = DriverStation.getLocation();
+	Optional<DriverStation.Alliance> dsAlliance = DriverStation.getAlliance();
+	int dsMatchNumber = DriverStation.getMatchNumber();
+	double dsMatchTime = DriverStation.getMatchTime();
+
+	public Autos(Chassis chassis, Intake intake, Feeder feeder, Shooter shooter) {
 		System.out.println("+++++ Starting Autos Constructor +++++");
+
+		String match = dsAlliance + " " + dsLocation + " / " + dsEventName + " " + dsMatchNumber;
+
+		final GenericEntry sbMatch = compTab.addPersistent("Match Info", "")
+				.withWidget("Text View").withPosition(0, 1).withSize(2, 1).getEntry();
+
+		sbMatch.getString(match);
+
+		// Game Manual page 45
+		// Note 1
+		note1Trajectory = TrajectoryGenerator.generateTrajectory(
+				// Start at the origin facing the +X direction
+				chassis.getPose(), // start from current pose
+				// Pass through these two interior waypoints, making an 's' curve path
+				List.of(new Translation2d(2.9, 1.0)),
+				// End 3 meters straight ahead of where we started, facing forward
+				new Pose2d(2.9, 1.45, new Rotation2d(Math.toRadians(90.0))),
+				config);
+
+		note2Trajectory = TrajectoryGenerator.generateTrajectory(
+				// Start at the origin facing the +X direction
+				chassis.getPose(), // start from current pose
+				// Pass through these two interior waypoints, making an 's' curve path
+				List.of(new Translation2d(2.9, 2.0)),
+				// End 3 meters straight ahead of where we started, facing forward
+				new Pose2d(2.9, 2.9, new Rotation2d(Math.toRadians(90.0))),
+				config);
+
+		note3Trajectory = TrajectoryGenerator.generateTrajectory(
+				// Start at the origin facing the +X direction
+				chassis.getPose(), // start from current pose
+				// Pass through these two interior waypoints, making an 's' curve path
+				List.of(new Translation2d(2.9, 3.0)),
+				// End 3 meters straight ahead of where we started, facing forward
+				new Pose2d(2.9, 4.35, new Rotation2d(Math.toRadians(90.0))),
+				config);
+
+		note1Command = new SwerveControllerCommand(
+				note1Trajectory,
+				chassis::getPose,
+				ChassisConstants.kDriveKinematics,
+				holonomicController,
+				chassis::setModuleStates,
+				chassis);
+
+		note2Command = new SwerveControllerCommand(
+				note1Trajectory,
+				chassis::getPose,
+				ChassisConstants.kDriveKinematics,
+				holonomicController,
+				chassis::setModuleStates,
+				chassis);
+
+		note3Command = new SwerveControllerCommand(
+				note1Trajectory,
+				chassis::getPose,
+				ChassisConstants.kDriveKinematics,
+				holonomicController,
+				chassis::setModuleStates,
+				chassis);
 
 		thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -97,8 +178,7 @@ public class Autos {
 								0.0, 0.0), // Rotation PID constants
 						ChassisConstants.kMaxSpeedMetersPerSecond, // Max module speed, in m/s
 						ChassisConstants.kWheelRadius, // Drive base radius in meters. Distance
-						// from robot center to
-						// furthest module.
+						// from robot center to furthest module.
 						new ReplanningConfig() // Default path replanning config. See the API
 														// for the options here
 				),
@@ -125,21 +205,22 @@ public class Autos {
 		// Generate Auto commands
 		// Note: Named commands used in Auto command must be defined
 		// before defining the Auto command
-		// cmdAutoZigZag3m = new PathPlannerAuto("ZigZag3m");
+		AutonShootLeave autoShootLeave = new AutonShootLeave(chassis, intake, feeder, shooter);
+		AutonShootStay autoShootStay = new AutonShootStay(chassis, intake, feeder, shooter);
 
 		// ********************************************
 		// Initialize auto command chooser with auton commands
 		chooser = AutoBuilder.buildAutoChooser();
 
-		// chooser.addOption("Traj ZigZag3Cmd", swerveControllerCommand);
-		// chooser.addOption("Path ZigZag3Cmd", cmdZigZag3m);
+		chooser.setDefaultOption("Shoot N Leave", autoShootLeave);
+		chooser.addOption("Shoot N Stay", autoShootStay);
 		// chooser.addOption("Auto ZigZag3Cmd", cmdAutoZigZag3m);
 
 		// ********************************************
 		// Add Auton Command chooser to Shuffleboard
 		compTab.add("Auton Command", chooser)
 				.withWidget("ComboBox Chooser")
-				.withPosition(0, 0)
+				.withPosition(0, 10)
 				.withSize(4, 1);
 
 		System.out.println("----- Ending Autos Constructor -----");

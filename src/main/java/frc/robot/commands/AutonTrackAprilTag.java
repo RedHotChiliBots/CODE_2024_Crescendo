@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Vision;
 
@@ -12,12 +13,11 @@ public class AutonTrackAprilTag extends Command {
   Chassis chassis;
   Vision vision;
   int targetId;
-  
+
   /** Creates a new AutonTrackAprilTag. */
-  public AutonTrackAprilTag(Chassis chassis, Vision vision, int targetId) {
+  public AutonTrackAprilTag(Chassis chassis, Vision vision) {
     this.chassis = chassis;
     this.vision = vision;
-    this.targetId = targetId;
 
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -25,21 +25,21 @@ public class AutonTrackAprilTag extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    vision.setTargetId(targetId);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (vision.hasTargets()) {
+    // if (vision.getHasTargets()) {
 
-      double[] spd = vision.trackAprilTag();
+    //   double[] spd = vision.trackAprilTag();
 
-      // Use our forward/turn speeds to control the drivetrain
-      chassis.drive(spd[0], spd[1], 0.0, true, false);
-    }
+    //   // Use our forward/turn speeds to control the drivetrain
+    //   chassis.drive(spd[0], spd[1], 0.0, true, false);
+    // }
   }
-    // Called once the command ends or is interrupted.
+
+  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
   }
@@ -47,6 +47,6 @@ public class AutonTrackAprilTag extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return vision.atDistTarget();
+    return true;  //vision.atDistTarget();
   }
 }

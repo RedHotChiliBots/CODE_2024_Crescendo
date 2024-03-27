@@ -5,21 +5,26 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.Shooter;
 
-public class StopChassis extends Command {
-  /** Creates a new StopChassis. */
-  Chassis chassis = null;
+public class ShooterHoldTilt extends Command {
+  /** Creates a new TrapClawOpen. */
 
-  public StopChassis(Chassis chassis) {
-    this.chassis = chassis;
+  private Shooter shooter = null;
+  private double deg = 0.0;
+
+  public ShooterHoldTilt(Shooter shooter, double deg) {
+    this.shooter = shooter;
+    this.deg = deg;
+
     // Use addRequirements() here to declare subsystem dependencies.
+    // Tilt should not interrup Shooter.  No dependency on Shooter.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    chassis.stopChassis();
+    shooter.holdTilt(deg);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
