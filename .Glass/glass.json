@@ -1,8 +1,52 @@
 {
   "NetworkTables": {
+    "transitory": {
+      "CameraPublisher": {
+        "open": true,
+        "photonvision": {
+          "open": true
+        }
+      },
+      "photonvision": {
+        "LimeLight": {
+          "open": true
+        },
+        "open": true,
+        "photonvision": {
+          "open": true
+        }
+      }
+    },
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/Shuffleboard/Competition/Auton Command": "String Chooser"
+      "/Shuffleboard/Competition/Auton Command": "String Chooser",
+      "/Shuffleboard/Competition/Chassis": "Subsystem",
+      "/Shuffleboard/Competition/Climb Dn": "Command",
+      "/Shuffleboard/Competition/Climb Stop": "Command",
+      "/Shuffleboard/Competition/Climb Up": "Command",
+      "/Shuffleboard/Competition/Climber": "Subsystem",
+      "/Shuffleboard/Competition/Feeder": "Subsystem",
+      "/Shuffleboard/Competition/Intake": "Subsystem",
+      "/Shuffleboard/Competition/IntakeNote": "Command",
+      "/Shuffleboard/Competition/ShootNote": "Command",
+      "/Shuffleboard/Competition/Shooter": "Subsystem",
+      "/Shuffleboard/Competition/ShooterTiltBot": "Command",
+      "/Shuffleboard/Competition/ShooterTiltMid": "Command",
+      "/Shuffleboard/Competition/ShooterTiltTop": "Command",
+      "/Shuffleboard/Competition/Trapper": "Subsystem",
+      "/Shuffleboard/Intake/IntakeNote": "Command",
+      "/Shuffleboard/Shooter/ShootNote": "Command",
+      "/Shuffleboard/Shooter/ShooterTiltBot": "Command",
+      "/Shuffleboard/Shooter/ShooterTiltMid": "Command",
+      "/Shuffleboard/Shooter/ShooterTiltTop": "Command",
+      "/Shuffleboard/Trapper/TrapperClawClose": "Command",
+      "/Shuffleboard/Trapper/TrapperClawOpen": "Command",
+      "/Shuffleboard/Trapper/TrapperLiftBot": "Command",
+      "/Shuffleboard/Trapper/TrapperLiftMid": "Command",
+      "/Shuffleboard/Trapper/TrapperLiftTop": "Command",
+      "/Shuffleboard/Trapper/TrapperTiltBot": "Command",
+      "/Shuffleboard/Trapper/TrapperTiltMid": "Command",
+      "/Shuffleboard/Trapper/TrapperTiltTop": "Command"
     }
   },
   "NetworkTables Info": {

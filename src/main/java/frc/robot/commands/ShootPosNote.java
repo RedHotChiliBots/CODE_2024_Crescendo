@@ -26,7 +26,7 @@ public class ShootPosNote extends Command {
   int state = 0;
 
   /** Creates a new ShootNote. */
-  public ShootPosNote(Trapper trapper, Intake intake, Feeder feeder, Shooter shooter) {
+  public ShootPosNote(Trapper trapper, Intake intake,  Feeder feeder, Shooter shooter) {
     this.trapper = trapper;
     this.intake = intake;
     this.feeder = feeder;
@@ -42,10 +42,12 @@ public class ShootPosNote extends Command {
   public void initialize() {
     finished = false;
     state = 0;
+    trapper.holdClaw(CLAW.OPEN);
     feeder.holdVelocity(FeederConstants.kMoveVelocity);
-    shooter.holdVelocity(ShooterConstants.kMoveVelocity);
-    trapper.setTiltSP(TrapperConstants.kSetupTiltDeg);
-    shooter.setTiltSP(ShooterConstants.kMaxTiltPos);
+    intake.holdVelocity(FeederConstants.kMoveVelocity);
+    // shooter.holdVelocity(ShooterConstants.kMoveVelocity);
+    shooter.setPercent(0.035);
+    shooter.holdTilt(ShooterConstants.kMaxTiltPos);
     timer.start();
     timer.reset();
   }
@@ -58,21 +60,26 @@ public class ShootPosNote extends Command {
       case 0:
         if (!intake.isNoteDetected()) {
           feeder.stopFeeder();
+          intake.stopIntake();
           shooter.holdPosition(shooter.getPosition());
+          trapper.holdTilt(TrapperConstants.kSetupTiltDeg);
+          timer.reset();
           state++;
         }
         break;
 
       case 1:
-        trapper.holdClaw(CLAW.CLOSE);
-        // timer.start();
-        timer.reset();
-        state++;
+        if (timer.hasElapsed(0.5)) {
+          trapper.holdClaw(CLAW.CLOSE);
+          // timer.start();
+          timer.reset();
+          state++;
+        }
         break;
 
       case 2:
         if (timer.hasElapsed(1.5)) {
-          trapper.setTiltSP(TrapperConstants.kClearTiltDeg);
+          trapper.holdTilt(TrapperConstants.kClearTiltDeg);
           timer.reset();
           state++;
         }

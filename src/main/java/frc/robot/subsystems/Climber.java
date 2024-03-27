@@ -9,7 +9,6 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
@@ -159,9 +158,6 @@ public class Climber extends SubsystemBase {
     sbLeftPosSP.setDouble(getPositionSP());
     sbRightPos.setDouble(getRightPosition());
     sbRightPosSP.setDouble(getPositionSP());
-
-    SmartDashboard.putNumber("Leader Power", leftLeader.get());
-    SmartDashboard.putNumber("Follower Power", leftFollower.get());
   }
 
   public void initClimber() {

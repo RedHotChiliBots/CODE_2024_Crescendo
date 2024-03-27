@@ -25,11 +25,11 @@ public class ClimbNTrapSM extends SequentialCommandGroup {
         new JustClimb(climber, -0.40, 4.0),
         new WaitCommand(1.0),
         new ParallelCommandGroup(
-            new RunCommand(() -> trapper.setLiftSP(18.0)),
-            new RunCommand(() -> trapper.setTiltSP(TrapperConstants.kScoreTiltDeg))),
+            new RunCommand(() -> trapper.holdLift(18.0)),
+            new RunCommand(() -> trapper.holdTilt(TrapperConstants.kTrapScoreTiltDeg))),
         new WaitCommand(0.5),
         new RunCommand(() -> trapper.holdClaw(CLAW.OPEN)),
         new WaitCommand(1.0),
-        new RunCommand(() -> trapper.setLiftSP(0.0), trapper));
+        new RunCommand(() -> trapper.holdLift(0.0), trapper));
   }
 }

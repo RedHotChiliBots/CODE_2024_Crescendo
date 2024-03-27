@@ -5,12 +5,13 @@
 
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
 import com.kauailabs.navx.frc.AHRS;
 
 // import edu.wpi.first.hal.SimDevice;  //TODO Add Simulation
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,26 +24,26 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 // import edu.wpi.first.math.system.plant.DCMotor; //TODO Add Simulation
-
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.WPIUtilJNI;
-
 import edu.wpi.first.wpilibj.DriverStation;
+//import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 // import edu.wpi.first.wpilibj.ADXRS450_Gyro; //TODO Add Simulation
 //import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+//import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 // import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim; //TODO Add Simulation
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.LimelightHelpers;
 import frc.robot.Constants.CANIdConstants;
 import frc.robot.Constants.ChassisConstants;
-import frc.robot.Constants.SwerveModuleConstants;
 import frc.utils.SwerveUtils;
 
 public class Chassis extends SubsystemBase {
@@ -91,7 +92,7 @@ public class Chassis extends SubsystemBase {
 
   // The robot pose estimator for tracking swerve odometry and applying vision
   // corrections.
-  private final SwerveDrivePoseEstimator poseEstimator;
+  private SwerveDrivePoseEstimator poseEstimator = null;
 
   // private final SwerveDriveSim swerveDriveSim; //TODO Add Simulation
 
@@ -128,6 +129,14 @@ public class Chassis extends SubsystemBase {
   private final GenericEntry sbYaw = chassisTab.addPersistent("Yaw", 0)
       .withWidget("Text View").withPosition(5, 2).withSize(2, 1).getEntry();
 
+  private boolean calcPitch = false;
+  private int cntPitch = 0;
+  private double pitch = 0.0;
+  private double totPitch = 0.0;
+  private double maxPitch = 0.0;
+  private double minPitch = 0.0;
+  private double avgPitch = 0.0;
+
   /** Creates a new DriveSubsystem. */
   public Chassis() {
     System.out.println("+++++ Starting Chassis Constructor +++++");
@@ -146,21 +155,15 @@ public class Chassis extends SubsystemBase {
       DriverStation.reportError("Error instantiating navX-MXP:  " + ex.getMessage(), true);
     }
 
-    // Define the standard deviations for the pose estimator, which determine how
-    // fast the pose estimate converges to the vision measurement. This should
-    // depend on the vision measurement noise and how many or how frequently
-    // vision measurements are applied to the pose estimator.
-    Vector<N3> stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
-    Vector<N3> visionStdDevs = VecBuilder.fill(1, 1, 1);
-
+    // The robot pose estimator for tracking swerve odometry and applying vision
+    // corrections.
     poseEstimator = new SwerveDrivePoseEstimator(
         ChassisConstants.kDriveKinematics,
         getRotation2d(),
         getModulePositions(),
         new Pose2d(),
-        stateStdDevs,
-        visionStdDevs);
-
+        VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+        VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
     // ----- Simulation
     // ADXRS450_Gyro gyro = new ADXRS450_Gyro();
     // gyroSim = new ADXRS450_GyroSim(gyro);
@@ -189,6 +192,19 @@ public class Chassis extends SubsystemBase {
 
   @Override
   public void periodic() {
+    updateOdometry();
+
+    if (calcPitch) {
+      pitch = ahrs.getPitch();
+      totPitch += pitch;
+      cntPitch += 1;
+      avgPitch = totPitch / cntPitch;
+      if (pitch > maxPitch)
+        maxPitch = pitch;
+      if (pitch < minPitch)
+        minPitch = pitch;
+    }
+
     sbAngle.setDouble(getAngle());
     sbYaw.setDouble(getYaw());
     sbPitch.setDouble(getPitch());
@@ -198,7 +214,7 @@ public class Chassis extends SubsystemBase {
     sbRotDegree.setDouble(getRotation2d().getDegrees());
 
     // Update the odometry of the swerve drive using the wheel encoders and gyro.
-    poseEstimator.update(getRotation2d(), getModulePositions());
+    // poseEstimator.update(getRotation2d(), getModulePositions());
 
     // Update the odometry in the periodic block
     // m_odometry.update( //TODO Remove Odometry
@@ -211,27 +227,87 @@ public class Chassis extends SubsystemBase {
     // });
 
     // Add Swerve Drive to SmartDashboard
-    SwerveModuleState[] currentStates = new SwerveModuleState[4];
+    // SwerveModuleState[] currentStates = new SwerveModuleState[4];
 
-    currentStates[0] = m_frontLeft.getState();
-    currentStates[1] = m_frontRight.getState();
-    currentStates[2] = m_rearLeft.getState();
-    currentStates[3] = m_rearRight.getState();
+    // currentStates[0] = m_frontLeft.getState();
+    // currentStates[1] = m_frontRight.getState();
+    // currentStates[2] = m_rearLeft.getState();
+    // currentStates[3] = m_rearRight.getState();
 
-    double[] stateAdv = new double[8];
+    // double[] stateAdv = new double[8];
 
-    for (int i = 0; i < 4; i++) {
-      stateAdv[2 * i] = currentStates[i].angle.getDegrees();
-      stateAdv[2 * i + 1] = currentStates[i].speedMetersPerSecond;
+    // for (int i = 0; i < 4; i++) {
+    // stateAdv[2 * i] = currentStates[i].angle.getDegrees();
+    // stateAdv[2 * i + 1] = currentStates[i].speedMetersPerSecond;
+    // }
+
+    // SmartDashboard.putNumberArray("swerve/status", stateAdv);
+    // SmartDashboard.putNumber("swerve/velocity-rpm", m_frontLeft.getDriveVel());
+    // SmartDashboard.putNumber("swerve/posfactorC",
+    // SwerveModuleConstants.kDrivingEncoderPositionFactor);
+    // SmartDashboard.putNumber("swerve/velfactorC",
+    // SwerveModuleConstants.kDrivingEncoderVelocityFactor);
+    // SmartDashboard.putNumber("swerve/posfactorE",
+    // m_frontLeft.getDrivePosFactor());
+    // SmartDashboard.putNumber("swerve/velfactorE",
+    // m_frontLeft.getDriveVelFactor());
+    // SmartDashboard.putBoolean("pdh/channel", pdh.getSwitchableChannel());
+  }
+
+  /** Updates the field relative position of the robot. */
+  public void updateOdometry() {
+    poseEstimator.update(
+        ahrs.getRotation2d(),
+        getModulePositions());
+
+    LimelightHelpers.PoseEstimate limelightMeasurement = null;
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+
+    if (alliance.isPresent()) {
+      if (alliance.equals(Alliance.Blue)) {
+        limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      } else if (alliance.equals(Alliance.Red)) {
+        limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
+      } else {
+        DriverStation.reportError("Alliance not set.", false);
+      }
     }
+    
+    if (limelightMeasurement.tagCount >= 2) {
+      poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+      poseEstimator.addVisionMeasurement(
+          limelightMeasurement.pose,
+          limelightMeasurement.timestampSeconds);
+    }
+  }
 
-    SmartDashboard.putNumberArray("swerve/status", stateAdv);
-    SmartDashboard.putNumber("swerve/velocity-rpm", m_frontLeft.getDriveVel());
-    SmartDashboard.putNumber("swerve/posfactorC", SwerveModuleConstants.kDrivingEncoderPositionFactor);
-    SmartDashboard.putNumber("swerve/velfactorC", SwerveModuleConstants.kDrivingEncoderVelocityFactor);
-    SmartDashboard.putNumber("swerve/posfactorE", m_frontLeft.getDrivePosFactor());
-    SmartDashboard.putNumber("swerve/velfactorE", m_frontLeft.getDriveVelFactor());
-//    SmartDashboard.putBoolean("pdh/channel", pdh.getSwitchableChannel());
+  public void setCalcPitch(boolean p) {
+    calcPitch = p;
+  }
+
+  public boolean isCalcPitch() {
+    return calcPitch;
+  }
+
+  // public double getPitch() {
+  // return Math.toDegrees(SwerveUtils.WrapAngle(Math.toRadians(ahrs.getPitch()) +
+  // pitchOffset));
+  // }
+
+  public double getPitch() {
+    return pitch + Math.toDegrees(pitchOffset);
+  }
+
+  public double getMinPitch() {
+    return minPitch;
+  }
+
+  public double getMaxPitch() {
+    return maxPitch;
+  }
+
+  public double getAvgPitch() {
+    return avgPitch;
   }
 
   public void setChannelOn() {
@@ -314,10 +390,6 @@ public class Chassis extends SubsystemBase {
   /** Raw gyro yaw (this may not match the field heading!). */
   public double getYaw() {
     return ahrs.getYaw();
-  }
-
-  public double getPitch() {
-    return Math.toDegrees(SwerveUtils.WrapAngle(Math.toRadians(ahrs.getPitch()) + pitchOffset));
   }
 
   public double getRoll() {

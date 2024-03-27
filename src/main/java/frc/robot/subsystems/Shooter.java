@@ -49,7 +49,6 @@ public class Shooter extends SubsystemBase {
   private final SparkAnalogSensor tiltEncoder = tilt.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
   private final SparkPIDController tiltPIDController = tilt.getPIDController();
 
-
   private double tiltSetPoint = 0.0;
   private double velSetPoint = 0.0;
   private double posSetPoint = 0.0;
@@ -193,8 +192,12 @@ public class Shooter extends SubsystemBase {
   }
 
   public void holdPosition(double pos) {
-//    setPositionSP(pos);
+    setPositionSP(pos);
     leaderPIDController.setReference(getPositionSP(), CANSparkFlex.ControlType.kPosition);
+  }
+
+  public void setPercent(double spd) {
+    leader.set(spd);
   }
 
   public void holdVelocity(double vel) {
@@ -203,7 +206,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void holdTilt(double pos) {
-//    setTiltSP(pos);
+    setTiltSP(pos);
     tiltPIDController.setReference(getTiltSP() + ShooterConstants.kTiltPotAdj, CANSparkMax.ControlType.kPosition);
   }
 

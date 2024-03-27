@@ -58,7 +58,7 @@ public class Trapper extends SubsystemBase {
   private double liftSetPoint = getLiftPosition();
   private double tiltSetPoint = getTiltPosition();
   private CLAW clawSetPoint = CLAW.CLOSE;
-
+  
   public enum CLAW {
     OPEN,
     CLOSE,
@@ -66,9 +66,11 @@ public class Trapper extends SubsystemBase {
   }
 
   public CLAW clawPos = CLAW.NA;
+  public Chassis chassis = null;
 
-  public Trapper() {
+  public Trapper(Chassis chassis) {
     System.out.println("+++++ Starting Trapper Constructor +++++");
+    this.chassis = chassis;
 
     lift.restoreFactoryDefaults();
     lift.clearFaults();
@@ -139,6 +141,7 @@ public class Trapper extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
     sbLiftPos.setDouble(getLiftPosition() - TrapperConstants.kLiftPotAdj);
     sbLiftVolt.setDouble(getLiftVoltage());
     sbLiftPosSP.setDouble(getLiftSP());
@@ -176,11 +179,13 @@ public class Trapper extends SubsystemBase {
   }
 
   public void holdTilt(double deg) {
-//    setTiltSP(deg);
+    setTiltSP(deg);
     tiltPIDController.setReference(Math.toRadians(getTiltSP()), CANSparkMax.ControlType.kPosition);
   }
 
   public void holdClaw(CLAW clawPos) {
+    if (chassis.isCalcPitch()) {}
+
     switch (clawPos) {
       case OPEN:
         topClaw.setAngle(TrapperConstants.kTopClawOpen);

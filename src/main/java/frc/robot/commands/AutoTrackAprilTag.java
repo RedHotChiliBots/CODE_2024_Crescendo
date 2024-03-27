@@ -30,13 +30,13 @@ public class AutoTrackAprilTag extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (vision.getHasTargets()) {
+    // if (vision.getHasTargets()) {
 
-      double[] spd = vision.trackAprilTag();
+    //   double[] spd = vision.trackAprilTag();
 
-      // Use our forward/turn speeds to control the drivetrain
-      chassis.drive(spd[0], spd[1], 0.0, true, false);
-    }
+    //   // Use our forward/turn speeds to control the drivetrain
+    //   chassis.drive(spd[0], spd[1], 0.0, true, false);
+    // }
   }
 
   // Called once the command ends or is interrupted.
@@ -47,6 +47,6 @@ public class AutoTrackAprilTag extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return vision.atDistTarget();
+    return true;  //vision.atDistTarget();
   }
 }

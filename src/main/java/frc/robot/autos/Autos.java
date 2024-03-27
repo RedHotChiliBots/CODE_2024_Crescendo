@@ -50,6 +50,9 @@ public class Autos {
 	private Command cmdZigZag3m = null;
 	private Command cmdAutoZigZag3m = null;
 	private SwerveControllerCommand swerveControllerCommand = null;
+	private SwerveControllerCommand note1Command = null;
+	private SwerveControllerCommand note2Command = null;
+	private SwerveControllerCommand note3Command = null;
 
 	private TrajectoryConfig config = new TrajectoryConfig(
 			Constants.AutoConstants.kMaxSpeedMetersPerSecond,
@@ -64,6 +67,11 @@ public class Autos {
 			new PIDController(Constants.AutoConstants.kPXController, 0, 0),
 			new PIDController(Constants.AutoConstants.kPYController, 0, 0),
 			thetaController);
+
+	// An example trajectory to follow. All units in meters.
+	private Trajectory note1Trajectory = null;
+	private Trajectory note2Trajectory = null;
+	private Trajectory note3Trajectory = null;
 
 	// An example trajectory to follow. All units in meters.
 	private Trajectory zigzag3Trajectory = TrajectoryGenerator.generateTrajectory(
@@ -88,8 +96,61 @@ public class Autos {
 
 		final GenericEntry sbMatch = compTab.addPersistent("Match Info", "")
 				.withWidget("Text View").withPosition(0, 1).withSize(2, 1).getEntry();
-				
+
 		sbMatch.getString(match);
+
+		// Game Manual page 45
+		// Note 1
+		note1Trajectory = TrajectoryGenerator.generateTrajectory(
+				// Start at the origin facing the +X direction
+				chassis.getPose(), // start from current pose
+				// Pass through these two interior waypoints, making an 's' curve path
+				List.of(new Translation2d(2.9, 1.0)),
+				// End 3 meters straight ahead of where we started, facing forward
+				new Pose2d(2.9, 1.45, new Rotation2d(Math.toRadians(90.0))),
+				config);
+
+		note2Trajectory = TrajectoryGenerator.generateTrajectory(
+				// Start at the origin facing the +X direction
+				chassis.getPose(), // start from current pose
+				// Pass through these two interior waypoints, making an 's' curve path
+				List.of(new Translation2d(2.9, 2.0)),
+				// End 3 meters straight ahead of where we started, facing forward
+				new Pose2d(2.9, 2.9, new Rotation2d(Math.toRadians(90.0))),
+				config);
+
+		note3Trajectory = TrajectoryGenerator.generateTrajectory(
+				// Start at the origin facing the +X direction
+				chassis.getPose(), // start from current pose
+				// Pass through these two interior waypoints, making an 's' curve path
+				List.of(new Translation2d(2.9, 3.0)),
+				// End 3 meters straight ahead of where we started, facing forward
+				new Pose2d(2.9, 4.35, new Rotation2d(Math.toRadians(90.0))),
+				config);
+
+		note1Command = new SwerveControllerCommand(
+				note1Trajectory,
+				chassis::getPose,
+				ChassisConstants.kDriveKinematics,
+				holonomicController,
+				chassis::setModuleStates,
+				chassis);
+
+		note2Command = new SwerveControllerCommand(
+				note1Trajectory,
+				chassis::getPose,
+				ChassisConstants.kDriveKinematics,
+				holonomicController,
+				chassis::setModuleStates,
+				chassis);
+
+		note3Command = new SwerveControllerCommand(
+				note1Trajectory,
+				chassis::getPose,
+				ChassisConstants.kDriveKinematics,
+				holonomicController,
+				chassis::setModuleStates,
+				chassis);
 
 		thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -117,8 +178,7 @@ public class Autos {
 								0.0, 0.0), // Rotation PID constants
 						ChassisConstants.kMaxSpeedMetersPerSecond, // Max module speed, in m/s
 						ChassisConstants.kWheelRadius, // Drive base radius in meters. Distance
-						// from robot center to
-						// furthest module.
+						// from robot center to furthest module.
 						new ReplanningConfig() // Default path replanning config. See the API
 														// for the options here
 				),
@@ -160,8 +220,7 @@ public class Autos {
 		// Add Auton Command chooser to Shuffleboard
 		compTab.add("Auton Command", chooser)
 				.withWidget("ComboBox Chooser")
-				.withPosition(0, 10
-				)
+				.withPosition(0, 10)
 				.withSize(4, 1);
 
 		System.out.println("----- Ending Autos Constructor -----");

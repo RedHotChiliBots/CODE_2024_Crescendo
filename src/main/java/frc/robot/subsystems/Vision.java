@@ -8,6 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.photonvision.EstimatedRobotPose;
+// import org.photonvision.PhotonCamera;
+// import org.photonvision.PhotonPoseEstimator;
+// import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+// import org.photonvision.PhotonUtils;
+// import org.photonvision.targeting.PhotonPipelineResult;
+// import org.photonvision.targeting.PhotonTrackedTarget;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -19,33 +27,38 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonUtils;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-// import org.photonvision.simulation.PhotonCameraSim; //TODO Add Simulation
-// import org.photonvision.simulation.SimCameraProperties;
-// import org.photonvision.simulation.VisionSystemSim;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
+// import org.photonvision.EstimatedRobotPose;
+// import org.photonvision.PhotonCamera;
+// import org.photonvision.PhotonPoseEstimator;
+// import org.photonvision.PhotonUtils;
+// import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+// // import org.photonvision.simulation.PhotonCameraSim; //TODO Add Simulation
+// // import org.photonvision.simulation.SimCameraProperties;
+// // import org.photonvision.simulation.VisionSystemSim;
+// import org.photonvision.targeting.PhotonPipelineResult;
+// import org.photonvision.targeting.PhotonTrackedTarget;
 
 import frc.robot.Constants.VisionConstants;
+import frc.robot.LimelightHelpers;
 import frc.utils.VisionUtils;
 
 public class Vision extends SubsystemBase {
   /** Creates a new Vision. */
 
   // Change this to match the name of your camera
-  private final PhotonCamera camera = new PhotonCamera(VisionConstants.kCameraName);
+  // private final PhotonCamera camera = new
+  // PhotonCamera(VisionConstants.kCameraName);
 
-  private PhotonPoseEstimator photonEstimator = null;
+  // private PhotonPoseEstimator photonEstimator = null;
 
   private double lastEstTimestamp = 0.0;
 
@@ -53,9 +66,11 @@ public class Vision extends SubsystemBase {
   // private PhotonCameraSim cameraSim = null;
   // private VisionSystemSim visionSim = null;
 
-  private PhotonPipelineResult result;
-  private PhotonTrackedTarget target;
-  private List<PhotonTrackedTarget> targets = null;
+  private LimelightHelpers.LimelightResults llResults = null;
+  private String llJSON = "";
+  // private PhotonPipelineResult result;
+  // private PhotonTrackedTarget target;
+  // private List<PhotonTrackedTarget> targets = null;
   private double range;
   private int targetId;
 
@@ -145,27 +160,65 @@ public class Vision extends SubsystemBase {
 
   private Chassis chassis = null;
 
+  private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  private final NetworkTable table = inst.getTable("limelight");
+
+  private final NetworkTableEntry xEntry = table.getEntry("tx");
+  private final NetworkTableEntry yEntry = table.getEntry("ty");
+  private final NetworkTableEntry aEntry = table.getEntry("ta");
+  private final NetworkTableEntry lEntry = table.getEntry("tl");
+  private final NetworkTableEntry vEntry = table.getEntry("tv");
+  private final NetworkTableEntry sEntry = table.getEntry("ts");
+
+  private final NetworkTableEntry tshortEntry = table.getEntry("tshort");
+  private final NetworkTableEntry tlongEntry = table.getEntry("tlong");
+  private final NetworkTableEntry thorEntry = table.getEntry("thor");
+  private final NetworkTableEntry tvertEntry = table.getEntry("tvert");
+  private final NetworkTableEntry getpipeEntry = table.getEntry("getpipe");
+  private final NetworkTableEntry camtranEntry = table.getEntry("camtran");
+  private final NetworkTableEntry ledModeEntry = table.getEntry("ledMode");
+
+  private double tx = 0.0;
+  private double ty = 0.0;
+  private double ta = 0.0;
+  private double tl = 0.0;
+  private double tv = 0.0;
+  private double ts = 0.0;
+
+  private double tshort = 0.0;
+  private double tlong = 0.0;
+  private double thor = 0.0;
+  private double tvert = 0.0;
+  private double getpipe = 0.0;
+  private double[] camtran = {};
+  double[] array = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  private double ledMode = 0.0;
+
   public Vision(Chassis chassis) {
     System.out.println("+++++ Vision Constructor starting +++++");
 
     this.chassis = chassis;
 
-    if (camera.getName() == VisionConstants.kCameraName) {
-      System.out.println("Camera IS configured.");
-    } else {
-      DriverStation.reportError("Camera was not configured properly.", false);
-    }
+    // if (camera.getName() == VisionConstants.kCameraName) {
+    // System.out.println("Camera IS configured.");
+    // } else {
+    // DriverStation.reportError("Camera was not configured properly.", false);
+    // }
 
-    photonEstimator = new PhotonPoseEstimator(VisionConstants.kTagLayout,
-        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, VisionConstants.kRobotToCam);
+    // photonEstimator = new PhotonPoseEstimator(VisionConstants.kTagLayout,
+    // PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera,
+    // VisionConstants.kRobotToCam);
 
-    photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+    // photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
-    if (photonEstimator.getRobotToCameraTransform().equals(VisionConstants.kRobotToCam)) {
-      System.out.println("PhotonPoseEstimator IS configured.");
-    } else {
-      DriverStation.reportError("PhotonPoseEstimator was not configured properly.", false);
-    }
+    // if
+    // (photonEstimator.getRobotToCameraTransform().equals(VisionConstants.kRobotToCam))
+    // {
+    // System.out.println("PhotonPoseEstimator IS configured.");
+    // } else {
+    // DriverStation.reportError("PhotonPoseEstimator was not configured properly.",
+    // false);
+    // }
 
     // ----- Simulation
     // if (Robot.isSimulation()) { // TODO Add Simulation
@@ -199,7 +252,7 @@ public class Vision extends SubsystemBase {
     turnController.setTolerance(0.5);
 
     compTab.addCamera("Camera", VisionConstants.kCameraName,
-        "http://photonvision.local:1182/stream.mjpg")
+        "http://10.44.53.11:5800")
         .withWidget("Camera Stream")
         .withPosition(7, 2).withSize(4, 4)
         .withProperties(Map.of("crosshaircolor", "Red", "showcontrols", false));
@@ -210,20 +263,20 @@ public class Vision extends SubsystemBase {
     // // Change pipeline to 2
     // camera.setPipelineIndex(2);
 
-    Optional<EstimatedRobotPose> visionEst = getEstimatedGlobalPose();
-    if (visionEst.isPresent()) {
-      Pose2d estPose = visionEst.get().estimatedPose.toPose2d();
-      chassis.resetPose(estPose);
+    // Optional<EstimatedRobotPose> visionEst = getEstimatedGlobalPose();
+    // if (visionEst.isPresent()) {
+    //   Pose2d estPose = visionEst.get().estimatedPose.toPose2d();
+    //   chassis.resetPose(estPose);
 
-      if (estPose.equals(chassis.getPose())) {
-        System.out.println("Robot pose initialized.");
-      } else {
-        DriverStation.reportError("Robot pose was not initialized.", false);
-      }
-    } else {
-      chassis.resetPose(new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0.0)));
-      DriverStation.reportError("Robot pose could not be determined.  Setting to ((0,0),0)", false);
-    }
+    //   if (estPose.equals(chassis.getPose())) {
+    //     System.out.println("Robot pose initialized.");
+    //   } else {
+    //     DriverStation.reportError("Robot pose was not initialized.", false);
+    //   }
+    // } else {
+    //   chassis.resetPose(new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0.0)));
+    //   DriverStation.reportError("Robot pose could not be determined.  Setting to ((0,0),0)", false);
+    // }
 
     setTargetId(15);
 
@@ -233,236 +286,262 @@ public class Vision extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    if ((int) (LimelightHelpers.getFiducialID("limelight")) == getTargetId()) {
+
+    }
+
+    llResults = LimelightHelpers.getLatestResults("limelight");
+    // llJSON = LimelightHelpers.getJSONDump("limelight");
+
+    LimelightHelpers.LimelightTarget_Fiducial[] llFiducials = llResults.targetingResults.targets_Fiducials;
+    for (LimelightHelpers.LimelightTarget_Fiducial fiducial : llFiducials) {
+      int id = (int) fiducial.fiducialID;
+    }
+
+    tx = xEntry.getDouble(0.0);
+    ty = yEntry.getDouble(0.0);
+    ta = aEntry.getDouble(0.0);
+    tl = lEntry.getDouble(0.0);
+    tv = vEntry.getDouble(0.0);
+    ts = sEntry.getDouble(0.0);
+
+    tshort = tshortEntry.getDouble(0.0);
+    tlong = tlongEntry.getDouble(0.0);
+    thor = thorEntry.getDouble(0.0);
+    tvert = tvertEntry.getDouble(0.0);
+    getpipe = getpipeEntry.getDouble(0.0);
+    camtran = camtranEntry.getDoubleArray(array);
+    ledMode = ledModeEntry.getDouble(0.0);
 
     // Correct pose estimate with vision measurements
-    Optional<EstimatedRobotPose> visionEst = getEstimatedGlobalPose();
+    // Optional<EstimatedRobotPose> visionEst = getEstimatedGlobalPose();
 
-    // double[] visionPose = new double[] { visionEst.get().estimatedPose.getX(),
-    // visionEst.get().estimatedPose.getY(),
-    // Math.toDegrees(visionEst.get().estimatedPose.getRotation().getAngle()) };
-    // SmartDashboard.putNumberArray("field/vision2", visionPose);
+    // // double[] visionPose = new double[] { visionEst.get().estimatedPose.getX(),
+    // // visionEst.get().estimatedPose.getY(),
+    // // Math.toDegrees(visionEst.get().estimatedPose.getRotation().getAngle()) };
+    // // SmartDashboard.putNumberArray("field/vision2", visionPose);
 
-    visionEst.ifPresent(
-        est -> {
-          Pose2d estPose = est.estimatedPose.toPose2d();
+    // visionEst.ifPresent(
+    //     est -> {
+    //       Pose2d estPose = est.estimatedPose.toPose2d();
 
-          double[] visPose = new double[] { estPose.getX(), estPose.getY(), estPose.getRotation().getDegrees() };
-          SmartDashboard.putNumberArray("field/vision", visPose);
+    //       double[] visPose = new double[] { estPose.getX(), estPose.getY(), estPose.getRotation().getDegrees() };
+    //       SmartDashboard.putNumberArray("field/vision", visPose);
 
-          // Change our trust in the measurement based on the tags we can see
-          Matrix<N3, N1> estStdDevs = getEstimationStdDevs(estPose);
+    //       // Change our trust in the measurement based on the tags we can see
+    //       Matrix<N3, N1> estStdDevs = getEstimationStdDevs(estPose);
 
-          chassis.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-        });
+    //       chassis.addVisionMeasurement(
+    //           est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+    //     });
 
-    // Apply a random offset to pose estimator to test vision correction
-    if (getInsertOffset()) {
-      setInsertOffset(false);
+    // // Apply a random offset to pose estimator to test vision correction
+    // if (getInsertOffset()) {
+    //   setInsertOffset(false);
 
-      chassis.resetPose(VisionUtils.BumpPose(chassis.getPose()), false);
-    }
+    //   chassis.resetPose(VisionUtils.BumpPose(chassis.getPose()), false);
+     }
 
-    // Get information from target.
-    result = getLatestResult();
+//     // Get information from target.
+//     result = getLatestResult();
 
-    target = null;
+//     target = null;
 
-    if (result.hasTargets()) {
-      sbHasTargets.setBoolean(true);
+//     if (result.hasTargets()) {
+//       sbHasTargets.setBoolean(true);
 
-      targets = result.getTargets();
+//       targets = result.getTargets();
 
-      for (PhotonTrackedTarget t : targets) {
-        if (t.getFiducialId() == targetId) {
-          target = t;
-          setHasTarget(true);
-        } else {
-          setHasTarget(false);
-        }
-      }
+//       for (PhotonTrackedTarget t : targets) {
+//         if (t.getFiducialId() == targetId) {
+//           target = t;
+//           setHasTarget(true);
+//         } else {
+//           setHasTarget(false);
+//         }
+//       }
 
-      sbHasTarget.setBoolean(hasTarget);
+//       sbHasTarget.setBoolean(hasTarget);
 
-      if (hasTarget) {
+//       if (hasTarget) {
 
-        yaw = target.getYaw();
-        pitch = target.getPitch();
-        area = target.getArea();
-        skew = target.getSkew();
+//         yaw = target.getYaw();
+//         pitch = target.getPitch();
+//         area = target.getArea();
+//         skew = target.getSkew();
 
-        range = PhotonUtils.calculateDistanceToTargetMeters(
-            VisionConstants.kCameraHeight,
-            VisionConstants.kTargetHeight,
-            VisionConstants.kCameraPitch,
-            Units.degreesToRadians(pitch));
+//         range = PhotonUtils.calculateDistanceToTargetMeters(
+//             VisionConstants.kCameraHeight,
+//             VisionConstants.kTargetHeight,
+//             VisionConstants.kCameraPitch,
+//             Units.degreesToRadians(pitch));
 
-        sbRange.setDouble(Units.metersToFeet(range));
+//         sbRange.setDouble(Units.metersToFeet(range));
 
-        sbYaw.setDouble(target.getYaw());
-        sbPitch.setDouble(target.getPitch());
-        sbArea.setDouble(target.getArea());
-        sbSkew.setDouble(target.getSkew());
-        sbTargetID.setDouble(target.getFiducialId());
-        sbDistAtTarget.setBoolean(atDistTarget());
-        sbTurnAtTarget.setBoolean(atTurnTarget());
-      }
-    } else {
-      // If we have no targets, stay still.
-      sbHasTargets.setBoolean(false);
-      setHasTarget(false);
-    }
+//         sbYaw.setDouble(target.getYaw());
+//         sbPitch.setDouble(target.getPitch());
+//         sbArea.setDouble(target.getArea());
+//         sbSkew.setDouble(target.getSkew());
+//         sbTargetID.setDouble(target.getFiducialId());
+//         sbDistAtTarget.setBoolean(atDistTarget());
+//         sbTurnAtTarget.setBoolean(atTurnTarget());
+//       }
+//     } else {
+//       // If we have no targets, stay still.
+//       sbHasTargets.setBoolean(false);
+//       setHasTarget(false);
+//     }
 
-    sbHasTarget.setBoolean(getHasTarget());
-  }
+//     sbHasTarget.setBoolean(getHasTarget());
+//   }
 
-  public double[] trackAprilTag() {
+//   public double[] trackAprilTag() {
 
-    if (hasTarget) {
-      int tgtId = target.getFiducialId();
-      Optional<Pose3d> tagPose = photonEstimator.getFieldTags().getTagPose(tgtId);
-      double tgtX = tagPose.get().getTranslation().getX();
-      double tgtY = tagPose.get().getTranslation().getY();
-      double tgtZ = tagPose.get().getTranslation().getZ();
-      double tgtRot = Math.toDegrees(tagPose.get().getRotation().getAngle());
+//     if (hasTarget) {
+//       int tgtId = target.getFiducialId();
+//       Optional<Pose3d> tagPose = photonEstimator.getFieldTags().getTagPose(tgtId);
+//       double tgtX = tagPose.get().getTranslation().getX();
+//       double tgtY = tagPose.get().getTranslation().getY();
+//       double tgtZ = tagPose.get().getTranslation().getZ();
+//       double tgtRot = Math.toDegrees(tagPose.get().getRotation().getAngle());
 
-      sbTgtX.setDouble(tgtX);
-      sbTgtY.setDouble(tgtY);
-      sbTgtZ.setDouble(tgtZ);
-      sbTgtRot.setDouble(tgtRot);
+//       sbTgtX.setDouble(tgtX);
+//       sbTgtY.setDouble(tgtY);
+//       sbTgtZ.setDouble(tgtZ);
+//       sbTgtRot.setDouble(tgtRot);
 
-      Pose2d estPose = chassis.getPose();
-      double estX = estPose.getTranslation().getX();
-      double estY = estPose.getTranslation().getY();
-      double estRot = estPose.getRotation().getDegrees();
+//       Pose2d estPose = chassis.getPose();
+//       double estX = estPose.getTranslation().getX();
+//       double estY = estPose.getTranslation().getY();
+//       double estRot = estPose.getRotation().getDegrees();
 
-      sbEstX.setDouble(estX);
-      sbEstY.setDouble(estY);
-      sbEstRot.setDouble(estRot);
+//       sbEstX.setDouble(estX);
+//       sbEstY.setDouble(estY);
+//       sbEstRot.setDouble(estRot);
 
-      double range = tagPose.get().toPose2d().getTranslation().getDistance(estPose.getTranslation());
-      double angle = tagPose.get().toPose2d().getRotation().minus(estPose.getRotation()).getDegrees();
-      double deltaX = tagPose.get().toPose2d().getTranslation().minus(estPose.getTranslation()).getX();
-      double deltaY = tagPose.get().toPose2d().getTranslation().minus(estPose.getTranslation()).getY();
+//       double range = tagPose.get().toPose2d().getTranslation().getDistance(estPose.getTranslation());
+//       double angle = tagPose.get().toPose2d().getRotation().minus(estPose.getRotation()).getDegrees();
+//       double deltaX = tagPose.get().toPose2d().getTranslation().minus(estPose.getTranslation()).getX();
+//       double deltaY = tagPose.get().toPose2d().getTranslation().minus(estPose.getTranslation()).getY();
 
-      sbERange.setDouble(range);
-      sbEAngle.setDouble(angle);
-      sbDeltaX.setDouble(deltaX);
-      sbDeltaY.setDouble(deltaY);
+//       sbERange.setDouble(range);
+//       sbEAngle.setDouble(angle);
+//       sbDeltaX.setDouble(deltaX);
+//       sbDeltaY.setDouble(deltaY);
 
-      double shootAngle = Math.toDegrees(Math.sin((tgtZ - VisionConstants.kCameraHeight) / range));
+//       double shootAngle = Math.toDegrees(Math.sin((tgtZ - VisionConstants.kCameraHeight) / range));
 
-      sbShootAngle.setDouble(shootAngle);
+//       sbShootAngle.setDouble(shootAngle);
 
-      double[] robotPose = new double[] { estPose.getX(), estPose.getY(), estPose.getRotation().getDegrees() };
-      SmartDashboard.putNumberArray("field/robot", robotPose);
+//       double[] robotPose = new double[] { estPose.getX(), estPose.getY(), estPose.getRotation().getDegrees() };
+//       SmartDashboard.putNumberArray("field/robot", robotPose);
 
-      double[] targetPose = new double[] { tagPose.get().getX(), tagPose.get().getY(), tagPose.get().getZ(),
-          Math.toDegrees(tagPose.get().getRotation().getAngle()) };
-      SmartDashboard.putNumberArray("field/target", targetPose);
+//       double[] targetPose = new double[] { tagPose.get().getX(), tagPose.get().getY(), tagPose.get().getZ(),
+//           Math.toDegrees(tagPose.get().getRotation().getAngle()) };
+//       SmartDashboard.putNumberArray("field/target", targetPose);
 
-      // Use this range as the measurement we give to the PID controller.
-      // -1.0 required to ensure positive PID controller effort _increases_ range
-      forwardSpeed = distController.calculate(range, VisionConstants.kTargetDist);
+//       // Use this range as the measurement we give to the PID controller.
+//       // -1.0 required to ensure positive PID controller effort _increases_ range
+//       forwardSpeed = distController.calculate(range, VisionConstants.kTargetDist);
 
-      // Also calculate angular power
-      // -1.0 required to ensure positive PID controller effort _increases_ yaw
-      rotationSpeed = -turnController.calculate(angle, 0);
+//       // Also calculate angular power
+//       // -1.0 required to ensure positive PID controller effort _increases_ yaw
+//       rotationSpeed = -turnController.calculate(angle, 0);
 
-    } else {
-      forwardSpeed = 0;
-      rotationSpeed = 0;
-    }
+//     } else {
+//       forwardSpeed = 0;
+//       rotationSpeed = 0;
+//     }
 
-    return new double[] { forwardSpeed, rotationSpeed };
-  }
+//     return new double[] { forwardSpeed, rotationSpeed };
+//   }
 
-  public PhotonPipelineResult getLatestResult() {
-    return camera.getLatestResult();
-  }
+//   public PhotonPipelineResult getLatestResult() {
+//     return camera.getLatestResult();
+//   }
 
-  /**
-   * The latest estimated robot pose on the field from vision data. This may be
-   * empty. This should
-   * only be called once per loop.
-   *
-   * @return An {@link EstimatedRobotPose} with an estimated pose, estimate
-   *         timestamp, and targets
-   *         used for estimation.
-   */
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-    Optional<EstimatedRobotPose> visionEst = photonEstimator.update();
-    double latestTimestamp = camera.getLatestResult().getTimestampSeconds();
-    boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
-    // if (Robot.isSimulation()) { // TODO Add Simulation
-    // visionEst.ifPresentOrElse(
-    // est -> getSimDebugField()
-    // .getObject("VisionEstimation")
-    // .setPose(est.estimatedPose.toPose2d()),
-    // () -> {
-    // if (newResult)
-    // getSimDebugField().getObject("VisionEstimation").setPoses();
-    // });
-    // }
-    if (newResult)
-      lastEstTimestamp = latestTimestamp;
-    return visionEst;
-  }
+//   /**
+//    * The latest estimated robot pose on the field from vision data. This may be
+//    * empty. This should
+//    * only be called once per loop.
+//    *
+//    * @return An {@link EstimatedRobotPose} with an estimated pose, estimate
+//    *         timestamp, and targets
+//    *         used for estimation.
+//    */
+//   public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+//     Optional<EstimatedRobotPose> visionEst = photonEstimator.update();
+//     double latestTimestamp = camera.getLatestResult().getTimestampSeconds();
+//     boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
+//     // if (Robot.isSimulation()) { // TODO Add Simulation
+//     // visionEst.ifPresentOrElse(
+//     // est -> getSimDebugField()
+//     // .getObject("VisionEstimation")
+//     // .setPose(est.estimatedPose.toPose2d()),
+//     // () -> {
+//     // if (newResult)
+//     // getSimDebugField().getObject("VisionEstimation").setPoses();
+//     // });
+//     // }
+//     if (newResult)
+//       lastEstTimestamp = latestTimestamp;
+//     return visionEst;
+//   }
 
-  /**
-   * The standard deviations of the estimated pose from
-   * {@link #getEstimatedGlobalPose()}, for use
-   * with {@link edu.wpi.first.math.estimator.SwerveDrivePoseEstimator
-   * SwerveDrivePoseEstimator}.
-   * This should only be used when there are targets visible.
-   *
-   * @param estimatedPose The estimated pose to guess standard deviations for.
-   */
-  public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
-    var estStdDevs = VisionConstants.kSingleTagStdDevs;
-    var targets = getLatestResult().getTargets();
-    int numTags = 0;
-    double avgDist = 0;
-    for (var tgt : targets) {
-      var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
-      if (tagPose.isEmpty())
-        continue;
-      numTags++;
-      avgDist += tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
-    }
-    if (numTags == 0)
-      return estStdDevs;
-    avgDist /= numTags;
-    // Decrease std devs if multiple targets are visible
-    if (numTags > 1)
-      estStdDevs = VisionConstants.kMultiTagStdDevs;
-    // Increase std devs based on (average) distance
-    if (numTags == 1 && avgDist > 4)
-      estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-    else
-      estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+//   /**
+//    * The standard deviations of the estimated pose from
+//    * {@link #getEstimatedGlobalPose()}, for use
+//    * with {@link edu.wpi.first.math.estimator.SwerveDrivePoseEstimator
+//    * SwerveDrivePoseEstimator}.
+//    * This should only be used when there are targets visible.
+//    *
+//    * @param estimatedPose The estimated pose to guess standard deviations for.
+//    */
+//   public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
+//     var estStdDevs = VisionConstants.kSingleTagStdDevs;
+//     var targets = getLatestResult().getTargets();
+//     int numTags = 0;
+//     double avgDist = 0;
+//     for (var tgt : targets) {
+//       var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+//       if (tagPose.isEmpty())
+//         continue;
+//       numTags++;
+//       avgDist += tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
+//     }
+//     if (numTags == 0)
+//       return estStdDevs;
+//     avgDist /= numTags;
+//     // Decrease std devs if multiple targets are visible
+//     if (numTags > 1)
+//       estStdDevs = VisionConstants.kMultiTagStdDevs;
+//     // Increase std devs based on (average) distance
+//     if (numTags == 1 && avgDist > 4)
+//       estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+//     else
+//       estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
 
-    return estStdDevs;
-  }
+//     return estStdDevs;
+//   }
 
-  // ----- Simulation //TODO Add Simulation
+//   // ----- Simulation //TODO Add Simulation
 
-  // public void simulationPeriodic(Pose2d robotSimPose) {
-  // visionSim.update(robotSimPose);
-  // }
+//   // public void simulationPeriodic(Pose2d robotSimPose) {
+//   // visionSim.update(robotSimPose);
+//   // }
 
-  // /** Reset pose history of the robot in the vision system simulation. */
-  // public void resetSimPose(Pose2d pose) {
-  // if (Robot.isSimulation())
-  // visionSim.resetRobotPose(pose);
-  // }
+//   // /** Reset pose history of the robot in the vision system simulation. */
+//   // public void resetSimPose(Pose2d pose) {
+//   // if (Robot.isSimulation())
+//   // visionSim.resetRobotPose(pose);
+//   // }
 
-  // /** A Field2d for visualizing our robot and objects on the field. */
-  // public Field2d getSimDebugField() {
-  // if (!Robot.isSimulation())
-  // return null;
-  // return visionSim.getDebugField();
-  // }
+//   // /** A Field2d for visualizing our robot and objects on the field. */
+//   // public Field2d getSimDebugField() {
+//   // if (!Robot.isSimulation())
+//   // return null;
+//   // return visionSim.getDebugField();
+//   // }
 
   public void setTargetId(int id) {
     targetId = id;
@@ -472,63 +551,63 @@ public class Vision extends SubsystemBase {
     return targetId;
   }
 
-  public boolean getHasTargets() {
-    return result.hasTargets();
-  }
+//   public boolean getHasTargets() {
+//     return result.hasTargets();
+//   }
 
-  public boolean getHasTarget() {
-    return hasTarget;
-  }
+//   public boolean getHasTarget() {
+//     return hasTarget;
+//   }
 
-  public void setHasTarget(boolean t) {
-    hasTarget = t;
-  }
+//   public void setHasTarget(boolean t) {
+//     hasTarget = t;
+//   }
 
-  public boolean atDistTarget() {
-    return distController.atSetpoint();
-  }
+//   public boolean atDistTarget() {
+//     return distController.atSetpoint();
+//   }
 
-  public boolean atTurnTarget() {
-    return turnController.atSetpoint();
-  }
+//   public boolean atTurnTarget() {
+//     return turnController.atSetpoint();
+//   }
 
-  public double getRange() {
-    return range;
-  }
+//   public double getRange() {
+//     return range;
+//   }
 
-  public double getYaw() {
-    return yaw;
-  }
+//   public double getYaw() {
+//     return yaw;
+//   }
 
-  public double getPitch() {
-    return pitch;
-  }
+//   public double getPitch() {
+//     return pitch;
+//   }
 
-  public double getArea() {
-    return area;
-  }
+//   public double getArea() {
+//     return area;
+//   }
 
-  public double getSkew() {
-    return skew;
-  }
+//   public double getSkew() {
+//     return skew;
+//   }
 
-  public void setRumble(boolean r) {
-    rumble = r;
-  }
+//   public void setRumble(boolean r) {
+//     rumble = r;
+//   }
 
-  public boolean getRumble() {
-    return rumble;
-  }
+//   public boolean getRumble() {
+//     return rumble;
+//   }
 
-  public void toggleRumble() {
-    rumble = !rumble;
-  }
+//   public void toggleRumble() {
+//     rumble = !rumble;
+//   }
 
-  public void setInsertOffset(boolean i) {
-    insertOffset = i;
-  }
+//   public void setInsertOffset(boolean i) {
+//     insertOffset = i;
+//   }
 
-  public boolean getInsertOffset() {
-    return insertOffset;
-  }
-}
+//   public boolean getInsertOffset() {
+//     return insertOffset;
+//   }
+ }

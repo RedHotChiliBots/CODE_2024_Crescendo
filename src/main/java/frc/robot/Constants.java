@@ -140,19 +140,20 @@ public final class Constants {
 
     // public static final double kBarrelDia = 0.75;
     // public static final double kDistPerShaftRev = kBarrelDia * Math.PI;
-    
+
     public static final double kClimbBarrelDia = 0.75;
     public static final double kInchPerRev = (Math.PI * kClimbBarrelDia) / kGearRatio;
 
     // public static final double kDistPerMotorRev = kDistPerShaftRev / kGearRatio;
     // public static final double kShaftRevsPerVolt = kMaxShaftRevs / kMaxPotVolt;
     // public static final double kMotorRevsPerVolt = kMaxMotorRevs / kMaxPotVolt;
-    // public static final double kDistPerVolt = kDistPerMotorRev * kMotorRevsPerVolt;
+    // public static final double kDistPerVolt = kDistPerMotorRev *
+    // kMotorRevsPerVolt;
     // public static final double kMaxShaftRot = kMaxClimbPos / kDistPerShaftRev;
     // public static final double kMaxMotorRot = kMaxClimbPos / kDistPerMotorRev;
 
     public static final double kClimberEncoderPositionFactor = kInchPerRev;
-//    public static final double kClimberEncoderPositionFactor = kDistPerVolt;
+    // public static final double kClimberEncoderPositionFactor = kDistPerVolt;
     public static final double kClimberTollerance = 1.0;
 
     public static final int kCurrentLimit = 40;
@@ -260,7 +261,7 @@ public final class Constants {
     public static final double kDistPerMotorRev = kDistPerShaftRev / kGearRatio;
     public static final double kShaftRevsPerVolt = kMaxShaftRevs / kMaxPotVolt;
     public static final double kMotorRevsPerVolt = kMaxMotorRevs / kMaxPotVolt;
-    public static final double kDistPerVolt = 13.58;  //kDistPerMotorRev * kMotorRevsPerVolt;
+    public static final double kDistPerVolt = 13.58; // kDistPerMotorRev * kMotorRevsPerVolt;
     public static final double kVoltPerDist = 1.0 / kDistPerVolt;
     public static final double kMaxShaftRot = kMaxTiltPos / kDistPerShaftRev;
     public static final double kMaxMotorRot = kMaxTiltPos / kDistPerMotorRev;
@@ -313,17 +314,20 @@ public final class Constants {
     public static final double kRangePos = 20.0; // inches
     public static final double kOffsetPos = -1.0; // inches
 
-    public static final double kMaxTiltDeg = 165.0;
+    public static final double kMaxTiltDeg = 190.0;
     public static final double kMidTiltDeg = (TrapperConstants.kMinTiltDeg + TrapperConstants.kMaxTiltDeg) / 2.0;
     public static final double kMinTiltDeg = 100.0;
     public static final double kInitTiltDeg = 120.0;
-    public static final double kSetupTiltDeg = 110.0;
-    public static final double kClearTiltDeg = 165.0;
-    public static final double kScoreTiltDeg = 140.0;
+    public static final double kSetupTiltDeg = 100.0;
+    public static final double kClearTiltDeg = 175.0;
+    public static final double kTrapScoreTiltDeg = 160.0;
+    public static final double kTrapScoreLiftDeg = 23.0;
+    public static final double kAmpScoreTiltDeg = 120.0;
+    public static final double kAmpScoreLiftLen = 16.0;
     public static final double kTiltTollerance = 0.5;
 
     public static final double kLiftPotAdj = 4.5;
-    public static final double kMaxLiftLen = 19.5;
+    public static final double kMaxLiftLen = 23.0;
     public static final double kMidLiftLen = (TrapperConstants.kMinLiftLen + TrapperConstants.kMaxLiftLen) / 2.0;
     public static final double kMinLiftLen = 0.0;
     public static final double kLiftTollerance = 0.25;
@@ -378,8 +382,8 @@ public final class Constants {
 
     public static final boolean kTiltMotorInverted = false;
 
-    public static final double kTiltP = 0.13;  //0.115
-    public static final double kTiltI = 0.0;  //0.00005;
+    public static final double kTiltP = 0.55; // 0.115
+    public static final double kTiltI = 0.0; // 0.00005;
     public static final double kTiltD = 0;
     public static final double kTiltFF = 0;
     public static final double kTiltMinOutput = -1.0;
@@ -553,7 +557,8 @@ public final class Constants {
     // Layout of AprilTags on the 2024 field
     public static final AprilTagFieldLayout kTagLayout = AprilTagFields.kDefaultField.loadAprilTagLayoutField();
 
-    // Standard deviations of vision estimated poses, which affect the correction rate
+    // Standard deviations of vision estimated poses, which affect the correction
+    // rate
     // (Fake values. Experiment and determine estimation noise on actual robot)
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
