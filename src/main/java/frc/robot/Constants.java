@@ -181,7 +181,7 @@ public final class Constants {
     public static final double kMinFeederVel = -MotorConstants.kNeoFreeSpeedRpm;
 
     public static final double kFeederVelocity = MotorConstants.kNeoFreeSpeedRpm * 0.8;
-    public static final double kMoveVelocity = MotorConstants.kNeoFreeSpeedRpm * 0.05;
+    public static final double kMoveVelocity = MotorConstants.kNeoFreeSpeedRpm * 0.025; // .05
 
     public static final double kFeederGearRatio = 1.0;
     // public static final double kFeederRotationsPerDegree = kFeederGearRatio /
@@ -252,7 +252,7 @@ public final class Constants {
     public static final double kMinPotVolt = 0.0390625;
 
     public static final double kTiltPotAdj = 2.973;
-    public static final double kMaxTiltPos = 4.875;
+    public static final double kMaxTiltPos = 4.75;
     public static final double kMinTiltPos = 0.0;
     public static final double kMidTiltPos = (ShooterConstants.kMaxTiltPos + ShooterConstants.kMinTiltPos) / 2.0;
 
@@ -320,13 +320,13 @@ public final class Constants {
     public static final double kInitTiltDeg = 120.0;
     public static final double kSetupTiltDeg = 100.0;
     public static final double kClearTiltDeg = 175.0;
-    public static final double kTrapScoreTiltDeg = 160.0;
-    public static final double kTrapScoreLiftDeg = 23.0;
-    public static final double kAmpScoreTiltDeg = 120.0;
-    public static final double kAmpScoreLiftLen = 16.0;
+    public static final double kTrapScoreTiltDeg = 157.0; //158.0; //160.0
+    public static final double kTrapScoreLiftLen = 23.0;
+    public static final double kAmpScoreTiltDeg = 125.0;
+    public static final double kAmpScoreLiftLen = 13.0;
     public static final double kTiltTollerance = 0.5;
 
-    public static final double kLiftPotAdj = 4.5;
+    public static final double kLiftPotAdj = 3.0;
     public static final double kMaxLiftLen = 23.0;
     public static final double kMidLiftLen = (TrapperConstants.kMinLiftLen + TrapperConstants.kMaxLiftLen) / 2.0;
     public static final double kMinLiftLen = 0.0;
@@ -572,7 +572,7 @@ public final class Constants {
     public static final double kCameraPitch = Units.degreesToRadians(49.7 / 2.0);
 
     // How far from the target we want to be
-    public static final double kTargetDist = Units.feetToMeters(2.0);
+    public static final double kTargetDist = Units.feetToMeters(1.0);
 
     public static final double kRange2Rumble = Units.feetToMeters(20.0);
 

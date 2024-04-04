@@ -14,12 +14,14 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TrapperConstants;
 import frc.robot.autos.Autos;
 import frc.robot.commands.AmpScore;
 import frc.robot.commands.AmpSetup;
+import frc.robot.commands.ClimberLift;
 import frc.robot.commands.TrapScore;
 import frc.robot.commands.TrapSetup;
 import frc.robot.commands.ClimberStop;
@@ -50,14 +52,14 @@ import frc.robot.subsystems.Trapper;
  */
 public class RobotContainer {
 	// The robot's subsystems
-	private final Chassis chassis = new Chassis();
+	private final Vision vision = new Vision();
+	private final Chassis chassis = new Chassis(vision);
 	private final Climber climber = new Climber();
 	private final Intake intake = new Intake();
 	private final Feeder feeder = new Feeder();
 	private final Shooter shooter = new Shooter();
 	private final Trapper trapper = new Trapper(chassis);
-	private final Autos auton = new Autos(chassis, intake, feeder, shooter);
-	private final Vision vision = new Vision(chassis);
+	private final Autos auton = new Autos(chassis, vision, intake, feeder, shooter);
 	// private final LEDs leds = new LEDs();
 
 	// The driver's controller
@@ -71,12 +73,13 @@ public class RobotContainer {
 	IntakeNote intakeNote = new IntakeNote(intake, feeder, shooter);
 	ShootNote shootNote = new ShootNote(intake, feeder, shooter);
 
-	// ClimberLift climberLiftTop = new ClimberLift(climber,
-	// ClimberConstants.kMaxClimbPos);
-	// ClimberLift climberLiftMid = new ClimberLift(climber,
-	// ClimberConstants.kMidClimbPos);
-	// ClimberLift climberLiftBot = new ClimberLift(climber,
-	// ClimberConstants.kMinClimbPos);
+	ClimberLift climberLiftTop = new ClimberLift(climber,
+	ClimberConstants.kMaxClimbPos);
+	ClimberLift climberLiftMid = new ClimberLift(climber,
+	ClimberConstants.kMidClimbPos);
+	ClimberLift climberLiftBot = new ClimberLift(climber,
+	ClimberConstants.kMinClimbPos);
+	
 	ClimberStop climbStop = new ClimberStop(climber);
 	JustClimb climbUp = new JustClimb(climber, 0.20, -1);
 	JustClimb climbDn = new JustClimb(climber, -0.20, -1);
@@ -111,34 +114,34 @@ public class RobotContainer {
 	 */
 	public RobotContainer() {
 
-		compTab.add("Chassis", chassis);
-		compTab.add("Intake", intake);
-		compTab.add("Feeder", feeder);
-		compTab.add("Shooter", shooter);
-		compTab.add("Climber", climber);
-		compTab.add("Trapper", trapper);
+		// compTab.add("Chassis", chassis);
+		// compTab.add("Intake", intake);
+		// compTab.add("Feeder", feeder);
+		// compTab.add("Shooter", shooter);
+		// compTab.add("Climber", climber);
+		// compTab.add("Trapper", trapper);
 
-		intakeTab.add("IntakeNote", intakeNote);
-		shooterTab.add("ShootNote", shootNote);
+		// intakeTab.add("IntakeNote", intakeNote);
+		// shooterTab.add("ShootNote", shootNote);
 
-		compTab.add("IntakeNote", intakeNote);
-		compTab.add("ShootNote", shootNote);
+		// compTab.add("IntakeNote", intakeNote);
+		// compTab.add("ShootNote", shootNote);
 
-		compTab.add("Climb Up", climbUp);
-		compTab.add("Climb Dn", climbDn);
-		compTab.add("Climb Stop", climbStop);
+		// compTab.add("Climb Up", climbUp);
+		// compTab.add("Climb Dn", climbDn);
+		// compTab.add("Climb Stop", climbStop);
 
-		compTab.add("ShooterTiltTop", shooterTiltTop);
-		compTab.add("ShooterTiltMid", shooterTiltMid);
-		compTab.add("ShooterTiltBot", shooterTiltBot);
+		// compTab.add("ShooterTiltTop", shooterTiltTop);
+		// compTab.add("ShooterTiltMid", shooterTiltMid);
+		// compTab.add("ShooterTiltBot", shooterTiltBot);
 
-		shooterTab.add("ShooterTiltTop", shooterTiltTop);
-		shooterTab.add("ShooterTiltMid", shooterTiltMid);
-		shooterTab.add("ShooterTiltBot", shooterTiltBot);
+		// shooterTab.add("ShooterTiltTop", shooterTiltTop);
+		// shooterTab.add("ShooterTiltMid", shooterTiltMid);
+		// shooterTab.add("ShooterTiltBot", shooterTiltBot);
 
-		// climberTab.add("ClimberLiftTop", climberLiftTop);
-		// climberTab.add("ClimberLiftMid", climberLiftMid);
-		// climberTab.add("ClimberLiftBot", climberLiftBot);
+		climberTab.add("ClimberLiftTop", climberLiftTop);
+		climberTab.add("ClimberLiftMid", climberLiftMid);
+		climberTab.add("ClimberLiftBot", climberLiftBot);
 
 		trapperTab.add("TrapperLiftTop", trapperLiftTop);
 		trapperTab.add("TrapperLiftMid", trapperLiftMid);
@@ -189,10 +192,8 @@ public class RobotContainer {
 	 * {@link JoystickButton}.
 	 */
 	private void configureButtonBindings() {
-		// new JoystickButton(m_driverController, Button.kX.value)
-		// .whileTrue(new RunCommand(
-		// () -> chassis.setX(),
-		// chassis));
+		new JoystickButton(m_driverController, Button.kX.value)
+		.whileTrue(new RunCommand(() -> chassis.setX(), chassis));
 
 		// new JoystickButton(m_driverController, Button.kB.value).debounce(1)
 		// .onTrue(new RunCommand(

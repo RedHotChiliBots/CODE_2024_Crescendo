@@ -46,7 +46,7 @@ public class ShootPosNote extends Command {
     feeder.holdVelocity(FeederConstants.kMoveVelocity);
     intake.holdVelocity(FeederConstants.kMoveVelocity);
     // shooter.holdVelocity(ShooterConstants.kMoveVelocity);
-    shooter.setPercent(0.035);
+    shooter.setPercent(0.06); //.035
     shooter.holdTilt(ShooterConstants.kMaxTiltPos);
     timer.start();
     timer.reset();
@@ -78,7 +78,7 @@ public class ShootPosNote extends Command {
         break;
 
       case 2:
-        if (timer.hasElapsed(1.5)) {
+        if (timer.hasElapsed(1.0)) {
           trapper.holdTilt(TrapperConstants.kClearTiltDeg);
           timer.reset();
           state++;

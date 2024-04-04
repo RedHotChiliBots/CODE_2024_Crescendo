@@ -80,10 +80,10 @@ public class Feeder extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    sbVel.setDouble(getCurrVel());
-    sbVelSP.setDouble(getVelocitySP());
-    sbPos.setDouble(getCurrPos());
-    sbPosSP.setDouble(getPositionSP());
+    // sbVel.setDouble(getCurrVel());
+    // sbVelSP.setDouble(getVelocitySP());
+    // sbPos.setDouble(getCurrPos());
+    // sbPosSP.setDouble(getPositionSP());
   }
 
   public void stopFeeder() {

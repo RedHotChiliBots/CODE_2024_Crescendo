@@ -24,14 +24,14 @@ public class TrapScore extends SequentialCommandGroup {
     addCommands(
         new InstantCommand(() -> chassis.setCalcPitch(true)),
         new JustClimb(climber, -0.40, 0.0),
-        new WaitCommand(3.0),
+        new WaitCommand(1.0), //3
         // new ParallelCommandGroup(
         new InstantCommand(() -> trapper.holdTilt(TrapperConstants.kTrapScoreTiltDeg), trapper),
-        new InstantCommand(() -> trapper.holdLift(TrapperConstants.kTrapScoreLiftDeg), trapper),
+        new InstantCommand(() -> trapper.holdLift(TrapperConstants.kTrapScoreLiftLen), trapper),
         // ),
-        new WaitCommand(2.5),
-        new InstantCommand(() -> trapper.holdClaw(CLAW.OPEN), trapper),
-        new WaitCommand(2.0),
+        new WaitCommand(1.5), //2 //2.5
+        new InstantCommand(() -> trapper.holdClaw(CLAW.TRAP), trapper),
+        new WaitCommand(0.7), //.3 //2
         new InstantCommand(() -> trapper.holdLift(0.0), trapper, trapper));
   }
 }

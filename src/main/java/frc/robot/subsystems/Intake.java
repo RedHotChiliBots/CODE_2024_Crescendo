@@ -90,12 +90,12 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    sbVel.setDouble(getVelocity());
-    sbVelSP.setDouble(getVelocitySP());
-    sbPos.setDouble(getPosition());
-    sbPosSP.setDouble(getPositionSP());
-    sbNoteDetect.setBoolean(isNoteDetected());
-    sbNoteCapture.setBoolean(isNoteCaptured());
+    // sbVel.setDouble(getVelocity());
+    // sbVelSP.setDouble(getVelocitySP());
+    // sbPos.setDouble(getPosition());
+    // sbPosSP.setDouble(getPositionSP());
+    // sbNoteDetect.setBoolean(isNoteDetected());
+    // sbNoteCapture.setBoolean(isNoteCaptured());
   }
 
   public boolean isNoteDetected() {

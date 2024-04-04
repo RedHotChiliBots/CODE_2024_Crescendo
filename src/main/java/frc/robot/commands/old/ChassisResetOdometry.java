@@ -2,43 +2,34 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.old;
 
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
-
 import frc.robot.subsystems.Chassis;
-import frc.robot.subsystems.Vision;
 
-public class AutonTrackAprilTag extends Command {
-  Chassis chassis;
-  Vision vision;
-  int tgtId;
+public class ChassisResetOdometry extends Command {
+  /** Creates a new ResetOdometry. */
 
-  /** Creates a new AutonTrackAprilTag. */
-  public AutonTrackAprilTag(Chassis chassis, Vision vision, int tgtId) {
-    this.chassis = chassis;
-    this.vision = vision;
-    this.tgtId = tgtId;
+  Chassis chassis = null;
+  Trajectory trajectory = null;
 
+  public ChassisResetOdometry(Chassis chassis, Trajectory trajectory) {
     // Use addRequirements() here to declare subsystem dependencies.
+    this.chassis = chassis;
+    this.trajectory = trajectory;
+    addRequirements(chassis);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    vision.setTargetId(tgtId);
+    chassis.resetPose(trajectory.getInitialPose());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (vision.getHasTargets()) {
-
-      double[] spd = vision.trackAprilTag();
-
-      // Use our forward/turn speeds to control the drivetrain
-      chassis.drive(spd[0], spd[1], 0.0, true, false);
-    }
   }
 
   // Called once the command ends or is interrupted.
@@ -49,6 +40,6 @@ public class AutonTrackAprilTag extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;  //vision.atDistTarget();
+    return true;
   }
 }

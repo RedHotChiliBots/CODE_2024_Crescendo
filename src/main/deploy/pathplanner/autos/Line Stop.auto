@@ -8,13 +8,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Amp"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 5.0
+            "pathName": "Line Stop"
           }
         }
       ]

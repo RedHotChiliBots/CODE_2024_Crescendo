@@ -5,13 +5,14 @@
 
 package frc.robot.subsystems;
 
-import java.util.Optional;
-
 import com.kauailabs.navx.frc.AHRS;
 
 // import edu.wpi.first.hal.SimDevice;  //TODO Add Simulation
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -33,15 +34,14 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 // import edu.wpi.first.wpilibj.ADXRS450_Gyro; //TODO Add Simulation
 //import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 //import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 // import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim; //TODO Add Simulation
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.LimelightHelpers;
+import frc.robot.Constants;
 import frc.robot.Constants.CANIdConstants;
 import frc.robot.Constants.ChassisConstants;
 import frc.utils.SwerveUtils;
@@ -90,26 +90,12 @@ public class Chassis extends SubsystemBase {
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(ChassisConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
-  // The robot pose estimator for tracking swerve odometry and applying vision
-  // corrections.
-  private SwerveDrivePoseEstimator poseEstimator = null;
+  SwerveDrivePoseEstimator poseEstimator = null;
 
   // private final SwerveDriveSim swerveDriveSim; //TODO Add Simulation
 
   // private final ADXRS450_GyroSim gyroSim;
   // private final SimDevice gyroSim;
-
-  // Odometry class for tracking robot pose
-  // SwerveDriveOdometry m_odometry = new SwerveDriveOdometry( //TODO Remove
-  // Odometry
-  // ChassisConstants.kDriveKinematics,
-  // Rotation2d.fromDegrees(-ahrs.getAngle()),
-  // new SwerveModulePosition[] {
-  // m_frontLeft.getPosition(),
-  // m_frontRight.getPosition(),
-  // m_rearLeft.getPosition(),
-  // m_rearRight.getPosition()
-  // });
 
   // ==============================================================
   // Define Shuffleboard data - Chassis Tab
@@ -137,9 +123,17 @@ public class Chassis extends SubsystemBase {
   private double minPitch = 0.0;
   private double avgPitch = 0.0;
 
+  private Pose2d origPose = null;
+  private Pose2d currPose = null;
+
+  private Vision vision = null;
+
   /** Creates a new DriveSubsystem. */
-  public Chassis() {
+  public Chassis(Vision vision) {
     System.out.println("+++++ Starting Chassis Constructor +++++");
+
+    this.vision = vision;
+    vision.setChassis(this);
 
     // ==============================================================
     // Initialize Rev PDH
@@ -164,23 +158,16 @@ public class Chassis extends SubsystemBase {
         new Pose2d(),
         VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
         VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
-    // ----- Simulation
-    // ADXRS450_Gyro gyro = new ADXRS450_Gyro();
-    // gyroSim = new ADXRS450_GyroSim(gyro);
-    // // gyroSim = new SimDevice();
-    // swerveDriveSim = new SwerveDriveSim(
-    // SwerveModuleConstants.kDrivingFF,
-    // DCMotor.getFalcon500(1),
-    // ChassisConstants.kDriveGearRatio,
-    // SwerveModuleConstants.kWheelDiameterMeters / 2.0,
-    // SwerveModuleConstants.kTurningFF,
-    // DCMotor.getFalcon500(1),
-    // ChassisConstants.kSteerGearRatio,
-    // ChassisConstants.kDriveKinematics);
 
     ahrs.reset();
     zeroYaw();
+    ahrs.setAngleAdjustment(0.0);
+    getPose().getRotation().getDegrees();
     resetPose(getPose());
+
+    origPose = getPose();
+    double[] origPoseArray = new double[] { origPose.getX(), origPose.getY(), origPose.getRotation().getDegrees() };
+    SmartDashboard.putNumberArray("pose/orig", origPoseArray);
 
     setChannelOff();
 
@@ -193,6 +180,10 @@ public class Chassis extends SubsystemBase {
   @Override
   public void periodic() {
     updateOdometry();
+  
+    currPose = getPose();
+    double[] currPoseArray = new double[] { currPose.getX(), currPose.getY(), currPose.getRotation().getDegrees() };
+    SmartDashboard.putNumberArray("pose/curr", currPoseArray);
 
     if (calcPitch) {
       pitch = ahrs.getPitch();
@@ -212,19 +203,6 @@ public class Chassis extends SubsystemBase {
     sbFusedHeading.setDouble(getFusedHeading());
     sbCompassHeading.setDouble(getCompassHeading());
     sbRotDegree.setDouble(getRotation2d().getDegrees());
-
-    // Update the odometry of the swerve drive using the wheel encoders and gyro.
-    // poseEstimator.update(getRotation2d(), getModulePositions());
-
-    // Update the odometry in the periodic block
-    // m_odometry.update( //TODO Remove Odometry
-    // Rotation2d.fromDegrees(-ahrs.getAngle()),
-    // new SwerveModulePosition[] {
-    // m_frontLeft.getPosition(),
-    // m_frontRight.getPosition(),
-    // m_rearLeft.getPosition(),
-    // m_rearRight.getPosition()
-    // });
 
     // Add Swerve Drive to SmartDashboard
     // SwerveModuleState[] currentStates = new SwerveModuleState[4];
@@ -260,25 +238,7 @@ public class Chassis extends SubsystemBase {
         ahrs.getRotation2d(),
         getModulePositions());
 
-    LimelightHelpers.PoseEstimate limelightMeasurement = null;
-    Optional<Alliance> alliance = DriverStation.getAlliance();
-
-    if (alliance.isPresent()) {
-      if (alliance.equals(Alliance.Blue)) {
-        limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-      } else if (alliance.equals(Alliance.Red)) {
-        limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
-      } else {
-        DriverStation.reportError("Alliance not set.", false);
-      }
-    }
-    
-    if (limelightMeasurement.tagCount >= 2) {
-      poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-      poseEstimator.addVisionMeasurement(
-          limelightMeasurement.pose,
-          limelightMeasurement.timestampSeconds);
-    }
+    vision.updateLimeLightPose();
   }
 
   public void setCalcPitch(boolean p) {
@@ -332,6 +292,15 @@ public class Chassis extends SubsystemBase {
     };
   }
 
+  private ProfiledPIDController thetaController = new ProfiledPIDController(
+			Constants.AutoConstants.kPThetaController, 0, 0,
+			Constants.AutoConstants.kThetaControllerConstraints);
+
+	public HolonomicDriveController holonomicController = new HolonomicDriveController(
+			new PIDController(Constants.AutoConstants.kPXController, 0, 0),
+			new PIDController(Constants.AutoConstants.kPYController, 0, 0),
+			thetaController);
+
   /**
    * See {@link SwerveDrivePoseEstimator#addVisionMeasurement(Pose2d, double)}.
    */
@@ -357,29 +326,12 @@ public class Chassis extends SubsystemBase {
    *                     teleports the robot and should only be used during the
    *                     setup of the simulation world.
    */
-  public void resetPose(Pose2d pose) {
-    resetPose(pose, false);
+  public void resetPose(Pose2d pose, boolean resetSimPose) { 
+    poseEstimator.resetPosition(getRotation2d(), getModulePositions(), pose);
   }
 
-  public void resetPose(Pose2d pose, boolean resetSimPose) { // TODO Add Simulation
-    // if (resetSimPose) {
-    // swerveDriveSim.reset(pose, false);
-    // // we shouldnt realistically be resetting pose after startup, but we will
-    // handle
-    // // it anyway for testing
-    // // for (int i = 0; i < swerveMods.length; i++) {
-    // // swerveMods[i].simulationUpdate(0, 0, 0, 0, 0, 0);
-    // // }
-    // m_frontLeft.simulationUpdate(0, 0, 0, 0, 0, 0);
-    // m_frontRight.simulationUpdate(0, 0, 0, 0, 0, 0);
-    // m_rearLeft.simulationUpdate(0, 0, 0, 0, 0, 0);
-    // m_rearRight.simulationUpdate(0, 0, 0, 0, 0, 0);
-
-    // gyroSim.setAngle(-pose.getRotation().getDegrees());
-    // gyroSim.setRate(0);
-    // }
-
-    poseEstimator.resetPosition(getRotation2d(), getModulePositions(), pose);
+    public void resetPose(Pose2d pose) {
+    resetPose(pose, false);
   }
 
   /** Get the estimated pose of the swerve drive on the field. */

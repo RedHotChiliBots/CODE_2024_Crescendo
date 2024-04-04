@@ -140,13 +140,13 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    sbVel.setDouble(getVelocity());
-    sbVelSP.setDouble(getVelocitySP());
-    sbPos.setDouble(getPosition());
-    sbPosSP.setDouble(getPositionSP());
-    sbTiltPos.setDouble(getTiltPos());
-    sbTiltVolt.setDouble(getTiltVolt());
-    sbTiltSP.setDouble(getTiltSP());
+    // sbVel.setDouble(getVelocity());
+    // sbVelSP.setDouble(getVelocitySP());
+    // sbPos.setDouble(getPosition());
+    // sbPosSP.setDouble(getPositionSP());
+    // sbTiltPos.setDouble(getTiltPos());
+    // sbTiltVolt.setDouble(getTiltVolt());
+    // sbTiltSP.setDouble(getTiltSP());
   }
 
   public void stopShooter() {

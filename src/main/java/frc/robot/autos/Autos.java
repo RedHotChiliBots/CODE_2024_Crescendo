@@ -9,10 +9,12 @@ import frc.robot.Constants.ChassisConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.commands.AutonShootLeave;
 import frc.robot.commands.AutonShootStay;
+import frc.robot.commands.AutonSpeakerAmp;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Vision;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -50,7 +52,7 @@ public class Autos {
 	private Command cmdZigZag3m = null;
 	private Command cmdAutoZigZag3m = null;
 	private SwerveControllerCommand swerveControllerCommand = null;
-	private SwerveControllerCommand note1Command = null;
+	public SwerveControllerCommand note1Command = null;
 	private SwerveControllerCommand note2Command = null;
 	private SwerveControllerCommand note3Command = null;
 
@@ -58,6 +60,12 @@ public class Autos {
 			Constants.AutoConstants.kMaxSpeedMetersPerSecond,
 			Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared)
 			.setKinematics(Constants.ChassisConstants.kDriveKinematics);
+
+	private TrajectoryConfig configRev = new TrajectoryConfig(
+			Constants.AutoConstants.kMaxSpeedMetersPerSecond,
+			Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+			.setKinematics(Constants.ChassisConstants.kDriveKinematics)
+			.setReversed(true);
 
 	private ProfiledPIDController thetaController = new ProfiledPIDController(
 			Constants.AutoConstants.kPThetaController, 0, 0,
@@ -69,9 +77,9 @@ public class Autos {
 			thetaController);
 
 	// An example trajectory to follow. All units in meters.
-	private Trajectory note1Trajectory = null;
-	private Trajectory note2Trajectory = null;
-	private Trajectory note3Trajectory = null;
+	public Trajectory note1Trajectory = null;
+	public Trajectory note2Trajectory = null;
+	public Trajectory note3Trajectory = null;
 
 	// An example trajectory to follow. All units in meters.
 	private Trajectory zigzag3Trajectory = TrajectoryGenerator.generateTrajectory(
@@ -89,7 +97,7 @@ public class Autos {
 	int dsMatchNumber = DriverStation.getMatchNumber();
 	double dsMatchTime = DriverStation.getMatchTime();
 
-	public Autos(Chassis chassis, Intake intake, Feeder feeder, Shooter shooter) {
+	public Autos(Chassis chassis, Vision vision, Intake intake, Feeder feeder, Shooter shooter) {
 		System.out.println("+++++ Starting Autos Constructor +++++");
 
 		String match = dsAlliance + " " + dsLocation + " / " + dsEventName + " " + dsMatchNumber;
@@ -108,7 +116,7 @@ public class Autos {
 				List.of(new Translation2d(2.9, 1.0)),
 				// End 3 meters straight ahead of where we started, facing forward
 				new Pose2d(2.9, 1.45, new Rotation2d(Math.toRadians(90.0))),
-				config);
+				configRev);
 
 		note2Trajectory = TrajectoryGenerator.generateTrajectory(
 				// Start at the origin facing the +X direction
@@ -117,7 +125,7 @@ public class Autos {
 				List.of(new Translation2d(2.9, 2.0)),
 				// End 3 meters straight ahead of where we started, facing forward
 				new Pose2d(2.9, 2.9, new Rotation2d(Math.toRadians(90.0))),
-				config);
+				configRev);
 
 		note3Trajectory = TrajectoryGenerator.generateTrajectory(
 				// Start at the origin facing the +X direction
@@ -126,7 +134,7 @@ public class Autos {
 				List.of(new Translation2d(2.9, 3.0)),
 				// End 3 meters straight ahead of where we started, facing forward
 				new Pose2d(2.9, 4.35, new Rotation2d(Math.toRadians(90.0))),
-				config);
+				configRev);
 
 		note1Command = new SwerveControllerCommand(
 				note1Trajectory,
@@ -207,6 +215,7 @@ public class Autos {
 		// before defining the Auto command
 		AutonShootLeave autoShootLeave = new AutonShootLeave(chassis, intake, feeder, shooter);
 		AutonShootStay autoShootStay = new AutonShootStay(chassis, intake, feeder, shooter);
+		AutonSpeakerAmp autoSpeakerAmp = new AutonSpeakerAmp(chassis, this, vision, intake, feeder, shooter);
 
 		// ********************************************
 		// Initialize auto command chooser with auton commands
@@ -214,6 +223,7 @@ public class Autos {
 
 		chooser.setDefaultOption("Shoot N Leave", autoShootLeave);
 		chooser.addOption("Shoot N Stay", autoShootStay);
+		chooser.addOption("Speaker Amp", autoSpeakerAmp);
 		// chooser.addOption("Auto ZigZag3Cmd", cmdAutoZigZag3m);
 
 		// ********************************************
